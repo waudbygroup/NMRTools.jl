@@ -1,0 +1,13 @@
+name = "NMRTools"
+uuid = "c2839fe3-f1de-42fc-897f-c1b0e8db4db6"
+authors = ["Chris Waudby"]
+version = "0.1.0"
+
+[compat]
+julia = "1.4"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
