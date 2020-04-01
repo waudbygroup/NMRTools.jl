@@ -1,6 +1,7 @@
 using NMRTools
 using Test
+using SafeTestsets
 
-@testset "NMRTools.jl" begin
-    # Write your own tests here.
+@safetestset "NMRData" begin
+    include("nmrdata_test.jl")
 end

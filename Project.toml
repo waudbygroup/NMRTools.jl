@@ -3,11 +3,17 @@ uuid = "c2839fe3-f1de-42fc-897f-c1b0e8db4db6"
 authors = ["Chris Waudby"]
 version = "0.1.0"
 
+[deps]
+DimensionalData = "0703355e-b756-11e9-17c0-8b28908087d0"
+Lazy = "50d2b5c4-7a5e-59d5-8109-a42b560f39c0"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+
 [compat]
 julia = "1.4"
 
 [extras]
+SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test"]
+test = ["Test", "SafeTestsets"]
