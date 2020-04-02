@@ -20,8 +20,8 @@ NMRData(data::AbstractArray, dims::Tuple, metadata = Dict{Any,Any}()) =
 
 # define additional methods for metadata
 metadata(d::NMRData) = getfield(d, :metadata)
-metadata(d::NMRData, axis::Int) = metadata(dims(d, axis))
-metadata(d::NMRData, axis::Union{Dimension,Type{<:Dimension}}) = metadata(dims(d, axis))
+metadata(d::NMRData, dim::Int) = metadata(dims(d, dim))
+metadata(d::NMRData, dim::Union{Dimension,Type{<:Dimension}}) = metadata(dims(d, dim))
 
 # default constructors for dimensions to create empty dictionarys for metadata
 # X(val) = X(val, UnknownGrid(), Dict{Any,Any}())
