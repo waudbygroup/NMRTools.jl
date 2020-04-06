@@ -5,21 +5,23 @@ using Test
 x1 = 0:.1:1;
 x2 = 1:4;
 y = [cos(n1)+n2 for n1 in x1,  n2 in x2];
-@test y[1,1] == 2
-@test y[11,4] ≈ 4.5403023
 md = Dict{Any,Any}(:test=>"hello data")
 md1 = Dict{Any,Any}(:test=>"hello axis 1")
 md2 = Dict{Any,Any}(:test=>"hello axis 2")
+@test y[1,1] == 2
+@test y[11,4] ≈ 4.5403023
 
 
 @testset "Creating axes" begin
-    ax1 = X(x1; metadata=Dict())
-    ax2 = Y(x2; metadata=Dict())
-    ax3 = Z(x1; metadata=Dict())
-    ax4 = Ti(x2; metadata=Dict())
-    @test ax1[1] == 0.0
-    @test val(ax1) == x1
-    @test metadata(ax1) isa Dict
+    ax1 = X(x1)
+    ax2 = Y(x2)
+    ax3 = Z(x1)
+    ax4 = Ti(x2)
+    for ax in [ax1, ax2, ax3, ax4]
+        @test ax[1] == 0.0
+        @test val(ax) == x1
+        @test metadata(ax) isa Dict
+    end
 end
 
 @testset "Creating NMRData indirectly via DimensionalData" begin
@@ -29,14 +31,15 @@ end
     @test d[1,1] == 2
 end
 
-@testset "Creating NMRData directly" begin
-    d = NMRData(y, (X(x1; metadata=Dict()), Y(x2; metadata=Dict())), md)
+@testset "Creating NMRData" begin
+    d = NMRData(y, (X(x1), Y(x2)), md)
     @test d[1,1] == 2
     @test d == y
     @test metadata(d) isa Dict
     @test metadata(d)[:test] == "hello data"
     @test metadata(d,X) isa Dict
     @test metadata(d,Y) isa Dict
+    @test metadata(d,1) isa Dict
     @test size(d) == (11,4)
     @test length(d) == 44
     @test d[At(1.0),At(4)] ≈ 4.5403023

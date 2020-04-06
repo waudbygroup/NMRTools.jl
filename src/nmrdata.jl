@@ -5,26 +5,44 @@ import DimensionalData: metadata # need to extend to cover general metadata call
 
 The main structure for holding NMR spectral data.
 """
-struct NMRData{T,N,S<:AbstractArray} <: AbstractArray{T,N}
-    parent::S
+struct NMRData{T,N,A<:AbstractArray} <: AbstractArray{T,N}
+    parent::A
     metadata::Dict{Any,Any}
 end
 
-NMRData(data::AbstractArray{T,N}, metadata = Dict{Any,Any}()) where {T,N} =
+NMRData(data::AbstractArray{T,N}, metadata = Dict()) where {T,N} =
     NMRData{T,N,typeof(data)}(data, metadata)
-NMRData(data::AbstractArray, dims::Tuple, metadata = Dict{Any,Any}()) =
+NMRData(data::AbstractArray, dims::Tuple, metadata = Dict()) =
     NMRData(DimensionalArray(data, dims), metadata)
 
 # forward array interface methods to contained data
 @forward NMRData.parent (Base.size, Base.length, Base.getindex, Base.iterate, DimensionalData.dims)
+
+# redefine axis functions to include metadata
+# X(x) = X(x; metadata=Dict())
+# Y(x) = Y(x; metadata=Dict())
+# Z(x) = Z(x; metadata=Dict())
+# Ti(x) = Ti(x; metadata=Dict())
 
 # define additional methods for metadata
 metadata(d::NMRData) = getfield(d, :metadata)
 metadata(d::NMRData, dim::Int) = metadata(dims(d, dim))
 metadata(d::NMRData, dim::Union{Dimension,Type{<:Dimension}}) = metadata(dims(d, dim))
 
-# default constructors for dimensions to create empty dictionarys for metadata
-# X(val) = X(val, UnknownGrid(), Dict{Any,Any}())
-# Y(val) = Y(val, UnknownGrid(), Dict{Any,Any}())
-# Z(val) = Z(val, UnknownGrid(), Dict{Any,Any}())
-# Ti(val) = Ti(val, UnknownGrid(), Dict{Any,Any}())
+##
+# define traits for pseudodimension
+@traitdef HasPseudoDimension{D}
+
+# adapted from expansion of @traitimpl
+# this is a pure function because it only depends on the type definition of NMRData
+Base.@pure function SimpleTraits.trait(t::Type{HasPseudoDimension{D}}) where D<:NMRData{T,N,A} where {T,N,A}
+    any(map(dim->(typeintersect(dim, TimeDim) != Union{}), A.parameters[3].parameters)) ? HasPseudoDimension{D} : Not{HasPseudoDimension{D}}
+end
+
+# example implementation:
+# @traitfn f(x::X) where {X; HasPseudoDimension{X}} = "Fake!"
+# @traitfn f(x::X) where {X; Not{HasPseudoDimension{X}}} = "The real deal!"
+
+##
+# number of dimensions
+ndim(d::NMRData{T,N,A}) where {T,N,A} = N

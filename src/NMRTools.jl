@@ -2,6 +2,7 @@ module NMRTools
 
 using Lazy
 using Reexport
+using SimpleTraits
 @reexport using DimensionalData
 
 #
@@ -28,6 +29,8 @@ using Reexport
 # Ti(val=:) = Ti(val, UnknownGrid(), Dict{Any,Any}())
 
 export NMRData
+export HasPseudoDimension
+export ndim#, X, Y, Z, Ti
 
 include("nmrdata.jl")
 
