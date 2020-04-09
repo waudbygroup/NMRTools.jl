@@ -18,11 +18,40 @@ NMRData(data::AbstractArray, dims::Tuple, metadata = Dict()) =
 # forward array interface methods to contained data
 @forward NMRData.parent (Base.size, Base.length, Base.getindex, Base.iterate, DimensionalData.dims)
 
-# redefine axis functions to include metadata
-# X(x) = X(x; metadata=Dict())
-# Y(x) = Y(x; metadata=Dict())
-# Z(x) = Z(x; metadata=Dict())
-# Ti(x) = Ti(x; metadata=Dict())
+# define axis functions to include metadata
+struct X{T,IM<:IndexMode,M} <: XDim{T,IM,M}
+    val::T
+    mode::IM
+    metadata::M
+end
+struct Y{T,IM<:IndexMode,M} <: YDim{T,IM,M}
+    val::T
+    mode::IM
+    metadata::M
+end
+struct Z{T,IM<:IndexMode,M} <: ZDim{T,IM,M}
+    val::T
+    mode::IM
+    metadata::M
+end
+struct Ti{T,IM<:IndexMode,M} <: TimeDim{T,IM,M}
+    val::T
+    mode::IM
+    metadata::M
+end
+X(val=:, metadata=Dict()) = X(val, AutoIndex(), metadata)
+Y(val=:, metadata=Dict()) = Y(val, AutoIndex(), metadata)
+Z(val=:, metadata=Dict()) = Z(val, AutoIndex(), metadata)
+Ti(val=:, metadata=Dict()) = Ti(val, AutoIndex(), metadata)
+DimensionalData.name(::Type{<:X}) = "X"
+DimensionalData.name(::Type{<:Y}) = "Y"
+DimensionalData.name(::Type{<:Z}) = "Z"
+DimensionalData.name(::Type{<:Ti}) = "T"
+DimensionalData.shortname(::Type{<:X}) = "X"
+DimensionalData.shortname(::Type{<:Y}) = "Y"
+DimensionalData.shortname(::Type{<:Z}) = "Z"
+DimensionalData.shortname(::Type{<:Ti}) = "T"
+
 
 # define additional methods for metadata
 metadata(d::NMRData) = getfield(d, :metadata)
@@ -45,4 +74,4 @@ end
 
 ##
 # number of dimensions
-ndim(d::NMRData{T,N,A}) where {T,N,A} = N
+#ndim(d::NMRData{T,N,A}) where {T,N,A} = N
