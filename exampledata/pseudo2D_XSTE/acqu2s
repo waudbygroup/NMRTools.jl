@@ -1,0 +1,18 @@
+##TITLE= Parameter file, TOPSPIN		Version 2.1
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 11	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= jk
+$$ 2013-06-24 16:17:51.487 +0100  jk@nmrspec500
+$$ /opt/topspin/data/jc/nmr/sammy_LRE_aSyn_24062013/7/acqu2s
+$$ process /opt/topspin/prog/mod/go
+##$BF1= 50.649361
+##$FnMODE= 1
+##$NUC1= <15N>
+##$O1= 5925.975237
+##$SFO1= 50.655286975237
+##$SW= 33
+##$SW_h= 1671.62447018282
+##$TD= 10
+##END=

@@ -1,0 +1,35 @@
+##TITLE= Audit trail, TOPSPIN		Version 2.1
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= jk
+$$ /opt/topspin/data/jc/nmr/sammy_LRE_aSyn_24062013/7/pdata/1/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2013-06-24 16:17:52.557 +0100>,<jk>,<nmrspec500>,<go>,<TOPSPIN 2.1>,
+      <created by zg
+	started at 2013-06-24 16:14:31.460 +0100,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       87 DE 2E A6 94 89 19 ED D4 9F F0 0F 5C EC 41 22
+       data hash MD5: 1K * 10
+       24 AF E2 66 B9 04 5A BC A0 AA 65 AC 7B 1F 5B 0B>)
+(   2,<2013-06-24 16:17:56.712 +0100>,<jk>,<nmrspec500>,<proc2d>,<TOPSPIN 2.1>,
+      <Start of raw data processing
+       xf2 F2: SI = 2K WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 PHC0 = 64.68823 PHC1 = 0 F1: SI = 16
+       data hash MD5: 2K * 16
+       75 47 6B 16 4B 76 34 25 13 6F DC 2C 89 D4 55 CE>)
+(   3,<2013-06-24 16:21:46.248 +0100>,<jk>,<nmrspec500>,<audit>,<TOPSPIN 2.1>,
+      <user comment:
+       TITLE=15N aSyn, 283 K - XSTE
+       DELTA = 100ms, delta = 4ms, G = 5-95%TITLE_END
+       data hash MD5: 2K * 16
+       75 47 6B 16 4B 76 34 25 13 6F DC 2C 89 D4 55 CE>)
+(   4,<2013-06-24 16:21:48.665 +0100>,<jk>,<nmrspec500>,<audit>,<TOPSPIN 2.1>,
+      <user comment:
+       TITLE=15N aSyn, 283 K - XSTE
+       DELTA = 100ms, delta = 4ms, G = 5-95%TITLE_END
+       data hash MD5: 2K * 16
+       75 47 6B 16 4B 76 34 25 13 6F DC 2C 89 D4 55 CE>)
+##END=
+
+$$ hash MD5
+$$ B2 64 E4 A3 CD 4E 1D 07 25 EA 04 23 36 49 64 0C

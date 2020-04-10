@@ -1,0 +1,16 @@
+##TITLE= Parameter file, TOPSPIN		Version 3.2
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 1	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= ucl
+$$ 2018-12-05 10:50:47.622 +0000  ucl@CZC33343GD
+$$ /opt/topspin3.2/data/ucl/nmr/anders_asyn_monomer_041218/9/pdata/1/outd
+$$ process /opt/topspin3.2.6/prog/au/bin/iexpno
+##$CURPLOT= <HP_LaserJet_500_color_M551_[37DE63]>
+##$CURPRIN= <$HP_LaserJet_500_color_M551_[37DE63]>
+##$DFORMAT= <normdp>
+##$LAYOUT= <+/2D_inv.xwp>
+##$LFORMAT= <normlp>
+##$PFORMAT= <normpl>
+##END=

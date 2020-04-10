@@ -1,0 +1,22 @@
+##TITLE= Parameter file, TOPSPIN		Version 3.2
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 7	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= ucl
+$$ 2018-12-05 12:00:21.226 +0000  ucl@CZC33343GD
+$$ /opt/topspin3.2/data/ucl/nmr/anders_asyn_monomer_041218/9/acqu3s
+$$ process /opt/topspin3.2.6/prog/mod/go
+##$ACQT0= 0
+##$BF1= 899.79
+##$FnMODE= 1
+##$NUC1= <1H>
+##$NusJSP= 0
+##$NusT2= 1
+##$NusTD= 11
+##$O1= 4226
+##$SFO1= 899.794226
+##$SW= 10.0122991998495
+##$SW_h= 9009.00900900901
+##$TD= 11
+##END=
