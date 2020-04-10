@@ -71,7 +71,3 @@ end
 # example implementation:
 # @traitfn f(x::X) where {X; HasPseudoDimension{X}} = "Fake!"
 # @traitfn f(x::X) where {X; Not{HasPseudoDimension{X}}} = "The real deal!"
-
-##
-# number of dimensions
-#ndim(d::NMRData{T,N,A}) where {T,N,A} = N
