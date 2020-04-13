@@ -4,6 +4,20 @@ import DimensionalData: metadata # need to extend to cover general metadata call
     NMRData(data, metadata)
 
 The main structure for holding NMR spectral data.
+Access metadata associated with the whole spectrum as `metadata(d)[:field]`, and metadata associated
+with invidual dimensions as `metadata(d,X)[:field]`.
+
+# Metadata fields
+- `:filename`
+- `:pulseprogram`
+
+# Axis metadata fields
+- `:swhz`
+- `:bf`
+- `:offsethz`
+- `:window`
+
+
 """
 struct NMRData{T,N,A<:AbstractArray} <: AbstractArray{T,N}
     parent::A

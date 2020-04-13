@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 DimensionalData = "0703355e-b756-11e9-17c0-8b28908087d0"
+Formatting = "59287772-0a20-5a39-b81b-1366585eb4c0"
 Lazy = "50d2b5c4-7a5e-59d5-8109-a42b560f39c0"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 SimpleTraits = "699a6c99-e7fa-54fc-8d76-47d257e15c1d"
