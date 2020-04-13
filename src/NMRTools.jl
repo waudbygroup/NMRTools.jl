@@ -12,10 +12,14 @@ export X, Y, Z, Ti
 export NMRToolsException
 export loadnmr
 export metadatahelp
+export WindowFunction, NullWindow, UnknownWindow, ExponentialWindow, SineWindow, GaussWindow
 
+# type definitions
 include("exceptions.jl")
 include("nmrdata.jl")
-include("loadnmr.jl")
+include("windows.jl")
 
+# routines
+include("loadnmr.jl")
 
 end # module

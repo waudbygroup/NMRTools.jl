@@ -13,8 +13,10 @@ with invidual dimensions as `metadata(d,X)[:field]`.
 
 # Axis metadata fields
 - `:swhz`
+- `:swppm`
 - `:bf`
 - `:offsethz`
+- `:offsetppm`
 - `:window`
 
 
