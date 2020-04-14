@@ -32,7 +32,13 @@ NMRData(data::AbstractArray, dims::Tuple, metadata = Dict()) =
     NMRData(DimensionalArray(data, dims), metadata)
 
 # forward array interface methods to contained data
-@forward NMRData.parent (Base.size, Base.length, Base.getindex, Base.iterate, DimensionalData.dims)
+@forward NMRData.parent (Base.size, Base.length, Base.getindex, Base.iterate,
+    DimensionalData.dims, DimensionalData.name)
+val(x::T) where {T<:Dict} = x # hack
+@inline rebuild(A::NMRData, data::AbstractArray, dims::Tuple,
+                refdims::Tuple, name::String) =
+    NMRData(DimensionalArray(data, dims, refdims), A.metadata)
+
 
 # define axis functions to include metadata
 struct X{T,IM<:IndexMode,M} <: XDim{T,IM,M}
