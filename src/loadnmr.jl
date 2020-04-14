@@ -33,14 +33,25 @@ function loadnmr(filename::String)
     end
 end
 
+
+
 function loadnmrpipe(filename::String)
     if occursin("%", filename)
         # something like test%03d.ft2 - pseudo3D
         filename = sprintf1(filename, 1)
     end
     # parse the header
-    header = loadnmrpipeheader(filename)
+    md, mdax = loadnmrpipeheader(filename)
+
+    ndim = md[:ndim]
+    if ndim == 1
+        loadnmrpipe1d(filename, md, mdax)
+    else
+        throw(NMRToolsException("can't load data $(filename), unsupported number of dimensions."))
+    end
 end
+
+
 
 function loadnmrpipeheader(filename::String)
     # check file exists
@@ -54,9 +65,26 @@ function loadnmrpipeheader(filename::String)
         read!(f, header)
     end
 
-    md, mdax = parsenmrpipeheader(header)
+    # parse the header, returning md and mdax
+    parsenmrpipeheader(header)
 end
 
+
+
+"""
+    parsenmrpipeheader(header)
+
+Pass a 512 x 4 byte array containing an nmrPipe header file, and returns dictionaries of metadata.
+
+# Return values
+- `md`: dictionary of spectrum metadata
+- `mdax`: array of dictionaries containing axis metadata
+
+# Examples
+```julia
+md, mdax = parsenmrpipeheader(header)
+```
+"""
 function parsenmrpipeheader(header::Vector{Float32})
     # declare constants for clarity in accessing nmrPipe header
 
@@ -202,6 +230,8 @@ function parsenmrpipeheader(header::Vector{Float32})
     return md, axesmd
 end
 
+
+
 """
     metadatahelp(entry::Symbol)
 
@@ -257,4 +287,27 @@ function metadatahelp(entry::Symbol)
     )
     entry in keys(refdict) || throw(NMRToolsException("symbol :$(entry) not found in reference dictionary"))
     return refdict[entry]
+end
+
+
+"""
+    loadnmrpipe1d(filename, md, mdax)
+
+Return NMRData object containing spectrum and associated metadata.
+"""
+function loadnmrpipe1d(filename::String, md, mdax)
+    npoints = mdax[1][:npoints]
+    # preallocate data (and dummy header)
+    header = zeros(Float32, 512)
+    y = zeros(Float32, npoints)
+
+    # read the file
+    open(filename) do f
+        read!(f, header)
+        read!(f, y)
+    end
+
+    x = Float64.(mdax[1][:val])
+    xaxis = X(x, mdax[1])
+    NMRData(Float64.(y), (xaxis, ), md)
 end
