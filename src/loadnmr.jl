@@ -3,7 +3,7 @@
 
 Main function for loading nmrPipe or bruker format NMR data.
 
-Returns an NMRData object, or throws an NMRToolsException is there is a problem.
+Returns a DimensionalArray, or throws an NMRToolsException is there is a problem.
 
 # Examples
 
@@ -46,6 +46,8 @@ function loadnmrpipe(filename::String)
     ndim = md[:ndim]
     if ndim == 1
         loadnmrpipe1d(filename, md, mdax)
+    elseif ndim == 2
+        loadnmrpipe2d(filename, md, mdax)
     else
         throw(NMRToolsException("can't load data $(filename), unsupported number of dimensions."))
     end
@@ -200,9 +202,9 @@ function parsenmrpipeheader(header::Vector{Float32})
             cs_at_other_edge = cs_at_edge + d[:swppm]
             x = range(cs_at_other_edge, cs_at_edge, length=d[:npoints]+1);
             d[:val] = x[2:end];
-            # alternative calculation (without extraction)
-            x = range(d[:offsetppm] + 0.5*d[:swppm], d[:offsetppm] - 0.5*d[:swppm], length=d[:npoints]+1)
-            d[:val2] = x[1:end-1]
+            # # alternative calculation (without extraction) - this agrees OK
+            # x = range(d[:offsetppm] + 0.5*d[:swppm], d[:offsetppm] - 0.5*d[:swppm], length=d[:npoints]+1)
+            # d[:val2] = x[1:end-1]
 
             # create a representation of the window function
             #:FDAPODCODE => "Window function used (0=none, 1=SP, 2=EM, 3=GM, 4=TM, 5=ZE, 6=TRI)",
@@ -293,7 +295,7 @@ end
 """
     loadnmrpipe1d(filename, md, mdax)
 
-Return NMRData object containing spectrum and associated metadata.
+Return DimensionalArray containing spectrum and associated metadata.
 """
 function loadnmrpipe1d(filename::String, md, mdax)
     npoints = mdax[1][:npoints]
@@ -307,7 +309,48 @@ function loadnmrpipe1d(filename::String, md, mdax)
         read!(f, y)
     end
 
-    x = Float64.(mdax[1][:val])
-    xaxis = X(x, mdax[1])
-    NMRData(Float64.(y), (xaxis, ), md)
+    # x = Float64.(mdax[1][:val])
+    xaxis = X(mdax[1][:val], metadata=mdax[1])
+    #DimensionalArray(Float64.(y), (xaxis, ), metadata=md)
+    DimensionalArray(y, (xaxis, ), metadata=md)
+end
+
+
+
+"""
+    loadnmrpipe2d(filename, md, mdax)
+
+Return DimensionalArray containing spectrum and associated metadata.
+"""
+function loadnmrpipe2d(filename::String, md, mdax)
+    npoints1 = mdax[1][:npoints]
+    npoints2 = mdax[2][:npoints]
+    transposeflag = md[:FDTRANSPOSED] > 0
+    # preallocate data (and dummy header)
+    header = zeros(Float32, 512)
+    if transposeflag
+        y = zeros(Float32, npoints2, npoints1)
+    else
+        y = zeros(Float32, npoints1, npoints2)
+    end
+
+    # read the file
+    open(filename) do f
+        read!(f, header)
+        read!(f, y)
+    end
+    if transposeflag
+        y = transpose(y)
+    end
+
+    #x = Float64.(mdax[1][:val])
+    xaxis = X(mdax[1][:val], metadata=mdax[1])
+    if mdax[2][:pseudodim]
+        ax2 = Ti
+    else
+        ax2 = Y
+    end
+    yaxis = ax2(mdax[2][:val], metadata=mdax[2])
+    #DimensionalArray(Float64.(y), (xaxis, ), metadata=md)
+    DimensionalArray(y, (xaxis, yaxis), metadata=md)
 end

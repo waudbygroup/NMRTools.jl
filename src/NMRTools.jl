@@ -4,11 +4,9 @@ using Lazy
 using Formatting
 using Reexport
 using SimpleTraits
-@reexport using DimensionalData
+using DimensionalData
 
-export NMRData
 export HasPseudoDimension
-export X, Y, Z, Ti
 export NMRToolsException
 export loadnmr
 export metadatahelp
