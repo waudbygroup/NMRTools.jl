@@ -25,7 +25,7 @@ loadnmr("exampledata/1D_19F/pdata/1/1r");
 """
 function loadnmr(filename::String)
     if occursin(r"[a-z0-9]+(\%03d)?\.ft[123]?$", filename)
-        # match files ending in .ft1 or .ft2
+        # match files ending in .ft, .ft1, .ft2 or .ft3
         loadnmrpipe(filename)
     else
         # TODO bruker import
@@ -35,19 +35,27 @@ end
 
 
 
+expandpipetemplate(template, n) = replace(template, "%03d"=>lpad(n,3,"0"))
+
+
+
 function loadnmrpipe(filename::String)
     if occursin("%", filename)
         # something like test%03d.ft2 - pseudo3D
-        filename = sprintf1(filename, 1)
+        filename1 = expandpipetemplate(filename, 1)
+    else
+        filename1 = filename
     end
     # parse the header
-    md, mdax = loadnmrpipeheader(filename)
+    md, mdax = loadnmrpipeheader(filename1)
 
     ndim = md[:ndim]
     if ndim == 1
         loadnmrpipe1d(filename, md, mdax)
     elseif ndim == 2
         loadnmrpipe2d(filename, md, mdax)
+    elseif ndim == 3
+        loadnmrpipe3d(filename, md, mdax)
     else
         throw(NMRToolsException("can't load data $(filename), unsupported number of dimensions."))
     end
@@ -326,6 +334,8 @@ function loadnmrpipe2d(filename::String, md, mdax)
     npoints1 = mdax[1][:npoints]
     npoints2 = mdax[2][:npoints]
     transposeflag = md[:FDTRANSPOSED] > 0
+    dimorder = md[:FDDIMORDER]
+
     # preallocate data (and dummy header)
     header = zeros(Float32, 512)
     if transposeflag
@@ -353,4 +363,61 @@ function loadnmrpipe2d(filename::String, md, mdax)
     yaxis = ax2(mdax[2][:val], metadata=mdax[2])
     #DimensionalArray(Float64.(y), (xaxis, ), metadata=md)
     DimensionalArray(y, (xaxis, yaxis), metadata=md)
+end
+
+
+
+"""
+    loadnmrpipe3d(filename, md, mdax)
+
+Return DimensionalArray containing spectrum and associated metadata.
+"""
+function loadnmrpipe3d(filename::String, md, mdax)
+    npoints = [mdax[i][:npoints] for i in 1:3]
+    pdim = [mdax[i][:pseudodim] for i in 1:3]
+    dimorder = md[:FDDIMORDER][1:3]
+    if md[:FDTRANSPOSED] == 0
+        permute!(dimorder,[1,3,2])
+    end
+
+    # load data
+    header = zeros(Float32, 512)
+    y = zeros(Float32, npoints[dimorder]...)
+    y2d = zeros(Float32, npoints[dimorder][2:3]...)
+    for i = 1:npoints[dimorder[1]]
+        filename1 = expandpipetemplate(filename, i)
+        open(filename1) do f
+            read!(f, header)
+            read!(f, y2d)
+        end
+        y[i,:,:] = y2d
+    end
+
+    # y is currently in order DIMORDER - we want to rearrange:
+    # 1 is always direct, and should be placed first (i.e. 1 x x)
+    # is there is a pseudodimension, put that last (i.e. 1 y p)
+    # otherwise, return data in the order 1 2 3 = order of fid.com, inner -> outer loop
+    if pdim[2]
+        # dimensions are x p y => we want ordering 1 3 2
+        xaxis = X(mdax[1][:val], metadata=mdax[1])
+        yaxis = Y(mdax[3][:val], metadata=mdax[3])
+        zaxis = Ti(mdax[2][:val], metadata=mdax[2])
+        unorder = [findfirst(x->x.==i,dimorder) for i=[1,3,2]]
+    elseif pdim[3]
+        # dimensions are x y p => we want ordering 1 2 3
+        xaxis = X(mdax[1][:val], metadata=mdax[1])
+        yaxis = Y(mdax[2][:val], metadata=mdax[2])
+        zaxis = Ti(mdax[3][:val], metadata=mdax[3])
+        unorder = [findfirst(x->x.==i,dimorder) for i=[1,2,3]]
+    else
+        # no pseudodimension, use Z axis not Ti
+        # dimensions are x y z => we want ordering 1 2 3
+        xaxis = X(mdax[1][:val], metadata=mdax[1])
+        yaxis = Y(mdax[2][:val], metadata=mdax[2])
+        zaxis = Z(mdax[3][:val], metadata=mdax[3])
+        unorder = [findfirst(x->x.==i,dimorder) for i=[1,2,3]]
+    end
+    y = permutedims(y, unorder)
+
+    DimensionalArray(y, (xaxis, yaxis, zaxis), metadata=md)
 end

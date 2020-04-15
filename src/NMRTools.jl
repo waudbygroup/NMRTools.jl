@@ -1,7 +1,6 @@
 module NMRTools
 
 using Lazy
-using Formatting
 using Reexport
 using SimpleTraits
 using DimensionalData

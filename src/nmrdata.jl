@@ -1,5 +1,5 @@
 # fix for DimensionalData plotting bug
-val(x::T) where {T<:Dict} = x
+#val(x::T) where {T<:Dict} = x
 
 # define traits for pseudodimension
 @traitdef HasPseudoDimension{D}
