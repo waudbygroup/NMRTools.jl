@@ -5,8 +5,10 @@ using Reexport
 using SimpleTraits
 using OffsetArrays
 using DimensionalData
+#using DimensionalData: StandardIndices
 
-export isnmrdata, IsNMRData
+
+export NMRData
 export haspseudodimension, HasPseudoDimension
 export NMRToolsException
 export loadnmr

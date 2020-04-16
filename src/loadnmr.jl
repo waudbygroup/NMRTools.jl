@@ -3,7 +3,7 @@
 
 Main function for loading nmrPipe or bruker format NMR data.
 
-Returns a DimensionalArray, or throws an NMRToolsException is there is a problem.
+Returns an NMRData array, or throws an NMRToolsException is there is a problem.
 
 # Examples
 
@@ -273,7 +273,7 @@ end
 """
     loadnmrpipe1d(filename, md, mdax)
 
-Return DimensionalArray containing spectrum and associated metadata.
+Return an NMRData array containing spectrum and associated metadata.
 """
 function loadnmrpipe1d(filename::String, md, mdax)
     npoints = mdax[1][:npoints]
@@ -291,7 +291,7 @@ function loadnmrpipe1d(filename::String, md, mdax)
     delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
     xaxis = X(valx, metadata=mdax[1])
 
-    DimensionalArray(y, (xaxis, ), metadata=md)
+    NMRData(y, (xaxis, ), metadata=md)
 end
 
 
@@ -299,7 +299,7 @@ end
 """
     loadnmrpipe2d(filename, md, mdax)
 
-Return DimensionalArray containing spectrum and associated metadata.
+Return NMRData containing spectrum and associated metadata.
 """
 function loadnmrpipe2d(filename::String, md, mdax)
     npoints1 = mdax[1][:npoints]
@@ -332,7 +332,7 @@ function loadnmrpipe2d(filename::String, md, mdax)
     xaxis = X(valx, metadata=mdax[1])
     yaxis = ax2(valy, metadata=mdax[2])
 
-    DimensionalArray(y, (xaxis, yaxis), metadata=md)
+    NMRData(y, (xaxis, yaxis), metadata=md)
 end
 
 
@@ -340,7 +340,7 @@ end
 """
     loadnmrpipe3d(filename, md, mdax)
 
-Return DimensionalArray containing spectrum and associated metadata.
+Return NMRData containing spectrum and associated metadata.
 """
 function loadnmrpipe3d(filename::String, md, mdax)
     npoints = [mdax[i][:npoints] for i in 1:3]
@@ -395,7 +395,7 @@ function loadnmrpipe3d(filename::String, md, mdax)
     end
     y = permutedims(y, unorder)
 
-    DimensionalArray(y, (xaxis, yaxis, zaxis), metadata=md)
+    NMRData(y, (xaxis, yaxis, zaxis), metadata=md)
 end
 
 
