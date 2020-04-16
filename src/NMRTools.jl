@@ -3,9 +3,11 @@ module NMRTools
 using Lazy
 using Reexport
 using SimpleTraits
+using OffsetArrays
 using DimensionalData
 
-export HasPseudoDimension
+export isnmrdata, IsNMRData
+export haspseudodimension, HasPseudoDimension
 export NMRToolsException
 export loadnmr
 export metadatahelp

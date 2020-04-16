@@ -23,14 +23,42 @@ bruker import:
 loadnmr("exampledata/1D_19F/pdata/1/1r");
 ```
 """
-function loadnmr(filename::String)
-    if occursin(r"[a-z0-9]+(\%03d)?\.ft[123]?$", filename)
-        # match files ending in .ft, .ft1, .ft2 or .ft3
-        loadnmrpipe(filename)
+function loadnmr(filename::String, acqusfilename::Union{String,Nothing}=nothing)
+    # load the data
+    ispipe = occursin(r"[a-z0-9]+(\%03d)?\.ft[123]?$", filename)
+    if ispipe
+        # match files ending in .ft, .ft1, .ft2 or .ft3 => NMRPipe
+        spectrum = loadnmrpipe(filename)
+        metadata(spectrum)[:format] = :NMRPipe
     else
         # TODO bruker import
         throw(NMRToolsException("unknown file format for loadnmr\ntemplate = " * template))
     end
+
+    # locate the acqus file
+    if isnothing(acqusfilename)
+        base = basename(filename)
+        dir = dirname(filename)
+        if ispipe
+            # assume that acqus is in same directory as test.ft2 files, and one up from ft/test%03d.ft2 files
+            if occursin("%", filename)
+                dir = dirname(dir) # this moves up one directory
+            end
+            acqusfilename = joinpath(dir, "acqus")
+        end
+    end
+
+    # parse the acqus file
+    acqusmetadata = parseacqus(acqusfilename)
+    metadata(spectrum)[:acqus] = acqusmetadata
+    metadata(spectrum)[:ns] = acqusmetadata["NS"]
+    metadata(spectrum)[:rg] = acqusmetadata["RG"]
+    metadata(spectrum)[:pulseprogram] = acqusmetadata["PULPROG"]
+    metadata(spectrum)[:filename] = filename
+    metadata(spectrum)[:acqusfilename] = acqusfilename
+    metadata(spectrum)[:NMRTools] = true
+
+    return spectrum
 end
 
 
@@ -387,6 +415,13 @@ function metadatahelp(entry::Symbol)
     refdict = Dict(
         # spectrum parameters
         :ndim => "Number of dimensions",
+        :format => "Original file format, :NMRPipe or :bruker",
+        :acqus => "Dictionary containing parsed acqus file",
+        :ns => "Number of scans (NS) from acqus file",
+        :rg => "Receiver gain (RG) from acqus file",
+        :pulseprogram => "Pulse program (PULPROG) from acqus file",
+        :filename => "Original filename or template",
+        :acqusfilename => "Path to imported acqus file",
 
         # dimension parameters
         :pseudodim => "Flag indicating non-frequency domain data",
@@ -445,4 +480,60 @@ function metadatahelp(entry::Symbol)
     )
     entry in keys(refdict) || throw(NMRToolsException("symbol :$(entry) not found in reference dictionary"))
     return refdict[entry]
+end
+
+
+
+function parseacqus(acqusfilename::String)
+    ispath(acqusfilename) || throw(NMRToolsException("loading acqus data: $(acqusfilename) is not a valid file"))
+
+    dat = open(acqusfilename) do f
+        read(f, String)
+    end
+
+    fields = [strip(strip(x),'$') for x in split(dat, "##")]
+    dic = Dict{String,Any}()
+    for field in fields
+        field == "" && continue # skip empty lines
+        x = split(field, "= ")
+        if length(x) > 1
+            dic[x[1]] = parseacqusentry(x[2])
+        end
+    end
+
+    return dic
+end
+
+
+
+function parseacqusentry(dat)
+    if dat[1] == '('
+        # array data - split into fields
+        fields = split(split(dat, ")\n")[2])
+        parsed = map(x -> parseacqusfield(x), fields)
+        if parsed isa Vector{Real}
+            parsed = float.(parsed)
+        end
+        # convert to a zero-based array to match expected bruker notation
+        parsed = OffsetArray(parsed, 0:length(parsed)-1)
+    else
+        parsed = parseacqusfield(dat)
+    end
+    return parsed
+end
+
+
+
+function parseacqusfield(dat)
+    if dat[1] == '<' # <string>
+        dat = dat[2:end-1]
+    else
+        x = tryparse(Int64, dat)
+        if isnothing(x)
+            dat = tryparse(Float64, dat)
+        else
+            dat = x
+        end
+    end
+    return dat
 end
