@@ -243,6 +243,136 @@ end
 
 
 """
+    loadnmrpipe1d(filename, md, mdax)
+
+Return DimensionalArray containing spectrum and associated metadata.
+"""
+function loadnmrpipe1d(filename::String, md, mdax)
+    npoints = mdax[1][:npoints]
+    # preallocate data (and dummy header)
+    header = zeros(Float32, 512)
+    y = zeros(Float32, npoints)
+
+    # read the file
+    open(filename) do f
+        read!(f, header)
+        read!(f, y)
+    end
+
+    valx = mdax[1][:val]
+    delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
+    xaxis = X(valx, metadata=mdax[1])
+
+    DimensionalArray(y, (xaxis, ), metadata=md)
+end
+
+
+
+"""
+    loadnmrpipe2d(filename, md, mdax)
+
+Return DimensionalArray containing spectrum and associated metadata.
+"""
+function loadnmrpipe2d(filename::String, md, mdax)
+    npoints1 = mdax[1][:npoints]
+    npoints2 = mdax[2][:npoints]
+    transposeflag = md[:FDTRANSPOSED] > 0
+    dimorder = md[:FDDIMORDER]
+
+    # preallocate data (and dummy header)
+    header = zeros(Float32, 512)
+    if transposeflag
+        y = zeros(Float32, npoints2, npoints1)
+    else
+        y = zeros(Float32, npoints1, npoints2)
+    end
+
+    # read the file
+    open(filename) do f
+        read!(f, header)
+        read!(f, y)
+    end
+    if transposeflag
+        y = transpose(y)
+    end
+
+    valx = mdax[1][:val]
+    delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
+    valy = mdax[2][:val]
+    delete!(mdax[2],:val) # remove values from metadata to prevent confusion when slicing up
+    ax2 = mdax[2][:pseudodim] ? Ti : Y
+    xaxis = X(valx, metadata=mdax[1])
+    yaxis = ax2(valy, metadata=mdax[2])
+
+    DimensionalArray(y, (xaxis, yaxis), metadata=md)
+end
+
+
+
+"""
+    loadnmrpipe3d(filename, md, mdax)
+
+Return DimensionalArray containing spectrum and associated metadata.
+"""
+function loadnmrpipe3d(filename::String, md, mdax)
+    npoints = [mdax[i][:npoints] for i in 1:3]
+    pdim = [mdax[i][:pseudodim] for i in 1:3]
+    dimorder = md[:FDDIMORDER][1:3]
+    if md[:FDTRANSPOSED] == 0
+        permute!(dimorder,[1,3,2])
+    end
+
+    # load data
+    header = zeros(Float32, 512)
+    y = zeros(Float32, npoints[dimorder]...)
+    y2d = zeros(Float32, npoints[dimorder][2:3]...)
+    for i = 1:npoints[dimorder[1]]
+        filename1 = expandpipetemplate(filename, i)
+        open(filename1) do f
+            read!(f, header)
+            read!(f, y2d)
+        end
+        y[i,:,:] = y2d
+    end
+
+    # y is currently in order DIMORDER - we want to rearrange:
+    # 1 is always direct, and should be placed first (i.e. 1 x x)
+    # is there is a pseudodimension, put that last (i.e. 1 y p)
+    # otherwise, return data in the order 1 2 3 = order of fid.com, inner -> outer loop
+    val1 = mdax[1][:val]
+    val2 = mdax[2][:val]
+    val3 = mdax[3][:val]
+    delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
+    delete!(mdax[2],:val)
+    delete!(mdax[3],:val)
+    if pdim[2]
+        # dimensions are x p y => we want ordering 1 3 2
+        xaxis = X(val1, metadata=mdax[1])
+        yaxis = Y(val3, metadata=mdax[3])
+        zaxis = Ti(val2, metadata=mdax[2])
+        unorder = [findfirst(x->x.==i,dimorder) for i=[1,3,2]]
+    elseif pdim[3]
+        # dimensions are x y p => we want ordering 1 2 3
+        xaxis = X(val1, metadata=mdax[1])
+        yaxis = Y(val2, metadata=mdax[2])
+        zaxis = Ti(val3, metadata=mdax[3])
+        unorder = [findfirst(x->x.==i,dimorder) for i=[1,2,3]]
+    else
+        # no pseudodimension, use Z axis not Ti
+        # dimensions are x y z => we want ordering 1 2 3
+        xaxis = X(val1, metadata=mdax[1])
+        yaxis = Y(val2, metadata=mdax[2])
+        zaxis = Z(val3, metadata=mdax[3])
+        unorder = [findfirst(x->x.==i,dimorder) for i=[1,2,3]]
+    end
+    y = permutedims(y, unorder)
+
+    DimensionalArray(y, (xaxis, yaxis, zaxis), metadata=md)
+end
+
+
+
+"""
     metadatahelp(entry::Symbol)
 
 Get a brief description of what's represented by metadata entry.
@@ -255,6 +385,24 @@ metadatahelp(:FDQUADFLAG);
 """
 function metadatahelp(entry::Symbol)
     refdict = Dict(
+        # spectrum parameters
+        :ndim => "Number of dimensions",
+
+        # dimension parameters
+        :pseudodim => "Flag indicating non-frequency domain data",
+        :npoints => "Number of (real) data points in dimension",
+        :td => "Number of complex points acquired",
+        :tdzf => "Number of complex points when FT executed, including linear prediction and zero filling",
+        :bf => "Base frequency, in MHz",
+        :swhz => "Spectrum width, in Hz",
+        :swppm => "Spectrum width, in ppm",
+        :offsetppm => "Carrier offset from bf, in ppm",
+        :offsethz => "Carrier offset from bf, in Hz",
+        :sf => "Carrier frequency, in MHz",
+        :region => "Extracted region, expressed as a range in points, otherwise missing",
+        :window => "WindowFunction structure indicating applied apodization",
+
+        # NMRPipe spectrum parameters
         :FDMAGIC => "Should be zero in valid NMRPipe data",
         :FDFLTFORMAT => "Constant defining floating point format",
         :FDFLTORDER => "Constant defining byte order",
@@ -297,127 +445,4 @@ function metadatahelp(entry::Symbol)
     )
     entry in keys(refdict) || throw(NMRToolsException("symbol :$(entry) not found in reference dictionary"))
     return refdict[entry]
-end
-
-
-"""
-    loadnmrpipe1d(filename, md, mdax)
-
-Return DimensionalArray containing spectrum and associated metadata.
-"""
-function loadnmrpipe1d(filename::String, md, mdax)
-    npoints = mdax[1][:npoints]
-    # preallocate data (and dummy header)
-    header = zeros(Float32, 512)
-    y = zeros(Float32, npoints)
-
-    # read the file
-    open(filename) do f
-        read!(f, header)
-        read!(f, y)
-    end
-
-    # x = Float64.(mdax[1][:val])
-    xaxis = X(mdax[1][:val], metadata=mdax[1])
-    #DimensionalArray(Float64.(y), (xaxis, ), metadata=md)
-    DimensionalArray(y, (xaxis, ), metadata=md)
-end
-
-
-
-"""
-    loadnmrpipe2d(filename, md, mdax)
-
-Return DimensionalArray containing spectrum and associated metadata.
-"""
-function loadnmrpipe2d(filename::String, md, mdax)
-    npoints1 = mdax[1][:npoints]
-    npoints2 = mdax[2][:npoints]
-    transposeflag = md[:FDTRANSPOSED] > 0
-    dimorder = md[:FDDIMORDER]
-
-    # preallocate data (and dummy header)
-    header = zeros(Float32, 512)
-    if transposeflag
-        y = zeros(Float32, npoints2, npoints1)
-    else
-        y = zeros(Float32, npoints1, npoints2)
-    end
-
-    # read the file
-    open(filename) do f
-        read!(f, header)
-        read!(f, y)
-    end
-    if transposeflag
-        y = transpose(y)
-    end
-
-    #x = Float64.(mdax[1][:val])
-    xaxis = X(mdax[1][:val], metadata=mdax[1])
-    if mdax[2][:pseudodim]
-        ax2 = Ti
-    else
-        ax2 = Y
-    end
-    yaxis = ax2(mdax[2][:val], metadata=mdax[2])
-    #DimensionalArray(Float64.(y), (xaxis, ), metadata=md)
-    DimensionalArray(y, (xaxis, yaxis), metadata=md)
-end
-
-
-
-"""
-    loadnmrpipe3d(filename, md, mdax)
-
-Return DimensionalArray containing spectrum and associated metadata.
-"""
-function loadnmrpipe3d(filename::String, md, mdax)
-    npoints = [mdax[i][:npoints] for i in 1:3]
-    pdim = [mdax[i][:pseudodim] for i in 1:3]
-    dimorder = md[:FDDIMORDER][1:3]
-    if md[:FDTRANSPOSED] == 0
-        permute!(dimorder,[1,3,2])
-    end
-
-    # load data
-    header = zeros(Float32, 512)
-    y = zeros(Float32, npoints[dimorder]...)
-    y2d = zeros(Float32, npoints[dimorder][2:3]...)
-    for i = 1:npoints[dimorder[1]]
-        filename1 = expandpipetemplate(filename, i)
-        open(filename1) do f
-            read!(f, header)
-            read!(f, y2d)
-        end
-        y[i,:,:] = y2d
-    end
-
-    # y is currently in order DIMORDER - we want to rearrange:
-    # 1 is always direct, and should be placed first (i.e. 1 x x)
-    # is there is a pseudodimension, put that last (i.e. 1 y p)
-    # otherwise, return data in the order 1 2 3 = order of fid.com, inner -> outer loop
-    if pdim[2]
-        # dimensions are x p y => we want ordering 1 3 2
-        xaxis = X(mdax[1][:val], metadata=mdax[1])
-        yaxis = Y(mdax[3][:val], metadata=mdax[3])
-        zaxis = Ti(mdax[2][:val], metadata=mdax[2])
-        unorder = [findfirst(x->x.==i,dimorder) for i=[1,3,2]]
-    elseif pdim[3]
-        # dimensions are x y p => we want ordering 1 2 3
-        xaxis = X(mdax[1][:val], metadata=mdax[1])
-        yaxis = Y(mdax[2][:val], metadata=mdax[2])
-        zaxis = Ti(mdax[3][:val], metadata=mdax[3])
-        unorder = [findfirst(x->x.==i,dimorder) for i=[1,2,3]]
-    else
-        # no pseudodimension, use Z axis not Ti
-        # dimensions are x y z => we want ordering 1 2 3
-        xaxis = X(mdax[1][:val], metadata=mdax[1])
-        yaxis = Y(mdax[2][:val], metadata=mdax[2])
-        zaxis = Z(mdax[3][:val], metadata=mdax[3])
-        unorder = [findfirst(x->x.==i,dimorder) for i=[1,2,3]]
-    end
-    y = permutedims(y, unorder)
-
-    DimensionalArray(y, (xaxis, yaxis, zaxis), metadata=md)
 end
