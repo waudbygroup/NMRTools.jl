@@ -1,10 +1,11 @@
 module NMRTools
 
-using Lazy
-using Reexport
+using DimensionalData
+#using Lazy
+#using Reexport
 using SimpleTraits
 using OffsetArrays
-using DimensionalData
+using Plots
 
 import Base.getindex
 import DimensionalData.refdims, DimensionalData.data, DimensionalData.name, DimensionalData.metadata, DimensionalData.label, DimensionalData.rebuild
@@ -25,5 +26,6 @@ include("windows.jl")
 
 # routines
 include("loadnmr.jl")
+include("plotrecipes.jl")
 
 end # module
