@@ -49,18 +49,23 @@ NMRData(A::AbstractArray, dims, name::String=""; refdims=(), metadata=Dict()) =
 #_to_tuple(t) = tuple(t)
 
 # Getters
-import DimensionalData.refdims, DimensionalData.data, DimensionalData.name, DimensionalData.metadata, DimensionalData.label, DimensionalData.rebuild
 refdims(A::NMRData) = A.refdims
 data(A::NMRData) = A.data
 name(A::NMRData) = A.name
 metadata(A::NMRData) = A.metadata
-label(A::NMRData) = name(A)
+label(A::NMRData) = get(metadata(A),:label,"")
+label(A::NMRData, dim) = get(metadata(A, dim),:label,"")
+label!(A::NMRData, labeltext::String) = (metadata(A)[:label] = labeltext)
+label!(A::NMRData, dim, labeltext::String) = (metadata(A, dim)[:label] = labeltext)
 # additional metadata accessor functions
 metadata(A::NMRData, key::Symbol) = get(metadata(A), key, missing)
 metadata(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, missing)
 getindex(A::NMRData, key::Symbol) = get(metadata(A), key, missing)
 getindex(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, missing)
-
+setindex!(A::NMRData, v, key::Symbol) = setindex!(metadata(A), v, key)
+#(metadata(A)[key] = v)
+setindex!(A::NMRData, v, dim, key::Symbol) = setindex!(metadata(A,dim), v, key)
+#(metadata(A, dim)[key] = v)
 
 # AbstractDimensionalArray interface
 @inline rebuild(A::NMRData, data::AbstractArray, dims::Tuple,
