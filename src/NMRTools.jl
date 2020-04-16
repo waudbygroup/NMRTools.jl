@@ -5,14 +5,17 @@ using Reexport
 using SimpleTraits
 using OffsetArrays
 using DimensionalData
-#using DimensionalData: StandardIndices
 
+import Base.getindex
+import DimensionalData.refdims, DimensionalData.data, DimensionalData.name, DimensionalData.metadata, DimensionalData.label, DimensionalData.rebuild
+import DimensionalData.X, DimensionalData.Y, DimensionalData.Z, DimensionalData.Ti
 
 export NMRData
+export X, Y, Z, Ti
 export haspseudodimension, HasPseudoDimension
 export NMRToolsException
 export loadnmr
-export metadatahelp
+export metadata, metadatahelp
 export WindowFunction, NullWindow, UnknownWindow, ExponentialWindow, SineWindow, GaussWindow
 
 # type definitions

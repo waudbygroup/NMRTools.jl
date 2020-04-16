@@ -43,7 +43,7 @@ julia> A[X(Near([12, 35])), Ti(At(DateTime(2001,5)))];
 julia> A[Near(DateTime(2001, 5, 4)), Between(20, 50)];
 ```
 """
-NMRData(A::AbstractArray, dims, name::String=""; refdims=(), metadata=nothing) =
+NMRData(A::AbstractArray, dims, name::String=""; refdims=(), metadata=Dict()) =
     NMRData(A, DimensionalData.formatdims(A, DimensionalData._to_tuple(dims)), refdims, name, metadata)
 #_to_tuple(t::T where T <: Tuple) = t
 #_to_tuple(t) = tuple(t)
@@ -55,6 +55,12 @@ data(A::NMRData) = A.data
 name(A::NMRData) = A.name
 metadata(A::NMRData) = A.metadata
 label(A::NMRData) = name(A)
+# additional metadata accessor functions
+metadata(A::NMRData, key::Symbol) = get(metadata(A), key, missing)
+metadata(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, missing)
+getindex(A::NMRData, key::Symbol) = get(metadata(A), key, missing)
+getindex(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, missing)
+
 
 # AbstractDimensionalArray interface
 @inline rebuild(A::NMRData, data::AbstractArray, dims::Tuple,
@@ -66,13 +72,6 @@ Base.@propagate_inbounds Base.setindex!(A::NMRData, x, I::Vararg{DimensionalData
     setindex!(data(A), x, I...)
 
 
-
-## additional metadata accessor functions
-import Base.getindex
-metadata(A::NMRData, key::Symbol) = get(metadata(A), key, missing)
-metadata(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, missing)
-getindex(A::NMRData, key::Symbol) = get(metadata(A), key, missing)
-getindex(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, missing)
 
 """
     @traitdef HasPseudoDimension{D}
