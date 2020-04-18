@@ -119,3 +119,19 @@ true
 function haspseudodimension(spectrum::NMRData{T,N,A}) where {T,N,A}
     any(map(dim->(typeintersect(dim, TimeDim) != Union{}), A.parameters))
 end
+
+
+
+"""
+    scale(d::NMRData)
+
+Return a scaling factor for the data combining the number of scans, receiver gain, and, if
+specified, the sample concentration.
+"""
+function scale(d::NMRData)
+    # get ns, rg, and concentration, with safe defaults in case missing
+    ns = get(d, :ns, 1)
+    rg = get(d, :rg, 1)
+    conc = get(d, :conc, 1)
+    return ns * rg * conc
+end

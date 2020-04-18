@@ -20,7 +20,7 @@ export At, Near, Between
 export haspseudodimension, HasPseudoDimension
 export NMRToolsException
 export loadnmr
-export data, label, label!, metadata, metadatahelp
+export data, label, label!, metadata, metadatahelp, scale
 export WindowFunction, NullWindow, UnknownWindow, ExponentialWindow, SineWindow, GaussWindow
 export estimatenoise!
 
