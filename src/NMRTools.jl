@@ -12,9 +12,11 @@ using Statistics
 import Base.getindex, Base.setindex!
 import DimensionalData.refdims, DimensionalData.data, DimensionalData.name, DimensionalData.metadata, DimensionalData.label, DimensionalData.rebuild
 import DimensionalData.X, DimensionalData.Y, DimensionalData.Z, DimensionalData.Ti
+import DimensionalData.Between, DimensionalData.At, DimensionalData.Near
 
 export NMRData
 export X, Y, Z, Ti
+export At, Near, Between
 export haspseudodimension, HasPseudoDimension
 export NMRToolsException
 export loadnmr
