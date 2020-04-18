@@ -58,6 +58,9 @@ function loadnmr(filename::String, acqusfilename::Union{String,Nothing}=nothing)
     metadata(spectrum)[:acqusfilename] = acqusfilename
     metadata(spectrum)[:NMRTools] = true
 
+    # populate the spectrum noise level
+    estimatenoise!(spectrum)
+
     return spectrum
 end
 
@@ -422,6 +425,7 @@ function metadatahelp(entry::Symbol)
         :pulseprogram => "Pulse program (PULPROG) from acqus file",
         :filename => "Original filename or template",
         :acqusfilename => "Path to imported acqus file",
+        :noise => "rms noise level",
 
         # dimension parameters
         :pseudodim => "Flag indicating non-frequency domain data",

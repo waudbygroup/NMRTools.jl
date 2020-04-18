@@ -1,5 +1,7 @@
 struct ContourLike end
 
+contourlevels(spacing=1.7, n=12) = (spacing^i for i=0:(n-1))
+
 # 1D plot
 @recipe function f(A::NMRData{T,1}; normalize=false) where T
     Afwd = DimensionalData.forwardorder(A) # make sure data axes are in forwards order
@@ -93,7 +95,7 @@ end
 @recipe function f(::ContourLike, A::NMRData{T,2}) where T
     Afwd = DimensionalData.forwardorder(A) # make sure data axes are in forwards order
     Afwd = DimensionalData.maybe_permute(Afwd, (YDim, XDim))
-    y, x = dims(A)
+    y, x = dims(Afwd)
 
     # set default title
     title --> DimensionalData.refdims_title(Afwd)
@@ -110,8 +112,22 @@ end
     ygrid --> false
     ytick_direction --> :out
 
+    basecolor = get(plotattributes, :linecolor, :blue)
+    colors = sequential_palette(hue(convert(HSV,parse(Colorant, basecolor))),5)[[4,2]]
+
     #delete!(plotattributes, :normalize)
     #scale = normalize ? A[:ns]*A[:rg] : 1
     #val(dim), parent(A) ./ scale
-    val(x), val(y), data(Afwd)
+    @series begin
+        levels --> 5*Afwd[:noise].*contourlevels()
+        linecolor := colors[1]
+        val(x), val(y), data(Afwd)
+    end
+    @series begin
+        levels --> -5*Afwd[:noise].*contourlevels()
+        linecolor := colors[2]
+        val(x), val(y), data(Afwd)
+    end
+
+
 end
