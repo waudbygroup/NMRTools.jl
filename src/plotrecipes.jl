@@ -113,11 +113,13 @@ end
     @series begin
         levels --> 5*dfwd[:noise].*contourlevels()
         linecolor := colors[1]
+        primary := true
         val(x), val(y), data(dfwd)
     end
     @series begin
         levels --> -5*dfwd[:noise].*contourlevels()
         linecolor := colors[2]
+        primary := false
         val(x), val(y), data(dfwd)
     end
 end
@@ -130,4 +132,81 @@ end
     y, x = dims(dfwd)
     @info "plot recipe for pseudo2D data not yet defined"
     val(x), val(y), data(dfwd)
+end
+
+
+
+# multiple 2D plots
+@recipe f(v::V; normalize=true) where {V::Vector{D where D<:NMRData{T,2} where T}} = SimpleTraits.trait(HasPseudoDimension{D}), v
+
+
+
+@recipe function f(::Type{Not{HasPseudoDimension{D}}}, v::V; normalize=true) where {V::Vector{D where D<:NMRData{T,2} where T}}
+    @info "plotting vector of 2D NMR data"
+    n = length(v)
+    hues = map(h->HSV(h,0.5,0.5), (0:n-1) .* (360/n))
+
+    # force 1D to be a line plot
+    seriestype := :contour
+
+    # get the first entry to determine axis label
+    dfwd = DimensionalData.forwardorder(v[1]) # make sure data axes are in forwards order
+    dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
+    y, x = dims(dfwd)
+
+    # set default title
+    title --> DimensionalData.refdims_title(dfwd)
+    legend --> false
+    framestyle --> :box
+
+    xlabel --> "$(dfwd[x,:label]) chemical shift / ppm"
+    xflip --> true
+    xgrid --> false
+    xtick_direction --> :out
+
+    ylabel --> "$(dfwd[y,:label]) chemical shift / ppm"
+    yflip --> true
+    ygrid --> false
+    ytick_direction --> :out
+
+    delete!(plotattributes, :normalize)
+
+    h = 0.0
+    for d in v
+        dfwd = DimensionalData.forwardorder(d) # make sure data axes are in forwards order
+        dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
+        y, x = dims(dfwd)
+        label --> label(d)
+        # generate light and dark colours for plot contours, based on supplied colour
+        # - create a 5-tone palette with the same hue as the passed colour, and select the
+        # fourth and second entries to provide dark and light shades
+        colors = sequential_palette(h, 5)[[4,2]]
+
+        @series begin
+            levels --> 5*dfwd[:noise].*contourlevels()
+            linecolor := colors[1]
+            primary := true
+            val(x), val(y), data(dfwd)
+        end
+        @series begin
+            levels --> -5*dfwd[:noise].*contourlevels()
+            linecolor := colors[2]
+            primary := false
+            val(x), val(y), data(dfwd)
+        end
+        h += 360.0/n
+    end
+end
+
+
+
+@recipe function f(::Type{Not{HasPseudoDimension{D}}}, v::V; normalize=true) where {V::Vector{D where D<:NMRData{T,2} where T}}
+    @info "plot recipe for vector of pseudo2D NMR data not yet implemented"
+    delete!(plotattributes, :normalize)
+    # TODO just make repeat calls to single plot recipe
+    for d in v
+        @series begin
+            ::Type{HasPseudoDimension{D}}, d
+        end
+    end
 end
