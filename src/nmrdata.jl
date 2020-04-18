@@ -130,8 +130,8 @@ specified, the sample concentration.
 """
 function scale(d::NMRData)
     # get ns, rg, and concentration, with safe defaults in case missing
-    ns = get(d, :ns, 1)
-    rg = get(d, :rg, 1)
-    conc = get(d, :conc, 1)
+    ns = get(metadata(d), :ns, 1)
+    rg = get(metadata(d), :rg, 1)
+    conc = get(metadata(d), :conc, 1)
     return ns * rg * conc
 end
