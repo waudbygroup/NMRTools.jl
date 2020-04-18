@@ -1,0 +1,18 @@
+##TITLE= Audit trail, TOPSPIN		Version 2.0
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= ccukier
+$$ /nmrdata/data/ccukier/nmr/RRM12LL_FBPNbox_new/9/audita.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2008-06-30 15:51:15.971 +0100>,<ccukier>,<spec602>,<go>,<TOPSPIN 2.0>,
+      <created by zg
+	started at 2008-06-30 15:26:41.879 +0100,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       FB 99 5E D6 4E F9 0D 0E E5 6B 8D 9F 5F 37 6B 33
+       data hash MD5: 2K * 256
+       BA 73 03 58 F4 3E D4 74 08 D6 80 74 7C 27 68 FC>)
+##END=
+
+$$ hash MD5
+$$ 6D DF 9D FB C0 79 AB E8 9A 29 72 E9 70 66 54 17
