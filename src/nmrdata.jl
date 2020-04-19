@@ -77,8 +77,8 @@ acqus(A::NMRData, key, index::Int) = acqus(A, key)[index]
 # label accessor functions
 label(A::NMRData) = get(metadata(A),:label,"")
 label(A::NMRData, dim) = get(metadata(A, dim),:label,"")
-label!(A::NMRData, labeltext::String) = (metadata(A)[:label] = labeltext)
-label!(A::NMRData, dim, labeltext::String) = (metadata(A, dim)[:label] = labeltext)
+label!(A::NMRData, labeltext::AbstractString) = (metadata(A)[:label] = labeltext)
+label!(A::NMRData, dim, labeltext::AbstractString) = (metadata(A, dim)[:label] = labeltext)
 
 
 # AbstractDimensionalArray interface

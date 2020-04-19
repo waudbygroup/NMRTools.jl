@@ -58,6 +58,13 @@ function loadnmr(filename::String, acqusfilename::Union{String,Nothing}=nothing)
     metadata(spectrum)[:acqusfilename] = acqusfilename
     metadata(spectrum)[:NMRTools] = true
 
+    # load the title file
+    titlefilename = joinpath(dirname(acqusfilename), "pdata", "1", "title")
+    title = read(titlefilename, String)
+    metadata(spectrum)[:title] = strip(title)
+    titleline1 = split(title, "\n")[1]
+    label!(spectrum, titleline1)
+
     # populate the spectrum noise level
     estimatenoise!(spectrum)
 
