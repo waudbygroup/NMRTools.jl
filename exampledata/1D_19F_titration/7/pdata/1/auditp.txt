@@ -1,0 +1,27 @@
+##TITLE= Audit trail, TopSpin 3.5 pl 7
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= Sam
+$$ C:/Bruker/SH3_SosBinding_PepS2/F19_T22G_PepS2_Dilute_08.07.17/7/pdata/1/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2017-08-07 10:30:15.247 +0200>,<sstadmiller>,<avance500.med.unc.edu>,<go>,<TOPSPIN 3.2>,
+      <created by zg
+	started at 2017-08-07 10:24:38.589 +0200,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       B7 32 6A 7D E1 13 2D CB 2E 20 51 33 8E E4 D5 59
+       data hash MD5: 28194
+       38 8D 80 1B DC 06 F4 FE D1 34 63 A8 28 E1 97 C3>)
+(   2,<2017-09-13 10:56:35.253 -0400>,<Sam>,<DESKTOP-H09PJL6>,<proc1d>,<TopSpin 3.5.7>,
+      <Start of raw data processing
+       efp LB = 10 FT_mod = 6 PKNL = 1 PHC0 = -59.36718 PHC1 = 40.86555 SI = 32K 
+       data hash MD5: 32K
+       43 6A 66 72 8B B1 91 E4 88 A6 57 E5 99 37 F0 66>)
+(   3,<2017-09-13 10:56:35.866 -0400>,<Sam>,<DESKTOP-H09PJL6>,<proc1d>,<TopSpin 3.5.7>,
+      <abs ABSG = 5 
+       data hash MD5: 32K
+       CC 70 42 21 3A D9 7E 3B AE 63 89 42 EF 69 D7 49>)
+##END=
+
+$$ hash MD5
+$$ 05 E8 0E 11 23 C2 EF 1A 9D D2 4A FB 7C 55 46 FB

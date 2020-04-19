@@ -1,0 +1,16 @@
+##TITLE= Parameter file, TOPSPIN		Version 3.2
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 1	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= sstadmiller
+$$ 2017-08-07 09:22:49.167 +0200  sstadmiller@avance500.med.unc.edu
+$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/6/pdata/1/outd
+$$ process /opt/topspin3.2pl2/prog/mod/edparproc
+##$CURPLOT= <no printer>
+##$CURPRIN= <dconpeaks.txt>
+##$DFORMAT= <normdp>
+##$LAYOUT= <+/1D_BB.xwp>
+##$LFORMAT= <normlp>
+##$PFORMAT= <normpl>
+##END=

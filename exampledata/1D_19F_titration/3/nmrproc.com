@@ -1,0 +1,22 @@
+#!/bin/csh
+
+bruk2pipe -in ./fid \
+  -bad 0.0 -ext -aswap -AMX -decim 1418.66666666667 -dspfvs 20 -grpdly 67.9896545410156  \
+  -xN             28416  \
+  -xT             14097  \
+  -xMODE            DQD  \
+  -xSW        14097.744  \
+  -xOBS         470.522  \
+  -xCAR        -130.000  \
+  -xLAB             19F  \
+  -ndim               1  \
+  -out ./test.fid -verb -ov
+
+nmrPipe -in test.fid \
+| nmrPipe -fn EM  -lb 5.0 -c 0.5                              \
+| nmrPipe  -fn ZF -auto                               \
+| nmrPipe  -fn FT -auto                               \
+| nmrPipe  -fn PS -p0 49.00 -p1 0.00 -di -verb         \
+| nmrPipe -fn BASE -nw 50 -nl -119ppm -140ppm           \
+| nmrPipe -fn EXT -x1 -120ppm -xn -128ppm -sw                                    \
+   -ov -out test.ft1
