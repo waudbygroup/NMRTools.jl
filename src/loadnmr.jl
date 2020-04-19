@@ -501,9 +501,14 @@ function parseacqus(acqusfilename::String)
         field == "" && continue # skip empty lines
         x = split(field, "= ")
         if length(x) > 1
-            dic[x[1]] = parseacqusentry(x[2])
+            # store keys as uppercase - there's only a couple of annoying exceptions like NusAMOUNT
+            # and forcing uppercase makes it easier to access, e.g. as :vclist not :VCLIST
+            dic[uppercase(x[1])] = parseacqusentry(x[2])
         end
     end
+
+    # lastly, check for referenced files like vclist, fq1list, and load these in place of filename
+    parseacqusauxfiles!(dic, dirname(acqusfilename))
 
     return dic
 end
@@ -540,4 +545,38 @@ function parseacqusfield(dat)
         end
     end
     return dat
+end
+
+
+
+function parseacqusauxfiles!(dic, basedir)
+    for k in ("VCLIST",) # integer lists
+        dic[k] == "" && continue
+        # note that filenames aren't actually used - vclist is always stored as vclist
+        filename = joinpath(basedir, lowercase(k))
+        x = readlines(filename)
+        xi = tryparse.(Int,x)
+        if any(xi.==nothing)
+            @warn "Unable to parse format of list $(k) when opening $(filename)"
+            dic[k] = x
+        else
+            dic[k] = xi
+        end
+    end
+
+    for k in ("FQ1LIST", "FQ2LIST", "FQ3LIST", "FQ4LIST", "FQ5LIST", "FQ6LIST", "FQ7LIST", "FQ8LIST",
+                "VALIST", "VDLIST", "VPLIST", "VTLIST") # float lists
+        dic[k] == "" && continue
+        # note that filenames aren't actually used - vclist is always stored as vclist
+        filename = joinpath(basedir, lowercase(k))
+        x = readlines(filename)
+        xp = [replace(replace(xs, "u"=>"e-6"),"m"=>"e-3") for xs in x]
+        xf = tryparse.(Float64,xp)
+        if any(xf.==nothing)
+            @warn "Unable to parse format of list $(k) when opening $(filename)"
+            dic[k] = x
+        else
+            dic[k] = xf
+        end
+    end
 end

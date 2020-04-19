@@ -137,11 +137,11 @@ end
 
 
 # multiple 2D plots
-@recipe f(v::V; normalize=true) where {V::Vector{D where D<:NMRData{T,2} where T}} = SimpleTraits.trait(HasPseudoDimension{D}), v
+@recipe f(v::Vector{D}; normalize=true) where {D<:NMRData{T,2}} where {T} = SimpleTraits.trait(HasPseudoDimension{D}), v
 
 
 
-@recipe function f(::Type{Not{HasPseudoDimension{D}}}, v::V; normalize=true) where {V::Vector{D where D<:NMRData{T,2} where T}}
+@recipe function f(::Type{Not{HasPseudoDimension{D}}}, v::Vector{D}; normalize=true) where {D<:NMRData{T,2}} where {T}
     @info "plotting vector of 2D NMR data"
     n = length(v)
     hues = map(h->HSV(h,0.5,0.5), (0:n-1) .* (360/n))
@@ -200,13 +200,13 @@ end
 
 
 
-@recipe function f(::Type{Not{HasPseudoDimension{D}}}, v::V; normalize=true) where {V::Vector{D where D<:NMRData{T,2} where T}}
+@recipe function f(::Type{HasPseudoDimension{D}}, v::Vector{D}; normalize=true) where {D<:NMRData{T,2}} where {T}
     @info "plot recipe for vector of pseudo2D NMR data not yet implemented"
     delete!(plotattributes, :normalize)
     # TODO just make repeat calls to single plot recipe
     for d in v
         @series begin
-            ::Type{HasPseudoDimension{D}}, d
+            HasPseudoDimension{D}, d
         end
     end
 end

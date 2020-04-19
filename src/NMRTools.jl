@@ -10,17 +10,18 @@ using SpecialFunctions
 using Statistics
 
 import Base.getindex, Base.setindex!
-import DimensionalData.refdims, DimensionalData.data, DimensionalData.name, DimensionalData.metadata, DimensionalData.label, DimensionalData.rebuild
+import DimensionalData.dims, DimensionalData.refdims, DimensionalData.data, DimensionalData.name, DimensionalData.metadata, DimensionalData.label, DimensionalData.rebuild
 import DimensionalData.X, DimensionalData.Y, DimensionalData.Z, DimensionalData.Ti
 import DimensionalData.Between, DimensionalData.At, DimensionalData.Near
 
 export NMRData
-export X, Y, Z, Ti
+export dims, X, Y, Z, Ti
+export xval, yval, zval, tval
 export At, Near, Between
 export haspseudodimension, HasPseudoDimension
 export NMRToolsException
 export loadnmr
-export data, label, label!, metadata, metadatahelp, scale
+export data, acqus, label, label!, metadata, metadatahelp, scale
 export WindowFunction, NullWindow, UnknownWindow, ExponentialWindow, SineWindow, GaussWindow
 export estimatenoise!
 

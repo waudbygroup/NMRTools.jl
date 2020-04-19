@@ -52,20 +52,34 @@ NMRData(A::AbstractArray, dims, name::String=""; refdims=(), metadata=Dict()) =
 refdims(A::NMRData) = A.refdims
 data(A::NMRData) = A.data
 name(A::NMRData) = A.name
+
+# get axis values
+xval(A::NMRData) = dims(A,X).val
+yval(A::NMRData) = dims(A,Y).val
+zval(A::NMRData) = dims(A,Z).val
+tval(A::NMRData) = dims(A,Ti).val
+
+# metadata accessor functions
 metadata(A::NMRData) = A.metadata
-label(A::NMRData) = get(metadata(A),:label,"")
-label(A::NMRData, dim) = get(metadata(A, dim),:label,"")
-label!(A::NMRData, labeltext::String) = (metadata(A)[:label] = labeltext)
-label!(A::NMRData, dim, labeltext::String) = (metadata(A, dim)[:label] = labeltext)
-# additional metadata accessor functions
 metadata(A::NMRData, key::Symbol) = get(metadata(A), key, missing)
 metadata(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, missing)
 getindex(A::NMRData, key::Symbol) = get(metadata(A), key, missing)
 getindex(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, missing)
-setindex!(A::NMRData, v, key::Symbol) = setindex!(metadata(A), v, key)
-#(metadata(A)[key] = v)
-setindex!(A::NMRData, v, dim, key::Symbol) = setindex!(metadata(A,dim), v, key)
-#(metadata(A, dim)[key] = v)
+setindex!(A::NMRData, v, key::Symbol) = setindex!(metadata(A), v, key)  #(metadata(A)[key] = v)
+setindex!(A::NMRData, v, dim, key::Symbol) = setindex!(metadata(A,dim), v, key)  #(metadata(A, dim)[key] = v)
+
+# acqus accessor functions
+acqus(A::NMRData) = get(A.metadata, :acqus, missing)
+acqus(A::NMRData, key::String) = ismissing(acqus(A)) ? missing : get(acqus(A), uppercase(key), missing)
+acqus(A::NMRData, key::Symbol) = acqus(A, string(key))
+acqus(A::NMRData, key, index::Int) = acqus(A, key)[index]
+
+# label accessor functions
+label(A::NMRData) = get(metadata(A),:label,"")
+label(A::NMRData, dim) = get(metadata(A, dim),:label,"")
+label!(A::NMRData, labeltext::String) = (metadata(A)[:label] = labeltext)
+label!(A::NMRData, dim, labeltext::String) = (metadata(A, dim)[:label] = labeltext)
+
 
 # AbstractDimensionalArray interface
 @inline rebuild(A::NMRData, data::AbstractArray, dims::Tuple,
@@ -75,6 +89,21 @@ setindex!(A::NMRData, v, dim, key::Symbol) = setindex!(metadata(A,dim), v, key)
 # Array interface (AbstractDimensionalArray takes care of everything else)
 Base.@propagate_inbounds Base.setindex!(A::NMRData, x, I::Vararg{DimensionalData.StandardIndices}) =
     setindex!(data(A), x, I...)
+
+
+
+function settvals(A::NMRData, tvals)
+    haspseudodimension(A) || throw(NMRToolsException("cannot set t values: data does not have a non-frequency dimension."))
+
+    taxis = Ti(tvals, metadata=metadata(A,Ti))
+    # two cases to consider: (x, t) or (x, y, t)
+    if ndims(A) == 2
+        newdims = (dims(A,X), taxis)
+    else
+        newdims = (dims(A,X), dims(A,Y), taxis)
+    end
+    NMRData(A.data, newdims, A.name, refdims=A.refdims, metadata=A.metadata)
+end
 
 
 
