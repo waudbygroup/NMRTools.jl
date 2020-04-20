@@ -92,7 +92,7 @@ Base.@propagate_inbounds Base.setindex!(A::NMRData, x, I::Vararg{DimensionalData
 
 
 
-function settvals(A::NMRData, tvals)
+function settval(A::NMRData, tvals)
     haspseudodimension(A) || throw(NMRToolsException("cannot set t values: data does not have a non-frequency dimension."))
 
     taxis = Ti(tvals, metadata=metadata(A,Ti))

@@ -2,6 +2,8 @@ module NMRTools
 
 using Colors
 using DimensionalData
+using LsqFit
+using Measurements
 using OffsetArrays
 using Optim
 using Plots
@@ -16,7 +18,7 @@ import DimensionalData.Between, DimensionalData.At, DimensionalData.Near
 
 export NMRData
 export dims, X, Y, Z, Ti
-export xval, yval, zval, tval
+export xval, yval, zval, tval, settval
 export At, Near, Between
 export haspseudodimension, HasPseudoDimension
 export NMRToolsException
@@ -24,6 +26,7 @@ export loadnmr
 export data, acqus, label, label!, metadata, metadatahelp, scale
 export WindowFunction, NullWindow, UnknownWindow, ExponentialWindow, SineWindow, GaussWindow
 export estimatenoise!
+export fitexp, fitdiffusion
 
 # type definitions
 include("util.jl")
@@ -35,5 +38,6 @@ include("windows.jl")
 include("noise.jl")
 include("loadnmr.jl")
 include("plotrecipes.jl")
+include("fittingpseudo2d.jl")
 
 end # module

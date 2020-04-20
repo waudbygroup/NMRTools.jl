@@ -561,6 +561,7 @@ function parseacqusauxfiles!(dic, basedir)
         dic[k] == "" && continue
         # note that filenames aren't actually used - vclist is always stored as vclist
         filename = joinpath(basedir, lowercase(k))
+        ispath(filename) || continue
         x = readlines(filename)
         xi = tryparse.(Int,x)
         if any(xi.==nothing)
@@ -576,6 +577,7 @@ function parseacqusauxfiles!(dic, basedir)
         dic[k] == "" && continue
         # note that filenames aren't actually used - vclist is always stored as vclist
         filename = joinpath(basedir, lowercase(k))
+        ispath(filename) || continue
         x = readlines(filename)
         xp = [replace(replace(xs, "u"=>"e-6"),"m"=>"e-3") for xs in x]
         xf = tryparse.(Float64,xp)

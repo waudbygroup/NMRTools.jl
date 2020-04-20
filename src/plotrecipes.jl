@@ -25,7 +25,7 @@ contourlevels(spacing=1.7, n=12) = (spacing^i for i=0:(n-1))
     yticks --> nothing
 
     delete!(plotattributes, :normalize)
-    val(dim), parent(A)./(normalize ? scale(A) : 1)
+    val(dim), parent(Afwd)./(normalize ? scale(A) : 1)
 end
 
 
@@ -70,7 +70,7 @@ end
             Afwd = DimensionalData.forwardorder(A) # make sure data axes are in forwards order
             dim = dims(Afwd, 1)
             label --> label(A)
-            val(dim), parent(A)./(normalize ? scale(A) : 1) .+ voffset
+            val(dim), parent(Afwd)./(normalize ? scale(A) : 1) .+ voffset
         end
         vstack && (voffset += vdelta)
     end
