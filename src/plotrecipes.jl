@@ -15,12 +15,12 @@ contourlevels(spacing=1.7, n=12) = (spacing^i for i=0:(n-1))
     title --> DimensionalData.refdims_title(Afwd)
     legend --> false
 
-    xlabel --> "$(Afwd[dim,:label]) chemical shift / ppm"
+    xguide --> "$(Afwd[dim,:label]) chemical shift / ppm"
     xflip --> true
     xgrid --> false
     xtick_direction --> :out
 
-    ylabel --> ""
+    yguide --> ""
     yshowaxis --> false
     yticks --> nothing
 
@@ -40,12 +40,12 @@ end
     Afwd = DimensionalData.forwardorder(v[1])
     dim = dims(Afwd, 1)
 
-    xlabel --> "$(Afwd[dim,:label]) chemical shift / ppm"
+    xguide --> "$(Afwd[dim,:label]) chemical shift / ppm"
     xflip --> true
     xgrid --> false
     xtick_direction --> :out
 
-    ylabel --> ""
+    yguide --> ""
     yshowaxis --> false
     yticks --> nothing
 
@@ -91,12 +91,12 @@ end
     legend --> false
     framestyle --> :box
 
-    xlabel --> "$(dfwd[x,:label]) chemical shift / ppm"
+    xguide --> "$(dfwd[x,:label]) chemical shift / ppm"
     xflip --> true
     xgrid --> false
     xtick_direction --> :out
 
-    ylabel --> "$(dfwd[y,:label]) chemical shift / ppm"
+    yguide --> "$(dfwd[y,:label]) chemical shift / ppm"
     yflip --> true
     ygrid --> false
     ytick_direction --> :out
@@ -159,12 +159,12 @@ end
     legend --> false
     framestyle --> :box
 
-    xlabel --> "$(dfwd[x,:label]) chemical shift / ppm"
+    xguide --> "$(dfwd[x,:label]) chemical shift / ppm"
     xflip --> true
     xgrid --> false
     xtick_direction --> :out
 
-    ylabel --> "$(dfwd[y,:label]) chemical shift / ppm"
+    yguide --> "$(dfwd[y,:label]) chemical shift / ppm"
     yflip --> true
     ygrid --> false
     ytick_direction --> :out
