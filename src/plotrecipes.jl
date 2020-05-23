@@ -83,7 +83,7 @@ end
 
 @recipe function f(::Type{Not{HasPseudoDimension{D}}}, d::D) where {D<:NMRData{T, 2} where T}
     dfwd = DimensionalData.forwardorder(d) # make sure data axes are in forwards order
-    #dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
+    dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
     y, x = dims(dfwd)
 
     # set default title

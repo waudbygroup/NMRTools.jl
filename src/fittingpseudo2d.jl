@@ -62,16 +62,16 @@ y = settval(y, LinRange(0.05, 0.95, 10))
 rH, D = fitdiffusion(y, Between(7.5,9))
 ```
 """
-fitdiffusion(A::X, selector; δ=0.004, Δ=0.1, σ=0.9, Gmax=0.55, solvent=:h2o, T=298, showplot=true) where {X<:NMRData{T,2} where T} =
-        fitdiffusion(SimpleTraits.trait(HasPseudoDimension{X}), A, selector, δ, Δ, σ, Gmax, solvent, T, showplot)
+fitdiffusion(spec::X, selector; δ=0.004, Δ=0.1, σ=0.9, Gmax=0.55, solvent=:h2o, T=298, showplot=true) where {X<:NMRData{T,2} where T} =
+        fitdiffusion(SimpleTraits.trait(HasPseudoDimension{X}), spec, selector, δ, Δ, σ, Gmax, solvent, T, showplot)
 
-function fitdiffusion(::Type{HasPseudoDimension{X}}, A::X, selector, δ, Δ, σ, Gmax, solvent, T, showplot) where {X<:NMRData{T, 2} where T}
+function fitdiffusion(::Type{HasPseudoDimension{X}}, spec::X, selector, δ, Δ, σ, Gmax, solvent, T, showplot) where {X<:NMRData{T, 2} where T}
     g = tval(A) * Gmax
     γ = 2.675e8;
     q = (γ*δ*σ*g).^2 * (Δ - δ/3)
     lab = label(A)
 
-    y = settval(A, q) # create copy of data containing q values
+    y = settval(spec, q) # create copy of data containing q values
     label!(y,Ti,"q / s m-2")
 
     D, plt = fitexp(y, selector)

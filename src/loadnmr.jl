@@ -327,7 +327,6 @@ function loadnmrpipe2d(filename::String, md, mdax)
     else
         y = zeros(Float32, npoints1, npoints2)
     end
-    y = Float64.(y)
 
     # read the file
     open(filename) do f
@@ -337,6 +336,7 @@ function loadnmrpipe2d(filename::String, md, mdax)
     if transposeflag
         y = transpose(y)
     end
+    y = Float64.(y)
 
     valx = mdax[1][:val]
     delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
