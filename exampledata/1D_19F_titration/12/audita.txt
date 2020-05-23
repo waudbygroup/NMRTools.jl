@@ -1,0 +1,18 @@
+##TITLE= Audit trail, TOPSPIN		Version 3.2
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= sstadmiller
+$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/12/audita.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2017-08-07 11:52:11.475 +0200>,<sstadmiller>,<avance500.med.unc.edu>,<go>,<TOPSPIN 3.2>,
+      <created by zg
+	started at 2017-08-07 11:46:37.661 +0200,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       B7 32 6A 7D E1 13 2D CB 2E 20 51 33 8E E4 D5 59
+       data hash MD5: 28194
+       BC B5 9B 5D FC F0 B0 15 B5 D4 D0 75 C5 43 B0 63>)
+##END=
+
+$$ hash MD5
+$$ 30 7E D5 B1 64 B9 21 B4 0D 4E CD 5B E0 DB 64 02

@@ -1,0 +1,25 @@
+##TITLE= Audit trail, TOPSPIN		Version 2.0
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= ccukier
+$$ /nmrdata/data/ccukier/nmr/RRM12LL_FBPNbox_new/8/pdata/1/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2008-06-30 15:10:08.185 +0100>,<ccukier>,<spec602>,<go>,<TOPSPIN 2.0>,
+      <created by zg
+	started at 2008-06-30 14:45:33.592 +0100,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       FB 99 5E D6 4E F9 0D 0E E5 6B 8D 9F 5F 37 6B 33
+       data hash MD5: 2K * 256
+       AE 13 99 36 F5 B8 AA 0D D6 73 C8 2D EC 6B D5 65>)
+(   2,<2008-06-30 15:11:55.049 +0100>,<ccukier>,<spec602>,<proc2d>,<TOPSPIN 2.0>,
+      <Start of raw data processing
+       xfb F2: SI = 2K BC_mod = 6 BCFW = 0.3 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 0 STSI = 1K PHC0 = -161.5961 PHC1 = 107.2 F1: SI = 1K ME_mod = 2 NCOEF = 16 WDW = 4 SSB = 2 FT_mod = 4 PHC0 = 90 PHC1 = -180
+       data hash MD5: 1K * 1K
+       06 CA FA 83 11 D5 F1 52 5B 5A 8C 9E 6D 5D F2 D7>)
+(   3,<2008-07-01 08:42:29.488 +0100>,<ccukier>,<spec602>,<disknew>,<TOPSPIN 2.0>,
+      <processed data deleted>)
+##END=
+
+$$ hash MD5
+$$ 46 70 5F 8F 39 AB D1 5C 1C 9C 98 A1 9B 5E C8 6E

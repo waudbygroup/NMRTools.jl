@@ -1,0 +1,17 @@
+##TITLE= Parameter file, TOPSPIN		Version 2.0
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 2	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= ccukier
+$$ 2008-06-30 10:27:52.916 +0100  ccukier@spec602
+$$ /nmrdata/data/ccukier/nmr/RRM12LL_FBPNbox_new/2/pdata/1/outd
+$$ process /opt/topspin/prog/mod/edparproc
+##$CURPLOT= <laser031>
+##$CURPRIN= <$laser031>
+##$DFORMAT= <normdp>
+##$LAYOUT= <+/2D_inv.xwp>
+##$LFORMAT= <normlp>
+##$PFORMAT= <normpl>
+##$SURQMSG= 1
+##END=

@@ -1,0 +1,17 @@
+##TITLE= Parameter file, TOPSPIN		Version 2.0
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 1	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= ccukier
+$$ 2008-06-30 14:05:34.645 +0100  ccukier@spec602
+$$ /nmrdata/data/ccukier/nmr/RRM12LL_FBPNbox_new/7/scon2
+$$ process /opt/topspin/prog/mod/go
+##$BLKTR= (0..15)
+3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+##$DE1= 6
+##$DEADC= 2
+##$DEPA= 3
+##$DERX= 3
+##$FILCOR= 0
+##END=
