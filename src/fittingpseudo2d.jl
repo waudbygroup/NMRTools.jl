@@ -66,10 +66,10 @@ fitdiffusion(spec::X, selector; δ=0.004, Δ=0.1, σ=0.9, Gmax=0.55, solvent=:h2
         fitdiffusion(SimpleTraits.trait(HasPseudoDimension{X}), spec, selector, δ, Δ, σ, Gmax, solvent, T, showplot)
 
 function fitdiffusion(::Type{HasPseudoDimension{X}}, spec::X, selector, δ, Δ, σ, Gmax, solvent, T, showplot) where {X<:NMRData{T, 2} where T}
-    g = tval(A) * Gmax
+    g = tval(spec) * Gmax
     γ = 2.675e8;
     q = (γ*δ*σ*g).^2 * (Δ - δ/3)
-    lab = label(A)
+    lab = label(spec)
 
     y = settval(spec, q) # create copy of data containing q values
     label!(y,Ti,"q / s m-2")
