@@ -59,8 +59,7 @@ end
 ```julia
 y = loadnmr("exampledata/pseudo2D_XSTE/test.ft1")
 y = settval(y, LinRange(0.05, 0.95, 10))
-D, plt = fitdiffusion(y, Between(7.5,9))
-display(plt)
+rH, D = fitdiffusion(y, Between(7.5,9))
 ```
 """
 fitdiffusion(A::X, selector; δ=0.004, Δ=0.1, σ=0.9, Gmax=0.55, solvent=:h2o, T=298, showplot=true) where {X<:NMRData{T,2} where T} =

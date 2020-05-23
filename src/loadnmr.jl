@@ -253,21 +253,23 @@ function parsenmrpipeheader(header::Vector{Float32})
             # d[:val2] = x[1:end-1]
 
             # create a representation of the window function
+            # calculate acquisition time = td / sw
+            taq = d[:td] / d[:swhz]
             #:FDAPODCODE => "Window function used (0=none, 1=SP, 2=EM, 3=GM, 4=TM, 5=ZE, 6=TRI)",
             w = d[:FDAPODCODE]
             q1 = d[:FDAPODQ1]
             q2 = d[:FDAPODQ2]
             q3 = d[:FDAPODQ3]
             if w == 0
-                window = NullWindow()
+                window = NullWindow(taq)
             elseif w == 1
-                window = SineWindow(q1, q2, q3)
+                window = SineWindow(q1, q2, q3, taq)
             elseif w == 2
-                window = ExponentialWindow(q1)
+                window = ExponentialWindow(q1, taq)
             elseif w == 3
-                window = GaussWindow(q1, q2, q3)
+                window = GaussWindow(q1, q2, q3, taq)
             else
-                window = UnknownWindow()
+                window = UnknownWindow(taq)
             end
             d[:window] = window
         end

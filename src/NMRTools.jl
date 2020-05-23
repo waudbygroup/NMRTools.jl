@@ -25,6 +25,7 @@ export NMRToolsException
 export loadnmr
 export data, acqus, label, label!, metadata, metadatahelp, scale
 export WindowFunction, NullWindow, UnknownWindow, ExponentialWindow, SineWindow, GaussWindow
+export GeneralSineWindow, CosWindow, Cos²Window, GeneralGaussWindow, LorentzToGaussWindow
 export estimatenoise!
 export fitexp, fitdiffusion
 
