@@ -21,35 +21,25 @@ md3 = Dict{Any,Any}(:test=>"hello axis 3");
     for f in [X, Y, Z, Ti]
         ax = f(0:.1:1)
         @test ax[1] == 0.0
-        @test val(ax) == 0:.1:1
-        @test metadata(ax) isa Dict
+        #@test val(ax) == 0:.1:1
+        #@test metadata(ax) isa Dict
     end
-end
-
-@testset "Creating NMRData indirectly via DimensionalData" begin
-    A = DimensionalArray(y2, (X(x1), Y(x2)));
-    @test A[1,1] == 2
-    d = NMRData(A, md)
-    @test d[1,1] == 2
 end
 
 @testset "Creating NMRData" begin
     d = NMRData(y2, (X(x1), Y(x2)))
     @test metadata(d) isa Dict
-    d = NMRData(y2, (X(x1), Y(x2)), md)
+    d = NMRData(y2, (X(x1), Y(x2)), metadata=md)
     @test d[1,1] == 2
     @test d == y2
     @test metadata(d) isa Dict
     @test metadata(d)[:test] == "hello data"
-    @test metadata(d,X) isa Dict
-    @test metadata(d,Y) isa Dict
-    @test metadata(d,1) isa Dict
     @test size(d) == (11,4)
     @test length(d) == 44
     @test d[At(1.0),At(4)] ≈ 4.5403023
     @test d[Near(-0.5), Near(0.9)] == 2
     @test size(d[Between(0.25,0.65),Between(3,4)]) == (4,2)
-    d = NMRData(y2, (X(0:.1:1, md1), Y(1:4, md2)), md)
+    d = NMRData(y2, (X(0:.1:1, metadata=md1), Y(1:4, metadata=md2)), metadata=md)
     @test d[1,1] == 2
     @test d == y2
     @test metadata(d,X)[:test] == "hello axis 1"
@@ -60,12 +50,11 @@ end
     d = NMRData(y1, (X(x1), ))
     @test metadata(d) isa Dict
     @test d[1] == 1
-    d = NMRData(y1, (X(x1), ), md)
+    d = NMRData(y1, (X(x1), ), metadata=md)
     @test d[1] == 1
     @test d == y1
     @test metadata(d) isa Dict
     @test metadata(d)[:test] == "hello data"
-    @test metadata(d,X) isa Dict
 end
 
 @traitfn f(x::X) where {X; HasPseudoDimension{X}} = "Fake!"
