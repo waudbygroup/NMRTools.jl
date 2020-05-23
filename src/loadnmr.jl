@@ -194,7 +194,7 @@ function parsenmrpipeheader(header::Vector{Float32})
         if x[1] isa Type
             md[k] = x[1].(header[x[2]])
         else
-            md[k] = header[x]
+            md[k] = Float64(header[x])
         end
     end
 
@@ -212,7 +212,7 @@ function parsenmrpipeheader(header::Vector{Float32})
             if x[1] isa Type
                 d[k] = x[1].(header[x[2][i]])
             else
-                d[k] = header[x[i]]
+                d[k] = Float64(header[x[i]])
             end
         end
         # add label, removing null characters
@@ -296,6 +296,7 @@ function loadnmrpipe1d(filename::String, md, mdax)
         read!(f, header)
         read!(f, y)
     end
+    y = Float64.(y)
 
     valx = mdax[1][:val]
     delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
@@ -324,6 +325,7 @@ function loadnmrpipe2d(filename::String, md, mdax)
     else
         y = zeros(Float32, npoints1, npoints2)
     end
+    y = Float64.(y)
 
     # read the file
     open(filename) do f
@@ -372,6 +374,7 @@ function loadnmrpipe3d(filename::String, md, mdax)
         end
         y[i,:,:] = y2d
     end
+    y = Float64.(y)
 
     # y is currently in order DIMORDER - we want to rearrange:
     # 1 is always direct, and should be placed first (i.e. 1 x x)
