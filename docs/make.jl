@@ -1,4 +1,5 @@
 using Documenter, NMRTools, Plots
+ENV["GKSwstype"] = "100" # https://github.com/jheinen/GR.jl/issues/278
 
 makedocs(;
     modules=[NMRTools],
