@@ -7,5 +7,4 @@
 
 NMRTools.jl is a simple library for importing and plotting NMR data.
 
-!!! note
-    This package is under active development and it may be a while before its features and syntax stabilises. Please take a look at the examples in the documentation for a guide to getting started.
+> **NOTE**: This package is under active development and it may be a while before its features and syntax stabilises. Please take a look at the examples in the documentation for a guide to getting started.
