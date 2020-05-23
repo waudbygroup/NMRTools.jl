@@ -1,4 +1,4 @@
-using Documenter, NMRTools
+using Documenter, NMRTools, Plots
 
 makedocs(;
     modules=[NMRTools],
