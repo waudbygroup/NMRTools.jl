@@ -114,7 +114,7 @@ savefig("plot-2d.svg"); nothing # hide
 
 ![](plot-2d.svg)
 
-### Accessing raw spectrum data
+## Accessing raw spectrum data
 
 Spectrum data and associated axis information, metadata, etc, is encapsulated in an [`NMRData`](@ref) object. Raw arrays of data for the spectrum and axes can be obtained from this using [`data`](@ref), [`xval`](@ref) and [`yval`](@ref) commands
 
