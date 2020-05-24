@@ -35,6 +35,9 @@ function loadnmr(filename::String, acqusfilename::Union{String,Nothing}=nothing)
         throw(NMRToolsException("unknown file format for loadnmr\ntemplate = " * template))
     end
 
+    metadata(spectrum)[:filename] = filename
+    metadata(spectrum)[:NMRTools] = true
+
     # locate the acqus file
     if isnothing(acqusfilename)
         base = basename(filename)
@@ -49,21 +52,27 @@ function loadnmr(filename::String, acqusfilename::Union{String,Nothing}=nothing)
     end
 
     # parse the acqus file
-    acqusmetadata = parseacqus(acqusfilename)
-    metadata(spectrum)[:acqus] = acqusmetadata
-    metadata(spectrum)[:ns] = acqusmetadata["NS"]
-    metadata(spectrum)[:rg] = acqusmetadata["RG"]
-    metadata(spectrum)[:pulseprogram] = acqusmetadata["PULPROG"]
-    metadata(spectrum)[:filename] = filename
-    metadata(spectrum)[:acqusfilename] = acqusfilename
-    metadata(spectrum)[:NMRTools] = true
+    if ispath(acqusfilename)
+        acqusmetadata = parseacqus(acqusfilename)
+        metadata(spectrum)[:acqus] = acqusmetadata
+        metadata(spectrum)[:ns] = acqusmetadata["NS"]
+        metadata(spectrum)[:rg] = acqusmetadata["RG"]
+        metadata(spectrum)[:pulseprogram] = acqusmetadata["PULPROG"]
+        metadata(spectrum)[:acqusfilename] = acqusfilename
+    else
+        @warn "cannot locate acqus file for $(filename) - some metadata will be missing"
+    end
 
     # load the title file
     titlefilename = joinpath(dirname(acqusfilename), "pdata", "1", "title")
-    title = read(titlefilename, String)
-    metadata(spectrum)[:title] = strip(title)
-    titleline1 = split(title, "\n")[1]
-    label!(spectrum, titleline1)
+    if ispath(titlefilename)
+        title = read(titlefilename, String)
+        metadata(spectrum)[:title] = strip(title)
+        titleline1 = split(title, "\n")[1]
+        label!(spectrum, titleline1)
+    else
+        @warn "cannot locate title file for $(filename) - some metadata will be missing"
+    end
 
     # populate the spectrum noise level
     estimatenoise!(spectrum)
