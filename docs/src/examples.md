@@ -5,15 +5,14 @@
 Load in some example data, in NMRPipe format
 
 ```@repl 1
-using NMRTools;
-y = loadnmr("../../exampledata/1D_19F/test.ft1")
+using NMRTools, Plots;
+spec = loadnmr("../../exampledata/1D_19F/test.ft1")
 ```
 
 and then plot it
 
 ```@repl 1
-using Plots;
-plot(y);
+plot(spec);
 savefig("plot-y.svg"); nothing # hide
 ```
 
@@ -22,7 +21,7 @@ savefig("plot-y.svg"); nothing # hide
 Zoom in on a particular region using a [`Between`](@ref) selector
 
 ```@repl 1
-plot(y[Between(-123,-124.5)]);
+plot(spec[Between(-123,-124.5)]);
 savefig("plot-y2.svg"); nothing # hide
 ```
 
@@ -34,30 +33,30 @@ savefig("plot-y2.svg"); nothing # hide
 Access metadata associated with the spectrum
 
 ```@repl 1
-metadata(y) |> keys
-metadata(y, :pulseprogram)
-metadata(y, :ns)
+metadata(spec) |> keys
+metadata(spec, :pulseprogram)
+metadata(spec, :ns)
 ```
 
 and with the X axis itself
 
 ```@repl 1
-metadata(y, X) |> keys
-metadata(y, X, :label)
-metadata(y, X, :offsetppm)
+metadata(spec, X) |> keys
+metadata(spec, X, :label)
+metadata(spec, X, :offsetppm)
 ```
 
 This includes information on the window function, indicating in this case the line broadening applied (in Hz) and the acquisition time (in s)
 
 ```@repl 1
-metadata(y, X, :window)
+metadata(spec, X, :window)
 ```
 
 Help is available on metadata entries
 
 ```@repl 1
 metadatahelp(:sf)
-metadata(y, X, :sf)
+metadata(spec, X, :sf)
 ```
 
 **Acquisition parameters** are easily accessible

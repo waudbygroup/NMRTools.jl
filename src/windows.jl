@@ -1,7 +1,7 @@
 abstract type WindowFunction end
 
 """
-NullWindow(tmax)
+    NullWindow(tmax)
 
 No apodization applied.
 """
@@ -11,7 +11,7 @@ struct NullWindow <: WindowFunction
 end
 
 """
-UnknownWindow(tmax)
+    UnknownWindow(tmax)
 
 Unknown apodization applied.
 """
@@ -22,7 +22,7 @@ end
 
 
 """
-ExponentialWindow(lb, tmax)
+    ExponentialWindow(lb, tmax)
 
 EM: Exponential Multiply Window.
  -lb    expHz  [0.0]  Exponential Broaden, Hz. (Q1)
@@ -34,7 +34,7 @@ struct ExponentialWindow <: WindowFunction
 end
 
 """
-SineWindow(offset, endpoint, power, tmax)
+    SineWindow(offset, endpoint, power, tmax)
 
 SP: Adjustable Sine Window. [SINE]
  -off   offset [0.0]  Sine Start*PI.  (Q1)

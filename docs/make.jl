@@ -7,6 +7,7 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "Examples" => "examples.md",
+        "Metadata" => "metadata.md",
     ],
     repo="https://github.com/chriswaudby/NMRTools.jl/blob/{commit}{path}#L{line}",
     sitename="NMRTools.jl",
