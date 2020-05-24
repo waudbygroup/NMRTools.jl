@@ -2,18 +2,14 @@
 
 [`NMRData`](@ref) objects contain comprehensive metadata on processing and acquisition parameters that are populated automatically upon loading a spectrum. Entries are divided into *spectrum* metadata - associated with the experiment in general - and *axis* metadata, that are associated with a particular dimension of the data.
 
-These will be demonstrated here for an example 2D spectrum
-
-```@repl 1
-using NMRTools;
-spec = loadnmr("../../exampledata/2D_HN/test.ft2");
-```
 
 ## Accessing spectrum metadata
 
 Metadata entries are labelled by symbols such as `:ns` or `:pulseprogram`. See below for a list of all available symbols. Entries can be accessed using the `metadata` function, or directly as a dictionary-style lookup
 
 ```@repl 1
+using NMRTools; # hide
+spec = loadnmr("../../exampledata/2D_HN/test.ft2"); # hide
 metadata(spec, :ns)
 spec[:ns]
 metadata(spec, :title)
@@ -23,8 +19,9 @@ spec[:title]
 Help on metadata symbols is available
 
 ```@repl 1
-metadatahelp(:ns)
+metadatahelp(:td)
 ```
+
 
 ## Accessing axis metadata
 
@@ -36,6 +33,7 @@ spec[X, :label]
 metadata(spec, Y, :label)
 spec[Y, :label]
 ```
+
 
 ## Accessing acquisition parameters
 
@@ -63,8 +61,8 @@ acqus(spec, :CNST, 4)
 If present, files such as `vclist` and `vdlist` are imported and can be accessed through the `acqus` function
 
 ```@repl 1
-pseudo3dspec = loadnmr("../../exampledata/pseudo3D_HN_R2/ft/test%03d.ft2");
-pseudo3dspec[:label]
+pseudo3dspec = loadnmr("../../exampledata/pseudo3D_HN_R2/ft/test%03d.ft2"); # hide
+pseudo3dspec[:label] # hide
 acqus(pseudo3dspec, :vclist)
 ```
 
