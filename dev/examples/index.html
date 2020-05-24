@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Examples · NMRTools.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">NMRTools.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#Loading-and-plotting-a-1D-spectrum-1"><span>Loading and plotting a 1D spectrum</span></a></li><li><a class="tocitem" href="#A-quick-look-at-spectrum-metadata-1"><span>A quick look at spectrum metadata</span></a></li><li><a class="tocitem" href="#Overlaying-multiple-1D-spectra-1"><span>Overlaying multiple 1D spectra</span></a></li><li><a class="tocitem" href="#Loading-and-plotting-a-2D-spectrum-1"><span>Loading and plotting a 2D spectrum</span></a></li><li><a class="tocitem" href="#Accessing-raw-spectrum-data-1"><span>Accessing raw spectrum data</span></a></li><li><a class="tocitem" href="#Overlaying-multiple-2D-spectra-1"><span>Overlaying multiple 2D spectra</span></a></li><li><a class="tocitem" href="#Analysis-of-pseudo-2D-diffusion-data-1"><span>Analysis of pseudo-2D diffusion data</span></a></li><li><a class="tocitem" href="#Saving-plots-1"><span>Saving plots</span></a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/chriswaudby/NMRTools.jl/blob/master/docs/src/examples.md#L" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples-1"><a class="docs-heading-anchor" href="#Examples-1">Examples</a><a class="docs-heading-anchor-permalink" href="#Examples-1" title="Permalink"></a></h1><h2 id="Loading-and-plotting-a-1D-spectrum-1"><a class="docs-heading-anchor" href="#Loading-and-plotting-a-1D-spectrum-1">Loading and plotting a 1D spectrum</a><a class="docs-heading-anchor-permalink" href="#Loading-and-plotting-a-1D-spectrum-1" title="Permalink"></a></h2><p>Load in some example data, in NMRPipe format</p><pre><code class="language-julia-repl">julia&gt; using NMRTools;
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Examples · NMRTools.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">NMRTools.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#Loading-and-plotting-a-1D-spectrum-1"><span>Loading and plotting a 1D spectrum</span></a></li><li><a class="tocitem" href="#A-quick-look-at-spectrum-metadata-1"><span>A quick look at spectrum metadata</span></a></li><li><a class="tocitem" href="#Overlaying-multiple-1D-spectra-1"><span>Overlaying multiple 1D spectra</span></a></li><li><a class="tocitem" href="#Loading-and-plotting-a-2D-spectrum-1"><span>Loading and plotting a 2D spectrum</span></a></li><li><a class="tocitem" href="#Accessing-raw-spectrum-data-1"><span>Accessing raw spectrum data</span></a></li><li><a class="tocitem" href="#Overlaying-multiple-2D-spectra-1"><span>Overlaying multiple 2D spectra</span></a></li><li><a class="tocitem" href="#Analysis-of-pseudo-2D-diffusion-data-1"><span>Analysis of pseudo-2D diffusion data</span></a></li><li><a class="tocitem" href="#Saving-plots-1"><span>Saving plots</span></a></li></ul></li><li><a class="tocitem" href="../metadata/">Metadata</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/chriswaudby/NMRTools.jl/blob/master/docs/src/examples.md#L" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples-1"><a class="docs-heading-anchor" href="#Examples-1">Examples</a><a class="docs-heading-anchor-permalink" href="#Examples-1" title="Permalink"></a></h1><h2 id="Loading-and-plotting-a-1D-spectrum-1"><a class="docs-heading-anchor" href="#Loading-and-plotting-a-1D-spectrum-1">Loading and plotting a 1D spectrum</a><a class="docs-heading-anchor-permalink" href="#Loading-and-plotting-a-1D-spectrum-1" title="Permalink"></a></h2><p>Load in some example data, in NMRPipe format</p><pre><code class="language-julia-repl">julia&gt; using NMRTools, Plots;
 
-julia&gt; y = loadnmr(&quot;../../exampledata/1D_19F/test.ft1&quot;)
+julia&gt; spec = loadnmr(&quot;../../exampledata/1D_19F/test.ft1&quot;)
 NMRData (named 45 C) with dimensions:
  X: -119.99959383646768:-0.0009143653407738972:-128.00029056823928
 and data: 8751-element Array{Float64,1}
-[-3741.88, -4000.97, -3816.28, -3438.31, -2960.06, -2279.44, -1297.88, -17.4062, 1441.69, 2952.72  …  -17120.4, -15306.0, -12575.2, -9020.53, -5042.94, -1183.31, 2036.5, 4275.69, 5542.06, 5973.62]</code></pre><p>and then plot it</p><pre><code class="language-julia-repl">julia&gt; using Plots;
-
-julia&gt; plot(y);</code></pre><p><img src="../plot-y.svg" alt/></p><p>Zoom in on a particular region using a <a href="@ref"><code>Between</code></a> selector</p><pre><code class="language-julia-repl">julia&gt; plot(y[Between(-123,-124.5)]);</code></pre><p><img src="../plot-y2.svg" alt/></p><h2 id="A-quick-look-at-spectrum-metadata-1"><a class="docs-heading-anchor" href="#A-quick-look-at-spectrum-metadata-1">A quick look at spectrum metadata</a><a class="docs-heading-anchor-permalink" href="#A-quick-look-at-spectrum-metadata-1" title="Permalink"></a></h2><p>Access metadata associated with the spectrum</p><pre><code class="language-julia-repl">julia&gt; metadata(y) |&gt; keys
+[-3741.88, -4000.97, -3816.28, -3438.31, -2960.06, -2279.44, -1297.88, -17.4062, 1441.69, 2952.72  …  -17120.4, -15306.0, -12575.2, -9020.53, -5042.94, -1183.31, 2036.5, 4275.69, 5542.06, 5973.62]</code></pre><p>and then plot it</p><pre><code class="language-julia-repl">julia&gt; plot(spec);</code></pre><p><img src="../plot-y.svg" alt/></p><p>Zoom in on a particular region using a <a href="@ref"><code>Between</code></a> selector</p><pre><code class="language-julia-repl">julia&gt; plot(spec[Between(-123,-124.5)]);</code></pre><p><img src="../plot-y2.svg" alt/></p><h2 id="A-quick-look-at-spectrum-metadata-1"><a class="docs-heading-anchor" href="#A-quick-look-at-spectrum-metadata-1">A quick look at spectrum metadata</a><a class="docs-heading-anchor-permalink" href="#A-quick-look-at-spectrum-metadata-1" title="Permalink"></a></h2><p>Access metadata associated with the spectrum</p><pre><code class="language-julia-repl">julia&gt; metadata(spec) |&gt; keys
 Base.KeySet for a Dict{Symbol,Any} with 23 entries. Keys:
   :FDSIZE
   :filename
@@ -30,11 +28,11 @@ Base.KeySet for a Dict{Symbol,Any} with 23 entries. Keys:
   :FDQUADFLAG
   ⋮
 
-julia&gt; metadata(y, :pulseprogram)
+julia&gt; metadata(spec, :pulseprogram)
 &quot;zg&quot;
 
-julia&gt; metadata(y, :ns)
-64</code></pre><p>and with the X axis itself</p><pre><code class="language-julia-repl">julia&gt; metadata(y, X) |&gt; keys
+julia&gt; metadata(spec, :ns)
+64</code></pre><p>and with the X axis itself</p><pre><code class="language-julia-repl">julia&gt; metadata(spec, X) |&gt; keys
 Base.KeySet for a Dict{Symbol,Any} with 39 entries. Keys:
   :FDGOFF
   :FDORIG
@@ -57,43 +55,23 @@ Base.KeySet for a Dict{Symbol,Any} with 39 entries. Keys:
   :FDOBS
   ⋮
 
-julia&gt; metadata(y, X, :label)
+julia&gt; metadata(spec, X, :label)
 &quot;19F&quot;
 
-julia&gt; metadata(y, X, :offsetppm)
--130.0</code></pre><p>This includes information on the window function, indicating in this case the line broadening applied (in Hz) and the acquisition time (in s)</p><pre><code class="language-julia-repl">julia&gt; metadata(y, X, :window)
+julia&gt; metadata(spec, X, :offsetppm)
+-130.0</code></pre><p>This includes information on the window function, indicating in this case the line broadening applied (in Hz) and the acquisition time (in s)</p><pre><code class="language-julia-repl">julia&gt; metadata(spec, X, :window)
 ExponentialWindow(5.0, 3.744288662922463)</code></pre><p>Help is available on metadata entries</p><pre><code class="language-julia-repl">julia&gt; metadatahelp(:sf)
 &quot;Carrier frequency, in MHz&quot;
 
-julia&gt; metadata(y, X, :sf)
+julia&gt; metadata(spec, X, :sf)
 470.5224736346634</code></pre><p><strong>Acquisition parameters</strong> are easily accessible</p><pre><code class="language-julia-repl">julia&gt; acqus(y, :P, 1)
-13.25
+ERROR: UndefVarError: y not defined
 
 julia&gt; acqus(y, :P)
-64-element OffsetArray(::Array{Float64,1}, 0:63) with eltype Float64 with indices 0:63:
- 11.0
- 13.25
- 22.0
-  0.0
-  0.0
-  0.0
-  0.0
-  0.0
-  0.0
-  0.0
-  ⋮
-  0.0
-  0.0
-  0.0
-  0.0
-  0.0
-  0.0
-  0.0
-  0.0
-  0.0
+ERROR: UndefVarError: y not defined
 
 julia&gt; acqus(y, :TE)
-318.1509</code></pre><h2 id="Overlaying-multiple-1D-spectra-1"><a class="docs-heading-anchor" href="#Overlaying-multiple-1D-spectra-1">Overlaying multiple 1D spectra</a><a class="docs-heading-anchor-permalink" href="#Overlaying-multiple-1D-spectra-1" title="Permalink"></a></h2><p>Load and plot multiple 1D spectra from a list of filenames</p><pre><code class="language-julia-repl">julia&gt; using NMRTools, Plots;
+ERROR: UndefVarError: y not defined</code></pre><h2 id="Overlaying-multiple-1D-spectra-1"><a class="docs-heading-anchor" href="#Overlaying-multiple-1D-spectra-1">Overlaying multiple 1D spectra</a><a class="docs-heading-anchor-permalink" href="#Overlaying-multiple-1D-spectra-1" title="Permalink"></a></h2><p>Load and plot multiple 1D spectra from a list of filenames</p><pre><code class="language-julia-repl">julia&gt; using NMRTools, Plots;
 
 julia&gt; filenames = [&quot;../../exampledata/1D_19F_titration/2/test.ft1&quot;,
                    &quot;../../exampledata/1D_19F_titration/3/test.ft1&quot;,
@@ -217,4 +195,4 @@ bounds: (6.919718355000003e7, 6.919718355000003e7)
 bounds: (6.919718355000003e7, 6.919718355000003e7)
 (34.88 ± 0.22, 4.525e-11 ± 2.8e-13, Plot{Plots.GRBackend() n=4})</code></pre><p><img src="../plot-diff-fit.svg" alt/></p><p>An estimate of the hydrodynamic radius is determined based on the viscosity of pure water at the specified temperature (default 298 K). Default values for gradient pulse length, δ, and strength, Gmax, and the diffusion delay, Δ, can be altered using the full form of the command</p><pre><code class="language-julia">fitdiffusion(spec, selector; δ=0.004, Δ=0.1, σ=0.9, Gmax=0.55, solvent=:h2o, T=298, showplot=true)</code></pre><h2 id="Saving-plots-1"><a class="docs-heading-anchor" href="#Saving-plots-1">Saving plots</a><a class="docs-heading-anchor-permalink" href="#Saving-plots-1" title="Permalink"></a></h2><p>All plots can be saved as high quality vector graphics, or as png files, using the <code>savefig</code> command</p><pre><code class="language-julia">savefig(&quot;myspectrum.pdf&quot;)
 savefig(&quot;myspectrum.svd&quot;)
-savefig(&quot;myspectrum.png&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 23 May 2020 16:51">Saturday 23 May 2020</span>. Using Julia version 1.4.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+savefig(&quot;myspectrum.png&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../metadata/">Metadata »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 24 May 2020 13:21">Sunday 24 May 2020</span>. Using Julia version 1.4.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
