@@ -132,6 +132,7 @@ end
     parsenmrpipeheader(header)
 
 Pass a 512 x 4 byte array containing an nmrPipe header file, and returns dictionaries of metadata.
+The nmrPipe header format is defined in `fdatap.h`.
 
 # Return values
 - `md`: dictionary of spectrum metadata
@@ -150,14 +151,17 @@ function parsenmrpipeheader(header::Vector{Float32})
         :FDMAGIC => 1,
         :FDFLTFORMAT => 2,
         :FDFLTORDER => 3,
+        :FDPIPEFLAG => (Int, 58),  #Dimension code of data stream
+        :FDCUBEFLAG => (Int, 448),
         :FDSIZE => (Int, 100),
-        :FSSPECNUM => (Int, 220),
+        :FDSPECNUM => (Int, 220),
         :FDQUADFLAG => (Int, 107),
         :FD2DPHASE => (Int, 257),
         :FDTRANSPOSED => (Int, 222),
         :FDDIMCOUNT => (Int, 10),
         :FDDIMORDER => (Int, 25:28),
         :FDFILECOUNT => (Int, 443),
+        :FDSIZE => (Int, (100, 220, 16, 33)),
     )
     # dimension-specific parameters
     dimlabels = (17:18, 19:20, 21:22, 23:24) # UInt8
@@ -201,7 +205,12 @@ function parsenmrpipeheader(header::Vector{Float32})
         x = genpars[k]
         # cast to new type if needed
         if x[1] isa Type
-            md[k] = x[1].(header[x[2]])
+            if length(x[2]) == 1
+                md[k] = x[1].(header[x[2]])
+            else
+                # array parameter
+                md[k] = [x[1].(header[i]) for i in x[2]]
+            end
         else
             md[k] = Float64(header[x])
         end
@@ -366,58 +375,79 @@ end
 Return NMRData containing spectrum and associated metadata.
 """
 function loadnmrpipe3d(filename::String, md, mdax)
-    npoints = [mdax[i][:npoints] for i in 1:3]
-    pdim = [mdax[i][:pseudodim] for i in 1:3]
-    dimorder = md[:FDDIMORDER][1:3]
-    if md[:FDTRANSPOSED] == 0
-        permute!(dimorder,[1,3,2])
-    end
+    datasize = md[:FDSIZE][1:3]
 
     # load data
     header = zeros(Float32, 512)
-    y = zeros(Float32, npoints[dimorder]...)
-    y2d = zeros(Float32, npoints[dimorder][2:3]...)
-    for i = 1:npoints[dimorder[1]]
-        filename1 = expandpipetemplate(filename, i)
-        open(filename1) do f
-            read!(f, header)
-            read!(f, y2d)
+    y = zeros(Float32, datasize...)
+    if md[:FDPIPEFLAG] == 0
+        # series of 2D files
+        y2d = zeros(Float32, datasize[1], datasize[2])
+        for i = 1:datasize[3]
+            filename1 = expandpipetemplate(filename, i)
+            open(filename1) do f
+                read!(f, header)
+                read!(f, y2d)
+            end
+            y[:,:,i] = y2d
         end
-        y[i,:,:] = y2d
+    else
+        # single stream
+        open(filename) do f
+            read!(f, header)
+            read!(f, y)
+        end
     end
     y = Float64.(y)
 
-    # y is currently in order DIMORDER - we want to rearrange:
-    # 1 is always direct, and should be placed first (i.e. 1 x x)
-    # is there is a pseudodimension, put that last (i.e. 1 y p)
-    # otherwise, return data in the order 1 2 3 = order of fid.com, inner -> outer loop
+    # get axis values
     val1 = mdax[1][:val]
     val2 = mdax[2][:val]
     val3 = mdax[3][:val]
     delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
     delete!(mdax[2],:val)
     delete!(mdax[3],:val)
+
+    # y is currently in order of FDSIZE - we need to rearrange
+    dimorder = md[:FDDIMORDER][1:3]
+    tr = md[:FDTRANSPOSED]
+
+    # figure out current ordering of data matrix
+    # e.g. order = [2 1 3] indicates the data matrix is axis2 x axis1 x axis3
+    if tr == 0
+        order = [findfirst(x->x.==i, dimorder) for i=[2,1,3]]
+    else # transpose flag
+        # swap first two entries of dimorder round
+        dimorder2 = [dimorder[2], dimorder[1], dimorder[3]]
+        order = [findfirst(x->x.==i, dimorder2) for i=[1,2,3]]
+    end
+    # calculate the permutation required to bring the data matrix into the order axis1 x axis2 x axis3
+    unorder = [findfirst(x->x.==i, order) for i=[1,2,3]]
+    y = permutedims(y, unorder)
+
+    # finally rearrange data into a useful order - always place pseudo-dimension last - and generate axes
+    # 1 is always direct, and should be placed first (i.e. 1 x x)
+    # is there is a pseudodimension, put that last (i.e. 1 y p)
+    # otherwise, return data in the order 1 2 3 = order of fid.com, inner -> outer loop
+    pdim = [mdax[i][:pseudodim] for i in 1:3]
     if pdim[2]
         # dimensions are x p y => we want ordering 1 3 2
         xaxis = X(val1, metadata=mdax[1])
         yaxis = Y(val3, metadata=mdax[3])
         zaxis = Ti(val2, metadata=mdax[2])
-        unorder = [findfirst(x->x.==i,dimorder) for i=[1,3,2]]
+        y = permutedims(y, [1, 3, 2])
     elseif pdim[3]
         # dimensions are x y p => we want ordering 1 2 3
         xaxis = X(val1, metadata=mdax[1])
         yaxis = Y(val2, metadata=mdax[2])
         zaxis = Ti(val3, metadata=mdax[3])
-        unorder = [findfirst(x->x.==i,dimorder) for i=[1,2,3]]
     else
         # no pseudodimension, use Z axis not Ti
         # dimensions are x y z => we want ordering 1 2 3
         xaxis = X(val1, metadata=mdax[1])
         yaxis = Y(val2, metadata=mdax[2])
         zaxis = Z(val3, metadata=mdax[3])
-        unorder = [findfirst(x->x.==i,dimorder) for i=[1,2,3]]
     end
-    y = permutedims(y, unorder)
 
     NMRData(y, (xaxis, yaxis, zaxis), metadata=md)
 end
@@ -467,15 +497,19 @@ function metadatahelp(entry::Symbol)
         :FDFLTFORMAT => "Constant defining floating point format",
         :FDFLTORDER => "Constant defining byte order",
         :FDSIZE => "Number of points in current dim R|I",
-        :FSSPECNUM => "Number of complex 1D slices in file",
+        :FDSPECNUM => "Number of complex 1D slices in file",
         :FDQUADFLAG => "0=quad/complex, 1=real, 2=pseudoquad, 3=se, 4=grad",
         :FD2DPHASE => "0=magnitude, 1=tppi, 2=states,3=image, 4=array",
         :FDTRANSPOSED => "1=Transposed, 0=Not Transposed",
         :FDDIMCOUNT => "Number of dimensions in complete data",
         :FDDIMORDER => "Dimension stored in X/Y/Z/A axes",
         :FDFILECOUNT => "Number of files in complete data",
+        :FDPIPEFLAG => "Dimension code of data stream: 0=single or multi-file; 2 1 3 or 4 = CUR_XDIM of a datastream",
+        :FDCUBEFLAG => "1=3D cube multi-file series (4D only); 0 otherwise",
+
 
         # axis parameters
+        :FDSIZE => "Actual size of data matrix (dim 1 = FDSIZE, dim 2 = FDSPECNUM, dim 3/4 = FDFxSIZE)"
         :FDAPOD => "Current valid time-domain size (complex points, before ZF, after extraction)",
         :FDSW => "Sweep Width Hz (after extraction)",
         :FDOBS => "Obs Freq MHz",

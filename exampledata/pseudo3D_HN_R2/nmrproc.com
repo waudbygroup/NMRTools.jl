@@ -26,7 +26,7 @@ xyz2pipe -in fid/test%03d.fid -x -verb              \
 | nmrPipe  -fn ZF -auto                             \
 | nmrPipe  -fn FT -neg                                  \
 | nmrPipe  -fn PS -p0 90.0 -p1 0.0 -di               \
-| pipe2xyz -out ft/test%03d.ft2 -y
+| pipe2xyz -out ftx/test%03d.ft2 -x
 
 cp ft/test001.ft2 first-plane.ft2
 sethdr first-plane.ft2 -ndim 2 -zN 1 -zT 1
