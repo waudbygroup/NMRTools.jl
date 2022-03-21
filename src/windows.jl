@@ -43,9 +43,9 @@ SP: Adjustable Sine Window. [SINE]
  """
 abstract type SineWindow <: WindowFunction end
 function SineWindow(offset=0.0, endpoint=1.0, power=1.0, tmax=Inf)
-    if power ≈ 1.0 && offset ≈ 0.0
+    if power ≈ 1.0 && offset ≈ 0.5
         return CosWindow(endpoint * tmax)
-    elseif power ≈ 2.0 && offset ≈ 0.0
+    elseif power ≈ 2.0 && offset ≈ 0.5
         return Cos²Window(endpoint * tmax)
     else
         return GeneralSineWindow(offset, endpoint, power, tmax)
