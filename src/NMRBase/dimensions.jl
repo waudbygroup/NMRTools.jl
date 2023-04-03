@@ -44,6 +44,6 @@ end
 
 @NMRdim FrequencyDim NMRDimension
 @NMRdim TimeDim NMRDimension
-@NMRdim QuadratureDim NMRDimension
-@NMRdim GradientDim NMRDimension
-@NMRdim SpatialDim NMRDimension
+# @NMRdim QuadratureDim NMRDimension
+# @NMRdim GradientDim NMRDimension
+# @NMRdim SpatialDim NMRDimension

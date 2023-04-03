@@ -31,6 +31,7 @@ import .LookupArrays: metadata, set, _set, rebuild, basetypeof, Metadata,
 import .Dimensions: dims, refdims, lookup, dimstride, kwdims, hasdim, label, _astuple
 
 include("nuclei.jl")
+include("coherences.jl")
 include("dimensions.jl")
 include("windows.jl")
 include("nmrdata.jl")
@@ -46,6 +47,12 @@ export Nucleus
 @exportinstances Nucleus
 export spin
 export gyromagneticratio
+
+# coherences
+export Coherence
+export SQ, MQ
+export coherenceorder
+export γeff
 
 # NMRData
 export AbstractNMRData
@@ -65,9 +72,9 @@ export scale
 export NMRDimension
 export TimeDim
 export FrequencyDim
-export QuadratureDim
-export GradientDim
-export SpatialDim
+# export QuadratureDim
+# export GradientDim
+# export SpatialDim
 
 # Metadata
 export AbstractMetadata, Metadata, NoMetadata
