@@ -6,14 +6,31 @@
 
 # getters ##########################################################################################
 
-# DD.units(A::AbstractNMRData) = get(metadata(A), :units, nothing)
+# metadata accessor functions
+metadata(A::NMRData, key::Symbol) = get(metadata(A), key, missing)
+metadata(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, missing)
+metadata(d::NMRDimension, key::Symbol) = get(metadata(d), key, missing)
+Base.getindex(A::NMRData, key::Symbol) = metadata(A, key)
+Base.getindex(A::NMRData, dim, key::Symbol) = metadata(A, dim, key)
+Base.getindex(d::NMRDimension, key::Symbol) = metadata(d, key)
+Base.setindex!(A::NMRData, v, key::Symbol) = setindex!(metadata(A), v, key)  #(A[key] = v  =>  metadata(A)[key] = v)
+Base.setindex!(A::NMRData, v, dim, key::Symbol) = setindex!(metadata(A,dim), v, key)  #(A[dim, key] = v  =>  metadata(A, dim)[key] = v)
+Base.setindex!(d::NMRDimension, v, key::Symbol) = setindex!(metadata(d), v, key)  #(d[key] = v  =>  metadata(d)[key] = v)
+
+
 function units end
-units(A::AbstractNMRData) = get(metadata(A), :units, nothing)
-units(A::NMRDimension) = get(metadata(A), :units, nothing)
+units(A::AbstractNMRData) = metadata(A, :units)
+units(A::AbstractNMRData, dim) = metadata(A, dim, :units)
+units(d::NMRDimension) = get(metadata(d), :units, nothing)
 
 function label end
-label(A::AbstractNMRData) = get(metadata(A), :label, nothing)
-label(A::NMRDimension) = get(metadata(A), :label, nothing)
+label(A::AbstractNMRData) = metadata(A, :label)
+label(A::AbstractNMRData, dim) = metadata(A, dim, :label)
+label(d::NMRDimension) = get(metadata(d), :label, nothing)
+label!(A::NMRData, labeltext::AbstractString) = (A[:label] = labeltext)
+label!(A::NMRData, dim, labeltext::AbstractString) = (A[dim, :label] = labeltext)
+label!(d::NMRDimension, labeltext::AbstractString) = (d[:label] = labeltext)
+
 
 # # Metadata for NMRData #############################################################################
 

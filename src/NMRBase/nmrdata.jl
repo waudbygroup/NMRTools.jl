@@ -137,6 +137,10 @@ end
 # DD.dimconstructor(::Tuple{<:Dimension{<:AbstractProjected},Vararg{<:Dimension}}) = NMRData
 
 
+# Getters ##########################################################################################
+val(A::NMRData) = A.data
+val(A::NMRData, dim) = val(dims(A, dim))
+
 # Methods ##########################################################################################
 """
     scale(d::AbstractNMRData)

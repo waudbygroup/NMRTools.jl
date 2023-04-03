@@ -47,3 +47,7 @@ end
 # @NMRdim QuadratureDim NMRDimension
 # @NMRdim GradientDim NMRDimension
 # @NMRdim SpatialDim NMRDimension
+
+
+# Getters ########
+val(d::NMRDimension) = d.val.data

@@ -20,6 +20,8 @@ using Test
     @test dat[Near(8.54)] == 5
     @test dat[8.4..8.6] == [4, 5, 6]
     @test dat[8.41..8.6] == [5, 6]
+
+    @test_throws DimensionMismatch NMRData(0.:1:9, (axH,))  # size of axis and data don't match
 end
 
 @testset "NMRBase: metadata" begin
