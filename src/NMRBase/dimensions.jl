@@ -50,4 +50,4 @@ end
 
 
 # Getters ########
-val(d::NMRDimension) = d.val.data
+# val(d::NMRDimension) = d.val.data

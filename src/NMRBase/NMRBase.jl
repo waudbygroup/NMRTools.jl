@@ -60,7 +60,7 @@ export NMRData
 # Selectors
 export At, Between, Touches, Contains, Near, Where, All, ..
 # getter methods
-export val, parent, dims, refdims, lookup, bounds, missingval
+export parent, dims, refdims, lookup, bounds, missingval
 # Dimension/Lookup primitives
 export dimnum, hasdim, hasselection, otherdims
 # utils

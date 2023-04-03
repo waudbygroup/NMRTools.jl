@@ -7,9 +7,9 @@
 # getters ##########################################################################################
 
 # metadata accessor functions
-metadata(A::NMRData, key::Symbol) = get(metadata(A), key, missing)
-metadata(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, missing)
-metadata(d::NMRDimension, key::Symbol) = get(metadata(d), key, missing)
+metadata(A::NMRData, key::Symbol) = get(metadata(A), key, nothing)
+metadata(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, nothing)
+metadata(d::NMRDimension, key::Symbol) = get(metadata(d), key, nothing)
 Base.getindex(A::NMRData, key::Symbol) = metadata(A, key)
 Base.getindex(A::NMRData, dim, key::Symbol) = metadata(A, dim, key)
 Base.getindex(d::NMRDimension, key::Symbol) = metadata(d, key)
