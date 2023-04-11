@@ -18,7 +18,7 @@ function addexptmetadata!(spectrum, filename, experimentfolder)
 
     
     # parse the acqus file
-    acqusfilename = joinpath(dir, "acqus")
+    acqusfilename = joinpath(experimentfolder, "acqus")
     if isfile(acqusfilename)
         acqusmetadata = parseacqus(acqusfilename)
         spectrum[:acqus] = acqusmetadata
@@ -80,8 +80,8 @@ function parseacqusentry(dat)
         if parsed isa Vector{Real}
             parsed = float.(parsed)
         end
-        # convert to a zero-based array to match expected bruker notation
-        parsed = OffsetArray(parsed, 0:length(parsed)-1)
+        # create a dictionary, 0 => p0, 1 => p1, etc.
+        parsed = Dict(zip(0:length(parsed)-1, parsed))
     else
         parsed = parseacqusfield(dat)
     end

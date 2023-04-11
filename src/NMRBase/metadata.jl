@@ -7,14 +7,14 @@
 # getters ##########################################################################################
 
 # metadata accessor functions
-metadata(A::NMRData, key::Symbol) = get(metadata(A), key, nothing)
-metadata(A::NMRData, dim, key::Symbol) = get(metadata(A, dim), key, nothing)
+metadata(A::AbstractNMRData, key::Symbol) = get(metadata(A), key, nothing)
+metadata(A::AbstractNMRData, dim, key::Symbol) = get(metadata(A, dim), key, nothing)
 metadata(d::NMRDimension, key::Symbol) = get(metadata(d), key, nothing)
-Base.getindex(A::NMRData, key::Symbol) = metadata(A, key)
-Base.getindex(A::NMRData, dim, key::Symbol) = metadata(A, dim, key)
+Base.getindex(A::AbstractNMRData, key::Symbol) = metadata(A, key)
+Base.getindex(A::AbstractNMRData, dim, key::Symbol) = metadata(A, dim, key)
 Base.getindex(d::NMRDimension, key::Symbol) = metadata(d, key)
-Base.setindex!(A::NMRData, v, key::Symbol) = setindex!(metadata(A), v, key)  #(A[key] = v  =>  metadata(A)[key] = v)
-Base.setindex!(A::NMRData, v, dim, key::Symbol) = setindex!(metadata(A,dim), v, key)  #(A[dim, key] = v  =>  metadata(A, dim)[key] = v)
+Base.setindex!(A::AbstractNMRData, v, key::Symbol) = setindex!(metadata(A), v, key)  #(A[key] = v  =>  metadata(A)[key] = v)
+Base.setindex!(A::AbstractNMRData, v, dim, key::Symbol) = setindex!(metadata(A,dim), v, key)  #(A[dim, key] = v  =>  metadata(A, dim)[key] = v)
 Base.setindex!(d::NMRDimension, v, key::Symbol) = setindex!(metadata(d), v, key)  #(d[key] = v  =>  metadata(d)[key] = v)
 
 
@@ -27,10 +27,15 @@ function label end
 label(A::AbstractNMRData) = metadata(A, :label)
 label(A::AbstractNMRData, dim) = metadata(A, dim, :label)
 label(d::NMRDimension) = get(metadata(d), :label, nothing)
-label!(A::NMRData, labeltext::AbstractString) = (A[:label] = labeltext)
-label!(A::NMRData, dim, labeltext::AbstractString) = (A[dim, :label] = labeltext)
+label!(A::AbstractNMRData, labeltext::AbstractString) = (A[:label] = labeltext)
+label!(A::AbstractNMRData, dim, labeltext::AbstractString) = (A[dim, :label] = labeltext)
 label!(d::NMRDimension, labeltext::AbstractString) = (d[:label] = labeltext)
 
+# acqus accessor functions
+acqus(A::AbstractNMRData) = metadata(A, :acqus)
+acqus(A::AbstractNMRData, key::String) = ismissing(acqus(A)) ? missing : get(acqus(A), uppercase(key), missing)
+acqus(A::AbstractNMRData, key::Symbol) = acqus(A, string(key))
+acqus(A::AbstractNMRData, key, index) = acqus(A, key)[index]
 
 # # Metadata for NMRData #############################################################################
 

@@ -87,6 +87,7 @@ export metadata
 export defaultmetadata
 export metadatahelp
 export label, label!, units
+export acqus
 
 # Window functions
 export WindowFunction

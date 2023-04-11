@@ -242,7 +242,6 @@ function loadnmrpipe1d(filename, md, mdax)
 
     valx = mdax[1][:val]
     delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
-    @show mdax
     xaxis = FrequencyDim(valx, metadata=mdax[1])
 
     return NMRData(y, (xaxis, ), metadata=md)
