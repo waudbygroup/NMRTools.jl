@@ -22,6 +22,20 @@ using Test
     @test dat[8.41..8.6] == [5, 6]
 
     @test_throws DimensionMismatch NMRData(0.:1:9, (axH,))  # size of axis and data don't match
+
+    # 2D data
+    x = 8:.1:9
+    y = 100:120
+    z = x .+ y'  # 11 x 21
+    axH = FrequencyDim(x)
+    axN = FrequencyDim(y)
+    dat = NMRData(z, (axH, axN))
+
+    @test size(dat) == (11, 21)
+    @test length(dat) == 11 * 21
+    @test dat[1,:] == y .+ 8
+    @test dat[:,1] == x .+ 100
+    @test dat[8.2..8.4, 101..102.5] == [109.2 110.2 ; 109.3 110.3 ; 109.4 110.4]
 end
 
 @testset "NMRBase: metadata" begin
