@@ -51,7 +51,7 @@ end
 
 # # Metadata for Dimensions ##########################################################################
 
-function defaultmetadata(::Type{<:NMRDimension})
+function defaultmetadata(T::Type{<:NMRDimension})
     defaults = Dict{Symbol,Any}(:label => "",
                                 :units => nothing)
     return Metadata{T}(defaults)
@@ -59,6 +59,16 @@ end
 
 function defaultmetadata(::Type{<:FrequencyDim})
     defaults = Dict{Symbol,Any}(:label => "",
+                                :coherence => nothing,
+                                :bf => nothing,
+                                :offsethz => nothing,
+                                :offsetppm => nothing,
+                                :swhz => nothing,
+                                :swppm => nothing,
+                                :td => nothing,
+                                :tdzf => nothing,
+                                :npoints => nothing,
+                                :region => nothing,
                                 :units => nothing,
                                 :window => nothing,
                                 :mcindex => nothing)
@@ -71,6 +81,12 @@ function defaultmetadata(::Type{<:TimeDim})
                                 :window => nothing,
                                 :mcindex => nothing)
     return Metadata{TimeDim}(defaults)
+end
+
+function defaultmetadata(::Type{<:UnknownDim})
+    defaults = Dict{Symbol,Any}(:label => "",
+                                :units => nothing)
+    return Metadata{UnknownDim}(defaults)
 end
 
 

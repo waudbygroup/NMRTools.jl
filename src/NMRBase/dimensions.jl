@@ -15,13 +15,21 @@ function NMRdimmacro(typ, supertype, name::String=string(typ))
             if :metadata ∉ keys(kw)
                 # if no metadata defined, define it
                 # alternatively, if there is valid metadata, merge in the defaults
+                @debug "Creating default dimension metadata"
                 v = merge((metadata=defaultmetadata($typ),), v)
             elseif v[:metadata] isa Metadata{$typ}
+                @debug "Merging dimension metadata with defaults"
                 v2 = merge(v, (metadata=defaultmetadata($typ),))
                 merge!(v2[:metadata].val, v[:metadata].val)
                 v = v2
+            elseif v[:metadata] isa Dict
+                @debug "Merging metadata dictionary with defaults"
+                md = v[:metadata]
+                v = merge(v, (metadata=defaultmetadata($typ),))
+                merge!(v[:metadata].val, md)
             else
                 # if NoMetadata (or an invalid type), define the correct default metadata
+                @debug "Dimension metadata is NoMetadata - replace with defaults"
                 v = merge(v, (metadata=defaultmetadata($typ),))
             end
             val = AutoLookup(val, v)
@@ -44,6 +52,7 @@ end
 
 @NMRdim FrequencyDim NMRDimension
 @NMRdim TimeDim NMRDimension
+@NMRdim UnknownDim NMRDimension
 # @NMRdim QuadratureDim NMRDimension
 # @NMRdim GradientDim NMRDimension
 # @NMRdim SpatialDim NMRDimension

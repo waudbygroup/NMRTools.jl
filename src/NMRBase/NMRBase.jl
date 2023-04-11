@@ -30,6 +30,7 @@ import .LookupArrays: metadata, set, _set, rebuild, basetypeof, Metadata,
     order, span, sampling, locus, val, index, bounds, hasselection, units, SelectorOrInterval
 import .Dimensions: dims, refdims, lookup, dimstride, kwdims, hasdim, label, _astuple
 
+include("exceptions.jl")
 include("nuclei.jl")
 include("coherences.jl")
 include("dimensions.jl")
@@ -41,6 +42,9 @@ macro exportinstances(enum)
     eval = GlobalRef(Core, :eval)
     return :($eval($__module__, Expr(:export, map(Symbol, instances($enum))...)))
 end
+
+# Exceptions
+export NMRToolsException
 
 # Nuclei
 export Nucleus
@@ -72,6 +76,7 @@ export scale
 export NMRDimension
 export TimeDim
 export FrequencyDim
+export UnknownDim
 # export QuadratureDim
 # export GradientDim
 # export SpatialDim
@@ -88,5 +93,9 @@ export WindowFunction
 export NullWindow
 export UnknownWindow
 export ExponentialWindow
+export SineWindow
+export GeneralSineWindow, CosWindow, Cos²Window
+export GaussWindow
+export GeneralGaussWindow, LorentzToGaussWindow
 
 end
