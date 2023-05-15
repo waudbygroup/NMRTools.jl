@@ -4,16 +4,16 @@
 ##NPOINTS= 9	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= sstadmiller
-$$ 2017-08-07 11:52:11.997 +0200  sstadmiller@avance500.med.unc.edu
-$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/12/acqus
+$$ 2017-08-07 09:18:33.453 +0200  sstadmiller@avance500.med.unc.edu
+$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/2/acqu
 $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
-##$ACQT0= -8.43519225872167
+##$ACQT0= 0
 ##$AMP= (0..31)
 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100
 100 100 100 100 100 100 100 100 100 100 100 100 100 100
 ##$AMPCOIL= (0..19)
 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##$ANAVPT= -1
+##$ANAVPT= 1
 ##$AQSEQ= 0
 ##$AQ_mod= 3
 ##$AUNM= <au_zg>
@@ -40,7 +40,7 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 ##$D= (0..63)
 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.0002 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##$DATE= 1502099531
+##$DATE= 0
 ##$DE= 6.5
 ##$DECBNUC= <off>
 ##$DECIM= 1418.66666666667
@@ -52,7 +52,7 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 ##$DR= 22
 ##$DS= 2
 ##$DSPFIRM= 0
-##$DSPFVS= 20
+##$DSPFVS= 0
 ##$DTYPA= 0
 ##$EXP= <F19>
 ##$F1LIST= <>
@@ -73,8 +73,8 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 ##$FQ6LIST= <>
 ##$FQ7LIST= <>
 ##$FQ8LIST= <>
-##$FRQLO3= 25082.7858400345
-##$FRQLO3N= 2
+##$FRQLO3= 0
+##$FRQLO3N= 0
 ##$FS= (0..7)
 83 83 83 83 83 83 83 83
 ##$FTLPGN= 0
@@ -91,7 +91,7 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 ##$GPZ= (0..31)
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 ##$GRDPROG= <>
-##$GRPDLY= 67.9896545410156
+##$GRPDLY= -1
 ##$HDDUTY= 20
 ##$HDRATE= 1
 ##$HGAIN= (0..3)
@@ -112,28 +112,28 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 ##$INP= (0..63)
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##$INSTRUM= <spect>
+##$INSTRUM= <>
 ##$L= (0..31)
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-##$LFILTER= 100
-##$LGAIN= -5
+##$LFILTER= 10
+##$LGAIN= -10
 ##$LINPSTP= 0
-##$LOCKED= yes
-##$LOCKFLD= 4124
-##$LOCKGN= 126.851768493652
-##$LOCKPOW= -18
-##$LOCKPPM= 4.69999980926514
+##$LOCKED= no
+##$LOCKFLD= 0
+##$LOCKGN= 0
+##$LOCKPOW= -20
+##$LOCKPPM= 0
 ##$LOCNUC= <2H>
-##$LOCPHAS= 127.2
-##$LOCSHFT= yes
+##$LOCPHAS= 0
+##$LOCSHFT= no
 ##$LOCSW= 0
-##$LTIME= 0.349999994039536
+##$LTIME= 0.1
 ##$MASR= 4200
 ##$MASRLST= <masrlst>
 ##$MULEXPNO= (0..15)
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 ##$NBL= 1
-##$NC= -6
+##$NC= 0
 ##$NLOGCH= 4
 ##$NOVFLW= 0
 ##$NS= 64
@@ -166,7 +166,7 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 11 13.25 22 0 0 0 0 0 0 0 0 0 0 0 0 0 1000 0 0 600 0 0 0 0 0 0 0 11 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 ##$PACOIL= (0..15)
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+1 5 0 2 3 4 0 0 0 0 0 0 0 0 0 0
 ##$PAPS= 0
 ##$PARMODE= 0
 ##$PCPD= (0..9)
@@ -189,7 +189,7 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 0 8.2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 8.2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 ##$PLWMAX= (0..7)
-125.572 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
 ##$POWMOD= 0
 ##$PQPHASE= 0
 ##$PQSCALE= 1
@@ -197,8 +197,7 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 ##$PRECHAN= (0..15)
 -1 4 0 1 3 5 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 ##$PRGAIN= 0
-##$PROBHD= <5 mm CPQCI 1H/19F-31P/13C/15N/D Z-GRD Z136678/0001
->
+##$PROBHD= <>
 ##$PULPROG= <zg>
 ##$PW= 0
 ##$PYNM= <>
@@ -213,8 +212,8 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 ##$RECSEL= (0..15)
 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##$RG= 76.02
-##$RO= 0
+##$RG= 80.6
+##$RO= 20
 ##$ROUTWD1= (0..23)
 1 2 2 2 2 2 2 2 0 0 0 1 1 0 0 0 0 0 0 0 0 0 0 0
 ##$ROUTWD2= (0..23)
@@ -270,15 +269,15 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 ##$SWfinal= 0
 ##$TD= 28194
 ##$TD0= 1
-##$TE= 318.1498
-##$TE1= 320.1317
-##$TE2= 0
-##$TE3= 0
-##$TE4= 0
+##$TE= 300
+##$TE1= 300
+##$TE2= 300
+##$TE3= 300
+##$TE4= 300
 ##$TEG= 300
-##$TE_PIDX= 1
+##$TE_PIDX= 0
 ##$TE_STAB= (0..9)
-2 2 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
 ##$TL= (0..7)
 120 120 120 120 120 120 120 120
 ##$TUNHIN= 0
@@ -302,8 +301,8 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 0 0 0 0
 ##$XL= 0
 ##$YL= 0
-##$YMAX_a= 245270
-##$YMIN_a= -140048
+##$YMAX_a= 0
+##$YMIN_a= 0
 ##$ZGOPTNS= <>
 ##$ZL1= 120
 ##$ZL2= 120

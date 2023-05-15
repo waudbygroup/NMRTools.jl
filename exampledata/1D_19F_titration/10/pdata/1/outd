@@ -4,8 +4,8 @@
 ##NPOINTS= 1	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= sstadmiller
-$$ 2017-08-07 09:25:22.915 +0200  sstadmiller@avance500.med.unc.edu
-$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/10/pdata/1/outd
+$$ 2017-08-07 09:08:56.940 +0200  sstadmiller@avance500.med.unc.edu
+$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/4/pdata/1/outd
 $$ process /opt/topspin3.2pl2/prog/mod/edparproc
 ##$CURPLOT= <no printer>
 ##$CURPRIN= <dconpeaks.txt>

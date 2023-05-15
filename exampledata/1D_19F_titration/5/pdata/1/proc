@@ -4,8 +4,8 @@
 ##NPOINTS= 5	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= sstadmiller
-$$ 2017-09-13 10:47:37.287 -0400  Sam@DESKTOP-H09PJL6
-$$ C:/Bruker/SH3_SosBinding_PepS2/F19_T22G_PepS2_Dilute_08.07.17/5/pdata/1/proc
+$$ 2017-09-13 10:48:44.152 -0400  Sam@DESKTOP-H09PJL6
+$$ C:/Bruker/SH3_SosBinding_PepS2/F19_T22G_PepS2_Dilute_08.07.17/9/pdata/1/proc
 $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\dataserver.exe
 ##$ABSF1= -90
 ##$ABSF2= -143.4524
@@ -82,8 +82,8 @@ $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\dataserver.exe
 ##$NZP= 0
 ##$OFFSET= -115.13
 ##$PC= 1
-##$PHC0= -85.49453
-##$PHC1= 144.8656
+##$PHC0= -65.74415
+##$PHC1= 60.86555
 ##$PH_mod= 1
 ##$PKNL= yes
 ##$PPARMOD= 0

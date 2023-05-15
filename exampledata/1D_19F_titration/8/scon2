@@ -4,8 +4,8 @@
 ##NPOINTS= 1	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= sstadmiller
-$$ 2017-08-07 10:39:57.421 +0200  sstadmiller@avance500.med.unc.edu
-$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/8/scon2
+$$ 2017-08-07 10:09:06.383 +0200  sstadmiller@avance500.med.unc.edu
+$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/6/scon2
 $$ process /opt/topspin3.2pl2/prog/mod/go
 ##$BLKTR= (0..19)
 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3

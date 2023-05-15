@@ -1,11 +1,11 @@
 ##TITLE= Parameter file, TopSpin 3.5 pl 7
 ##JCAMPDX= 5.0
 ##DATATYPE= Parameter Values
-##NPOINTS= 10	$$ modification sequence number
+##NPOINTS= 5	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= sstadmiller
-$$ 2017-09-13 17:14:38.857 -0400  Sam@DESKTOP-H09PJL6
-$$ C:/Bruker/SH3_SosBinding_PepS2/F19_T22G_PepS2_Dilute_08.07.17/3/pdata/1/proc
+$$ 2017-09-13 10:49:09.571 -0400  Sam@DESKTOP-H09PJL6
+$$ C:/Bruker/SH3_SosBinding_PepS2/F19_T22G_PepS2_Dilute_08.07.17/11/pdata/1/proc
 $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\dataserver.exe
 ##$ABSF1= -90
 ##$ABSF2= -143.4524
@@ -82,8 +82,8 @@ $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\dataserver.exe
 ##$NZP= 0
 ##$OFFSET= -115.13
 ##$PC= 1
-##$PHC0= -70.18459
-##$PHC1= 70.90337
+##$PHC0= -61.96718
+##$PHC1= 40.86555
 ##$PH_mod= 1
 ##$PKNL= yes
 ##$PPARMOD= 0
@@ -96,11 +96,11 @@ $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\dataserver.exe
 ##$PYNMP= <proc.py>
 ##$REVERSE= no
 ##$SF= 470.583019295799
-##$SI= 8192
+##$SI= 32768
 ##$SIGF1= 1
 ##$SIGF2= -1
 ##$SINO= 0
-##$SIOLD= 8192
+##$SIOLD= 32768
 ##$SPECTYP= <F19>
 ##$SREGLST= <>
 ##$SSB= 0

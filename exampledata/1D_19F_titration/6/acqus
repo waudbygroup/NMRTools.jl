@@ -1,11 +1,11 @@
 ##TITLE= Parameter file, TOPSPIN		Version 3.2
 ##JCAMPDX= 5.0
 ##DATATYPE= Parameter Values
-##NPOINTS= 11	$$ modification sequence number
+##NPOINTS= 9	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= sstadmiller
-$$ 2017-08-07 10:14:43.154 +0200  sstadmiller@avance500.med.unc.edu
-$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/6/acqus
+$$ 2017-08-07 10:45:35.057 +0200  sstadmiller@avance500.med.unc.edu
+$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/8/acqus
 $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 ##$ACQT0= -8.43519225872167
 ##$AMP= (0..31)
@@ -40,7 +40,7 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 ##$D= (0..63)
 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.0002 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##$DATE= 1502093621
+##$DATE= 1502095534
 ##$DE= 6.5
 ##$DECBNUC= <off>
 ##$DECIM= 1418.66666666667
@@ -119,8 +119,8 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 ##$LGAIN= -5
 ##$LINPSTP= 0
 ##$LOCKED= yes
-##$LOCKFLD= 4124
-##$LOCKGN= 126.099998474121
+##$LOCKFLD= 4123
+##$LOCKGN= 132.419509887695
 ##$LOCKPOW= -18
 ##$LOCKPPM= 4.69999980926514
 ##$LOCNUC= <2H>
@@ -270,8 +270,8 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 ##$SWfinal= 0
 ##$TD= 28194
 ##$TD0= 1
-##$TE= 318.1506
-##$TE1= 320.1325
+##$TE= 318.1499
+##$TE1= 320.1318
 ##$TE2= 0
 ##$TE3= 0
 ##$TE4= 0
@@ -302,8 +302,8 @@ $$ process /opt/topspin3.2pl2/prog/mod/shimcntl
 0 0 0 0
 ##$XL= 0
 ##$YL= 0
-##$YMAX_a= 329904
-##$YMIN_a= -164092
+##$YMAX_a= 305635
+##$YMIN_a= -125205
 ##$ZGOPTNS= <>
 ##$ZL1= 120
 ##$ZL2= 120

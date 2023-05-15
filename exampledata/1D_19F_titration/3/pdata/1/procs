@@ -1,11 +1,11 @@
 ##TITLE= Parameter file, TopSpin 3.5 pl 7
 ##JCAMPDX= 5.0
 ##DATATYPE= Parameter Values
-##NPOINTS= 16	$$ modification sequence number
+##NPOINTS= 12	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= sstadmiller
-$$ 2017-09-13 17:14:45.319 -0400  Sam@DESKTOP-H09PJL6
-$$ C:/Bruker/SH3_SosBinding_PepS2/F19_T22G_PepS2_Dilute_08.07.17/3/pdata/1/procs
+$$ 2017-09-13 11:01:49.288 -0400  Sam@DESKTOP-H09PJL6
+$$ C:/Bruker/SH3_SosBinding_PepS2/F19_T22G_PepS2_Dilute_08.07.17/11/pdata/1/procs
 $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\proc1d.exe
 ##$ABSF1= -115.1368
 ##$ABSF2= -145.0948
@@ -39,7 +39,7 @@ $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\proc1d.exe
 ##$F1P= -47.8364560373493
 ##$F2P= -49.0924873939807
 ##$FCOR= 0.5
-##$FTSIZE= 8192
+##$FTSIZE= 32768
 ##$FT_mod= 6
 ##$GAMMA= 0
 ##$GB= 0
@@ -78,7 +78,7 @@ $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\proc1d.exe
 ##$Mdd_LrZF= 0
 ##$Mdd_mod= 0
 ##$NCOEF= 0
-##$NC_proc= -14
+##$NC_proc= -15
 ##$NLEV= 6
 ##$NOISF1= 10
 ##$NOISF2= 9
@@ -87,8 +87,8 @@ $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\proc1d.exe
 ##$NZP= 0
 ##$OFFSET= -115.1368
 ##$PC= 1
-##$PHC0= -70.18459
-##$PHC1= 70.90337
+##$PHC0= -61.96718
+##$PHC1= 40.86555
 ##$PH_mod= 1
 ##$PKNL= yes
 ##$PPARMOD= 0
@@ -106,7 +106,7 @@ $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\proc1d.exe
 ##$RDPOS= 0
 ##$REVERSE= no
 ##$SF= 470.583022516201
-##$SI= 8192
+##$SI= 32768
 ##$SIGF1= 1
 ##$SIGF2= -1
 ##$SINO= 0
@@ -115,12 +115,12 @@ $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\proc1d.exe
 ##$SREF_mod= 1
 ##$SREGLST= <>
 ##$SSB= 0
-##$STSI= 8192
+##$STSI= 32768
 ##$STSR= 0
 ##$SW_p= 14097.7443609023
 ##$SYMM= 0
 ##$S_DEV= 0
-##$TDeff= 16384
+##$TDeff= 28194
 ##$TDoff= 0
 ##$TI= <>
 ##$TILT= no
@@ -134,6 +134,6 @@ $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\proc1d.exe
 ##$USERP5= <>
 ##$WDW= 1
 ##$XDIM= 0
-##$YMAX_p= 197933711
-##$YMIN_p= -6755425
+##$YMAX_p= 273094943
+##$YMIN_p= -13557811
 ##END=
