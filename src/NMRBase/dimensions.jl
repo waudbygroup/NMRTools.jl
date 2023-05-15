@@ -59,4 +59,4 @@ end
 
 
 # Getters ########
-# val(d::NMRDimension) = d.val.data
+data(d::NMRDimension) = d.val.data

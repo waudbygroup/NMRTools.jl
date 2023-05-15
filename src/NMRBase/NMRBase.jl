@@ -26,8 +26,10 @@ const DD = DimensionalData
 # using .Dimensions: StandardIndices, DimTuple, Dimension
 # using .LookupArrays: LookupArrayTuple
 
+import DimensionalData.refdims_title
 import .LookupArrays: metadata, set, _set, rebuild, basetypeof, Metadata,
-    order, span, sampling, locus, val, index, bounds, hasselection, units, SelectorOrInterval
+    order, span, sampling, locus, val, index, bounds, hasselection, units, SelectorOrInterval,
+    ForwardOrdered
 import .Dimensions: dims, refdims, lookup, dimstride, kwdims, hasdim, label, _astuple
 
 include("exceptions.jl")
@@ -64,11 +66,12 @@ export NMRData
 # Selectors
 export At, Between, Touches, Contains, Near, Where, All, ..
 # getter methods
-export parent, dims, refdims, lookup, bounds, missingval
+export data, parent, dims, refdims, lookup, bounds, missingval
 # Dimension/Lookup primitives
 export dimnum, hasdim, hasselection, otherdims
 # utils
-export set, rebuild, reorder, modify, broadcast_dims, broadcast_dims!
+export refdims_title
+export set, rebuild, reorder, modify, broadcast_dims, broadcast_dims!, ForwardOrdered
 # NMR properties
 export scale
 
