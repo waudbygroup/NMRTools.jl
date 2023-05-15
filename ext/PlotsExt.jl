@@ -17,6 +17,8 @@ struct ContourLike end
 
 contourlevels(spacing=1.7, n=12) = (spacing^i for i=0:(n-1))
 
+axislabel(dat::NMRData, n=1) = "$(label(dat,n)) chemical shift / ppm"
+
 # 1D plot
 @recipe function f(A::NMRData{T,1}; normalize=true) where T
     Afwd = reorder(A, ForwardOrdered) # make sure data axes are in forwards order
@@ -30,7 +32,7 @@ contourlevels(spacing=1.7, n=12) = (spacing^i for i=0:(n-1))
     title --> ifelse(isempty(refdims(Afwd)), label(Afwd), refdims_title(Afwd))
     legend --> false
 
-    xguide --> "$(label(Afwd, 1)) chemical shift / ppm"
+    xguide --> axislabel(A)
     xflip --> true
     xgrid --> false
     xtick_direction --> :out
@@ -45,51 +47,51 @@ end
 
 
 
-# # multiple 1D plots
-# @recipe function f(v::Vector{<:NMRData{T,1} where T}; normalize=true, vstack=false)
-#     # force 1D to be a line plot
-#     seriestype := :path
-#     markershape --> :none
+# multiple 1D plots
+@recipe function f(v::Vector{<:NMRData{T,1} where T}; normalize=true, vstack=false)
+    # recommend 1D to be a line plot
+    seriestype --> :path
+    markershape --> :none
 
-#     # get the first entry to determine axis label
-#     Afwd = DimensionalData.forwardorder(v[1])
-#     dim = dims(Afwd, 1)
+    # use the first entry to determine axis label
+    xguide --> axislabel(v[1])
+    xflip --> true
+    xgrid --> false
+    xtick_direction --> :out
 
-#     xguide --> "$(Afwd[dim,:label]) chemical shift / ppm"
-#     xflip --> true
-#     xgrid --> false
-#     xtick_direction --> :out
+    yguide --> ""
+    yshowaxis --> false
+    yticks --> nothing
 
-#     yguide --> ""
-#     yshowaxis --> false
-#     yticks --> nothing
+    delete!(plotattributes, :vstack)
+    delete!(plotattributes, :normalize)
 
-#     delete!(plotattributes, :vstack)
-#     delete!(plotattributes, :normalize)
+    voffset = 0
+    vdelta = maximum([
+            maximum(abs.(A)) / (normalize ? scale(A) : 1)
+            for A in v]) / length(v)
 
-#     voffset = 0
-#     vdelta = maximum([
-#             maximum(abs.(A)) / (normalize ? A[:ns]*A[:rg] : 1)
-#             for A in v]) / length(v)
+    # TODO add guide lines
+    # if vstack
+    #     yticks --> voffset .+ (0:length(v)-1)*vdelta
+    # else
+    #     yticks --> [0,]
+    # end
 
-#     # TODO add guide lines
-#     # if vstack
-#     #     yticks --> voffset .+ (0:length(v)-1)*vdelta
-#     # else
-#     #     yticks --> [0,]
-#     # end
-
-#     for A in v
-#         @series begin
-#             seriestype := :path
-#             Afwd = DimensionalData.forwardorder(A) # make sure data axes are in forwards order
-#             dim = dims(Afwd, 1)
-#             label --> label(A)
-#             val(dim), parent(Afwd)./(normalize ? scale(A) : 1) .+ voffset
-#         end
-#         vstack && (voffset += vdelta)
-#     end
-# end
+    for A in v
+        @series begin
+            seriestype --> :path
+            markershape --> :none
+            Afwd = reorder(A, ForwardOrdered) # make sure data axes are in forwards order
+            x = dims(Afwd, 1)
+            label --> label(A)
+            data(x), data(Afwd) ./ (normalize ? scale(A) : 1) .+ voffset
+        end
+        if vstack
+            voffset += vdelta
+        end
+    end
+end
 
 
 
