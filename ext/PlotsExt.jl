@@ -10,6 +10,7 @@ using NMRTools, Plots
 
 using NMRTools
 using Plots
+using SimpleTraits
 
 @info "PlotsExt being loaded"
 
@@ -17,7 +18,9 @@ struct ContourLike end
 
 contourlevels(spacing=1.7, n=12) = (spacing^i for i=0:(n-1))
 
-axislabel(dat::NMRData, n=1) = "$(label(dat,n)) chemical shift / ppm"
+axislabel(dat::NMRData, n=1) = axislabel(dims(dat,n))
+axislabel(dim::FrequencyDim) = "$(label(dim)) chemical shift / ppm"
+axislabel(dim::NMRDimension) = "$(label(dim))"
 
 # 1D plot
 @recipe function f(A::NMRData{T,1}; normalize=true) where T
@@ -95,61 +98,63 @@ end
 
 
 
-# # 2D plot
-# @recipe f(d::D) where {D<:NMRData{T,2} where T} = SimpleTraits.trait(HasPseudoDimension{D}), d
+# 2D plot
+@recipe f(d::D) where {D<:NMRData{T,2} where T} = SimpleTraits.trait(HasNonFrequencyDimension{D}), d
 
-# @recipe function f(::Type{Not{HasPseudoDimension{D}}}, d::D) where {D<:NMRData{T, 2} where T}
-#     dfwd = DimensionalData.forwardorder(d) # make sure data axes are in forwards order
-#     dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
-#     y, x = dims(dfwd)
+@recipe function f(::Type{Not{HasNonFrequencyDimension{D}}}, d::D) where {D<:NMRData{T, 2} where T}
+    dfwd = reorder(d, ForwardOrdered) # make sure data axes are in forwards order
+    # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
+    x, y = dims(dfwd)
 
-#     # set default title
-#     title --> DimensionalData.refdims_title(dfwd)
-#     legend --> false
-#     framestyle --> :box
+    # set default title
+    title --> label(d)
+    legend --> false
+    framestyle --> :box
 
-#     xguide --> "$(dfwd[x,:label]) chemical shift / ppm"
-#     xflip --> true
-#     xgrid --> false
-#     xtick_direction --> :out
+    xguide --> axislabel(x)
+    xflip --> true
+    xgrid --> false
+    xtick_direction --> :out
 
-#     yguide --> "$(dfwd[y,:label]) chemical shift / ppm"
-#     yflip --> true
-#     ygrid --> false
-#     ytick_direction --> :out
+    yguide --> axislabel(y)
+    yflip --> true
+    ygrid --> false
+    ytick_direction --> :out
 
-#     # generate light and dark colours for plot contours, based on supplied colour
-#     # - create a 5-tone palette with the same hue as the passed colour, and select the
-#     # fourth and second entries to provide dark and light shades
-#     basecolor = get(plotattributes, :linecolor, :blue)
-#     colors = sequential_palette(hue(convert(HSV,parse(Colorant, basecolor))),5)[[4,2]]
+    # generate light and dark colours for plot contours, based on supplied colour
+    # - create a 5-tone palette with the same hue as the passed colour, and select the
+    # fourth and second entries to provide dark and light shades
+    # TODO
+    # basecolor = get(plotattributes, :linecolor, :blue)
+    # colors = sequential_palette(hue(convert(HSV,parse(Colorant, basecolor))),5)[[4,2]]
 
-#     #delete!(plotattributes, :normalize)
-#     #scale = normalize ? A[:ns]*A[:rg] : 1
-#     #val(dim), parent(A) ./ scale
-#     @series begin
-#         levels --> 5*dfwd[:noise].*contourlevels()
-#         linecolor := colors[1]
-#         primary := true
-#         val(x), val(y), data(dfwd)
-#     end
-#     @series begin
-#         levels --> -5*dfwd[:noise].*contourlevels()
-#         linecolor := colors[2]
-#         primary := false
-#         val(x), val(y), data(dfwd)
-#     end
-# end
+    #delete!(plotattributes, :normalize)
+    #scale = normalize ? A[:ns]*A[:rg] : 1
+    #val(dim), parent(A) ./ scale
+    @series begin
+        # levels --> 5*dfwd[:noise].*contourlevels()
+        # linecolor := colors[1]
+        primary := true
+        data(x), data(y), data(dfwd)
+    end
+    # @series begin
+    #     levels --> -5*dfwd[:noise].*contourlevels()
+    #     linecolor := colors[2]
+    #     primary := false
+    #     data(x), data(y), data(dfwd)
+    # end
+end
 
 
-# @recipe function f(::Type{HasPseudoDimension{D}}, d::D) where {D<:NMRData{T, 2} where T}
-#     # TODO define recipe for pseudo2D data
-#     dfwd = DimensionalData.forwardorder(d) # make sure data axes are in forwards order
-#     dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
-#     y, x = dims(dfwd)
-#     @info "plot recipe for pseudo2D data not yet defined"
-#     val(x), val(y), data(dfwd)
-# end
+@recipe function f(::Type{HasNonFrequencyDimension{D}}, d::D) where {D<:NMRData{T, 2} where T}
+    # TODO define recipe for pseudo2D data
+    dfwd = reorder(d, ForwardOrdered) # make sure data axes are in forwards order
+    # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
+    x, y = dims(Afwd)
+
+    @warn "plot recipe for pseudo2D data not yet defined"
+    data(x), data(y), data(dfwd)
+end
 
 
 
