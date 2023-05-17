@@ -155,3 +155,49 @@ function scale(d::AbstractNMRData)
     conc = get(metadata(d), :conc, 1)
     return ns * rg * conc
 end
+
+
+# Traits ###########################################################################################
+"""
+    @traitdef HasNonFrequencyDimension{D}
+
+A trait indicating whether the data object has a non-frequency domain dimension.
+
+# Example
+
+```julia
+@traitfn f(x::X) where {X; HasNonFrequencyDimension{X}} = "This spectrum has a non-frequency domain dimension!"
+@traitfn f(x::X) where {X; Not{HasNonFrequencyDimension{X}}} = "This is a pure frequency-domain spectrum!"
+```
+"""
+@traitdef HasNonFrequencyDimension{D}
+
+# adapted from expansion of @traitimpl
+# this is a pure function because it only depends on the type definition of NMRData
+Base.@pure function SimpleTraits.trait(t::Type{HasNonFrequencyDimension{D}}) where D<:NMRData{T,N,A} where {T,N,A}
+    if any(map(dim->(typeintersect(dim, FrequencyDim) == Union{}), A.parameters))
+        HasNonFrequencyDimension{D}
+    else
+        Not{HasNonFrequencyDimension{D}}
+    end
+end
+
+"""
+    hasnonfrequencydimension(spectrum)
+
+Return true if the spectrum contains a non-frequency domain dimension.
+
+# Example
+
+```julia
+julia> y2=loadnmr("exampledata/2D_HN/test.ft2");
+julia> hasnonfrequencydimension(y2)
+false
+julia> y3=loadnmr("exampledata/pseudo3D_HN_R2/ft/test%03d.ft2");
+julia> hasnonfrequencydimension(y3)
+true
+```
+"""
+function hasnonfrequencydimension(spectrum::NMRData{T,N,A}) where {T,N,A}
+    any(map(dim->(typeintersect(dim, FrequencyDim) == Union{}), A.parameters))
+end

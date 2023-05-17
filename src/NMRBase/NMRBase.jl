@@ -15,6 +15,8 @@ const DDarraydocs = joinpath(DDdocs, "#DimensionalData.AbstractDimensionalArray"
 # const DDselectordocs = joinpath(DDdocs, "#DimensionalData.Selector")
 # const DDtidocs = joinpath(DDdocs, "#DimensionalData.Ti")
 
+using SimpleTraits
+
 # using Reexport: Reexport
 # Reexport.@reexport using DimensionalData
 using DimensionalData
@@ -67,6 +69,8 @@ export NMRData
 export At, Between, Touches, Contains, Near, Where, All, ..
 # getter methods
 export data, parent, dims, refdims, lookup, bounds, missingval
+# traits
+export hasnonfrequencydimension, HasNonFrequencyDimension
 # Dimension/Lookup primitives
 export dimnum, hasdim, hasselection, otherdims
 # utils
