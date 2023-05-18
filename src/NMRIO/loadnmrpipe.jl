@@ -242,7 +242,7 @@ function loadnmrpipe1d(filename, md, mdax)
 
     valx = mdax[1][:val]
     delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
-    xaxis = FrequencyDim(valx, metadata=mdax[1])
+    xaxis = F1Dim(valx, metadata=mdax[1])
 
     return NMRData(y, (xaxis, ), metadata=md)
 end
@@ -282,8 +282,8 @@ function loadnmrpipe2d(filename::String, md, mdax)
     delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
     valy = mdax[2][:val]
     delete!(mdax[2],:val) # remove values from metadata to prevent confusion when slicing up
-    ax2 = mdax[2][:pseudodim] ? UnknownDim : FrequencyDim
-    xaxis = FrequencyDim(valx, metadata=mdax[1])
+    ax2 = mdax[2][:pseudodim] ? X2Dim : F2Dim
+    xaxis = F1Dim(valx, metadata=mdax[1])
     yaxis = ax2(valy, metadata=mdax[2])
 
     NMRData(y, (xaxis, yaxis), metadata=md)
@@ -354,21 +354,21 @@ function loadnmrpipe3d(filename::String, md, mdax)
     pdim = [mdax[i][:pseudodim] for i in 1:3]
     if pdim[2]
         # dimensions are x p y => we want ordering 1 3 2
-        xaxis = FrequencyDim(val1, metadata=mdax[1])
-        yaxis = FrequencyDim(val3, metadata=mdax[3])
-        zaxis = UnknownDim(val2, metadata=mdax[2])
+        xaxis = F1Dim(val1, metadata=mdax[1])
+        yaxis = F2Dim(val3, metadata=mdax[3])
+        zaxis = X3Dim(val2, metadata=mdax[2])
         y = permutedims(y, [1, 3, 2])
     elseif pdim[3]
         # dimensions are x y p => we want ordering 1 2 3
-        xaxis = FrequencyDim(val1, metadata=mdax[1])
-        yaxis = FrequencyDim(val2, metadata=mdax[2])
-        zaxis = UnknownDim(val3, metadata=mdax[3])
+        xaxis = F1Dim(val1, metadata=mdax[1])
+        yaxis = F2Dim(val2, metadata=mdax[2])
+        zaxis = X3Dim(val3, metadata=mdax[3])
     else
         # no pseudodimension, use Z axis not Ti
         # dimensions are x y z => we want ordering 1 2 3
-        xaxis = FrequencyDim(val1, metadata=mdax[1])
-        yaxis = FrequencyDim(val2, metadata=mdax[2])
-        zaxis = FrequencyDim(val3, metadata=mdax[3])
+        xaxis = F1Dim(val1, metadata=mdax[1])
+        yaxis = F2Dim(val2, metadata=mdax[2])
+        zaxis = F3Dim(val3, metadata=mdax[3])
     end
 
     NMRData(y, (xaxis, yaxis, zaxis), metadata=md)

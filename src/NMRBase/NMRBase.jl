@@ -81,10 +81,15 @@ export scale
 
 # Dimensions
 export NMRDimension
-export TimeDim
-export FrequencyDim
-export UnknownDim
-# export QuadratureDim
+export TimeDimension
+export FrequencyDimension
+export QuadratureDimension
+export UnknownDimension
+export F1Dim, F2Dim, F3Dim, F4Dim
+export T1Dim, T2Dim, T3Dim, T4Dim
+export TrelaxDim, TkinDim
+export Q1Dim, Q2Dim, Q3Dim, Q4Dim
+export X1Dim, X2Dim, X3Dim, X4Dim
 # export GradientDim
 # export SpatialDim
 

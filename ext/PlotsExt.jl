@@ -19,8 +19,14 @@ struct ContourLike end
 contourlevels(spacing=1.7, n=12) = (spacing^i for i=0:(n-1))
 
 axislabel(dat::NMRData, n=1) = axislabel(dims(dat,n))
-axislabel(dim::FrequencyDim) = "$(label(dim)) chemical shift / ppm"
-axislabel(dim::NMRDimension) = "$(label(dim))"
+axislabel(dim::FrequencyDimension) = "$(label(dim)) chemical shift (ppm)"
+function axislabel(dim::NMRDimension)
+    if isnothing(units(dim))
+        "$(label(dim))"
+    else
+        "$(label(dim)) ($(units(dim)))"
+    end
+end
 
 # 1D plot
 @recipe function f(A::NMRData{T,1}; normalize=true) where T
@@ -135,7 +141,7 @@ end
         # levels --> 5*dfwd[:noise].*contourlevels()
         # linecolor := colors[1]
         primary := true
-        data(x), data(y), data(dfwd)
+        data(x), data(y), permutedims(data(dfwd))
     end
     # @series begin
     #     levels --> -5*dfwd[:noise].*contourlevels()
@@ -150,10 +156,26 @@ end
     # TODO define recipe for pseudo2D data
     dfwd = reorder(d, ForwardOrdered) # make sure data axes are in forwards order
     # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
-    x, y = dims(Afwd)
+    x, y = dims(dfwd)
 
     @warn "plot recipe for pseudo2D data not yet defined"
-    data(x), data(y), data(dfwd)
+
+    # set default title
+    title --> label(d)
+    legend --> false
+    framestyle --> :box
+
+    xguide --> axislabel(x)
+    xflip --> true
+    xgrid --> false
+    xtick_direction --> :out
+
+    yguide --> axislabel(y)
+    yflip --> false
+    ygrid --> false
+    ytick_direction --> :out
+    
+    data(x), data(y), permutedims(data(dfwd))
 end
 
 

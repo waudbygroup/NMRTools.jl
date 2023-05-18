@@ -175,7 +175,7 @@ A trait indicating whether the data object has a non-frequency domain dimension.
 # adapted from expansion of @traitimpl
 # this is a pure function because it only depends on the type definition of NMRData
 Base.@pure function SimpleTraits.trait(t::Type{HasNonFrequencyDimension{D}}) where D<:NMRData{T,N,A} where {T,N,A}
-    if any(map(dim->(typeintersect(dim, FrequencyDim) == Union{}), A.parameters))
+    if any(map(dim->(typeintersect(dim, FrequencyDimension) == Union{}), A.parameters))
         HasNonFrequencyDimension{D}
     else
         Not{HasNonFrequencyDimension{D}}
@@ -199,5 +199,5 @@ true
 ```
 """
 function hasnonfrequencydimension(spectrum::NMRData{T,N,A}) where {T,N,A}
-    any(map(dim->(typeintersect(dim, FrequencyDim) == Union{}), A.parameters))
+    any(map(dim->(typeintersect(dim, FrequencyDimension) == Union{}), A.parameters))
 end

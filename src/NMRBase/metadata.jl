@@ -62,7 +62,7 @@ function defaultmetadata(T::Type{<:NMRDimension})
     return Metadata{T}(defaults)
 end
 
-function defaultmetadata(::Type{<:FrequencyDim})
+function defaultmetadata(::Type{<:FrequencyDimension})
     defaults = Dict{Symbol,Any}(:label => "",
                                 :coherence => nothing,
                                 :bf => nothing,
@@ -77,21 +77,33 @@ function defaultmetadata(::Type{<:FrequencyDim})
                                 :units => nothing,
                                 :window => nothing,
                                 :mcindex => nothing)
-    return Metadata{FrequencyDim}(defaults)
+    return Metadata{FrequencyDimension}(defaults)
 end
 
-function defaultmetadata(::Type{<:TimeDim})
+function defaultmetadata(::Type{<:TimeDimension})
     defaults = Dict{Symbol,Any}(:label => "",
                                 :units => nothing,
                                 :window => nothing,
                                 :mcindex => nothing)
-    return Metadata{TimeDim}(defaults)
+    return Metadata{TimeDimension}(defaults)
 end
 
-function defaultmetadata(::Type{<:UnknownDim})
+function defaultmetadata(::Type{<:TrelaxDim})
+    defaults = Dict{Symbol,Any}(:label => "Relaxation time",
+                                :units => nothing)
+    return Metadata{TrelaxDim}(defaults)
+end
+
+function defaultmetadata(::Type{<:TkinDim})
+    defaults = Dict{Symbol,Any}(:label => "Time elapsed",
+                                :units => nothing)
+    return Metadata{TkinDim}(defaults)
+end
+
+function defaultmetadata(::Type{<:UnknownDimension})
     defaults = Dict{Symbol,Any}(:label => "",
                                 :units => nothing)
-    return Metadata{UnknownDim}(defaults)
+    return Metadata{UnknownDimension}(defaults)
 end
 
 
