@@ -43,4 +43,4 @@ end
 
 Estimate the rms noise level and update `:noise` metadata for a list of spectra.
 """
-estimatenoise!(spectra::Array{<:NMRData,1}) = [estimatenoise!(spectrum) for spectrum in spectra]
+estimatenoise!(spectra::Array{<:NMRData,1}) = map(estimatenoise!, spectra)

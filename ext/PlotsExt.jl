@@ -11,6 +11,7 @@ using NMRTools, Plots
 using NMRTools
 using Plots
 using SimpleTraits
+using Colors
 
 @info "PlotsExt being loaded"
 
@@ -131,24 +132,25 @@ end
     # - create a 5-tone palette with the same hue as the passed colour, and select the
     # fourth and second entries to provide dark and light shades
     # TODO
-    # basecolor = get(plotattributes, :linecolor, :blue)
-    # colors = sequential_palette(hue(convert(HSV,parse(Colorant, basecolor))),5)[[4,2]]
+    basecolor = get(plotattributes, :linecolor, :blue)
+    colors = sequential_palette(hue(convert(HSV,parse(Colorant, basecolor))),5)[[4,2]]
 
-    #delete!(plotattributes, :normalize)
-    #scale = normalize ? A[:ns]*A[:rg] : 1
+    # delete!(plotattributes, :normalize)
+    # scaling = normalize ? scale(dfwd) : 1
+    scaling = scale(dfwd)
     #val(dim), parent(A) ./ scale
     @series begin
-        # levels --> 5*dfwd[:noise].*contourlevels()
-        # linecolor := colors[1]
-        primary := true
-        data(x), data(y), permutedims(data(dfwd))
+        levels --> 5 * dfwd[:noise] / scaling .* contourlevels()
+        linecolor := colors[1]
+        primary --> true
+        data(x), data(y), permutedims(data(dfwd / scaling))
     end
-    # @series begin
-    #     levels --> -5*dfwd[:noise].*contourlevels()
-    #     linecolor := colors[2]
-    #     primary := false
-    #     data(x), data(y), data(dfwd)
-    # end
+    @series begin
+        levels --> -5 * dfwd[:noise] / scaling .* contourlevels()
+        linecolor := colors[2]
+        primary := false
+        data(x), data(y), permutedims(data(dfwd / scaling))
+    end
 end
 
 
@@ -157,8 +159,6 @@ end
     dfwd = reorder(d, ForwardOrdered) # make sure data axes are in forwards order
     # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
     x, y = dims(dfwd)
-
-    @warn "plot recipe for pseudo2D data not yet defined"
 
     # set default title
     title --> label(d)

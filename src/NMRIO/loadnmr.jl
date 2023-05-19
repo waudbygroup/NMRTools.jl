@@ -46,8 +46,7 @@ function loadnmr(filename, experimentfolder=nothing)
     addexptmetadata!(spectrum, filename, experimentfolder)
 
     # 4. estimate the spectrum noise level
-    # TODO
-    # estimatenoise!(spectrum)
+    estimatenoise!(spectrum)
 
     return spectrum
 end

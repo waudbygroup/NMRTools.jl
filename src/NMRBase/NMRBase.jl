@@ -16,6 +16,9 @@ const DDarraydocs = joinpath(DDdocs, "#DimensionalData.AbstractDimensionalArray"
 # const DDtidocs = joinpath(DDdocs, "#DimensionalData.Ti")
 
 using SimpleTraits
+using Optim
+using Statistics
+using SpecialFunctions
 
 # using Reexport: Reexport
 # Reexport.@reexport using DimensionalData
@@ -41,6 +44,7 @@ include("dimensions.jl")
 include("windows.jl")
 include("nmrdata.jl")
 include("metadata.jl")
+include("noise.jl")
 
 macro exportinstances(enum)
     eval = GlobalRef(Core, :eval)
@@ -78,6 +82,7 @@ export refdims_title
 export set, rebuild, reorder, modify, broadcast_dims, broadcast_dims!, ForwardOrdered
 # NMR properties
 export scale
+export estimatenoise!
 
 # Dimensions
 export NMRDimension
