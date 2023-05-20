@@ -31,6 +31,7 @@ end
 
 # 1D plot
 @recipe function f(A::NMRData{T,1}; normalize=true) where T
+    @info plotattributes
     Afwd = reorder(A, ForwardOrdered) # make sure data axes are in forwards order
     x = dims(Afwd, 1)
 
@@ -106,9 +107,11 @@ end
 
 
 # 2D plot
-@recipe f(d::D) where {D<:NMRData{T,2} where T} = SimpleTraits.trait(HasNonFrequencyDimension{D}), d
+@recipe f(d::D; normalize=true) where {D<:NMRData{T,2} where T} = SimpleTraits.trait(HasNonFrequencyDimension{D}), d
 
 @recipe function f(::Type{Not{HasNonFrequencyDimension{D}}}, d::D) where {D<:NMRData{T, 2} where T}
+    seriestype --> :contour
+
     dfwd = reorder(d, ForwardOrdered) # make sure data axes are in forwards order
     # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
     x, y = dims(dfwd)
@@ -131,23 +134,23 @@ end
     # generate light and dark colours for plot contours, based on supplied colour
     # - create a 5-tone palette with the same hue as the passed colour, and select the
     # fourth and second entries to provide dark and light shades
-    # TODO
-    basecolor = get(plotattributes, :linecolor, :blue)
+    basecolor = get(plotattributes, :seriescolor, :blue)
+    
     colors = sequential_palette(hue(convert(HSV,parse(Colorant, basecolor))),5)[[4,2]]
 
-    # delete!(plotattributes, :normalize)
-    # scaling = normalize ? scale(dfwd) : 1
-    scaling = scale(dfwd)
-    #val(dim), parent(A) ./ scale
+    normalize = get(plotattributes, :normalize, true)
+    delete!(plotattributes, :normalize)
+    scaling = normalize ? scale(dfwd) : 1
+    
     @series begin
         levels --> 5 * dfwd[:noise] / scaling .* contourlevels()
-        linecolor := colors[1]
+        seriescolor := colors[1]
         primary --> true
         data(x), data(y), permutedims(data(dfwd / scaling))
     end
     @series begin
         levels --> -5 * dfwd[:noise] / scaling .* contourlevels()
-        linecolor := colors[2]
+        seriescolor := colors[2]
         primary := false
         data(x), data(y), permutedims(data(dfwd / scaling))
     end
@@ -174,86 +177,95 @@ end
     yflip --> false
     ygrid --> false
     ytick_direction --> :out
+
+    normalize = get(plotattributes, :normalize, true)
+    delete!(plotattributes, :normalize)
+    scaling = normalize ? scale(dfwd) : 1
     
-    data(x), data(y), permutedims(data(dfwd))
+    data(x), data(y), permutedims(data(dfwd)) ./ scaling
+end
+
+
+# multiple 2D plots
+@recipe f(v::Vector{D}; normalize=true) where {D<:NMRData{T,2}} where {T} = SimpleTraits.trait(HasNonFrequencyDimension{D}), v
+
+
+
+@recipe function f(::Type{Not{HasNonFrequencyDimension{D}}}, v::Vector{D}) where {D<:NMRData{T,2}} where {T}
+    @info "plotting vector of 2D NMR data"
+    n = length(v)
+    hues = map(h->HSV(h,0.5,0.5), (0:n-1) .* (360/n))
+
+    seriestype --> :contour
+
+    dfwd = reorder(v[1], ForwardOrdered) # make sure data axes are in forwards order
+    # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
+    x, y = dims(dfwd)
+
+    # set default title
+    title --> ""
+    # legend --> :outerright
+    colorbar --> nothing
+    framestyle --> :box
+
+    xguide --> axislabel(x)
+    xflip --> true
+    xgrid --> false
+    xtick_direction --> :out
+
+    yguide --> axislabel(y)
+    yflip --> true
+    ygrid --> false
+    ytick_direction --> :out
+
+    normalize = get(plotattributes, :normalize, true)
+    delete!(plotattributes, :normalize)
+    
+    h = 0.
+    for d in v
+        dfwd = reorder(d, ForwardOrdered) # make sure data axes are in forwards order
+        # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
+        x, y = dims(dfwd)
+        label --> label(dfwd)
+        colors = sequential_palette(h, 5)[[4,2]]
+        scaling = normalize ? scale(dfwd) : 1
+
+        @series begin
+            levels --> 5 * dfwd[:noise] / scaling .* contourlevels()
+            seriescolor := colors[1]
+            primary := false # true
+            label := nothing
+            data(x), data(y), permutedims(data(dfwd / scaling))
+        end
+        @series begin
+            levels --> -5 * dfwd[:noise] / scaling .* contourlevels()
+            seriescolor := colors[2]
+            primary := false
+            label := nothing
+            data(x), data(y), permutedims(data(dfwd / scaling))
+        end
+        @series begin
+            seriestype := :path
+            seriescolor := colors[1]
+            primary --> true
+            # title := ""
+            [], []
+        end
+        h += 360.0/n
+    end
 end
 
 
 
-# # multiple 2D plots
-# @recipe f(v::Vector{D}; normalize=true) where {D<:NMRData{T,2}} where {T} = SimpleTraits.trait(HasPseudoDimension{D}), v
-
-
-
-# @recipe function f(::Type{Not{HasPseudoDimension{D}}}, v::Vector{D}; normalize=true) where {D<:NMRData{T,2}} where {T}
-#     @info "plotting vector of 2D NMR data"
-#     n = length(v)
-#     hues = map(h->HSV(h,0.5,0.5), (0:n-1) .* (360/n))
-
-#     # force 1D to be a line plot
-#     seriestype := :contour
-
-#     # get the first entry to determine axis label
-#     dfwd = DimensionalData.forwardorder(v[1]) # make sure data axes are in forwards order
-#     dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
-#     y, x = dims(dfwd)
-
-#     # set default title
-#     title --> DimensionalData.refdims_title(dfwd)
-#     legend --> false
-#     framestyle --> :box
-
-#     xguide --> "$(dfwd[x,:label]) chemical shift / ppm"
-#     xflip --> true
-#     xgrid --> false
-#     xtick_direction --> :out
-
-#     yguide --> "$(dfwd[y,:label]) chemical shift / ppm"
-#     yflip --> true
-#     ygrid --> false
-#     ytick_direction --> :out
-
-#     delete!(plotattributes, :normalize)
-
-#     h = 0.0
-#     for d in v
-#         dfwd = DimensionalData.forwardorder(d) # make sure data axes are in forwards order
-#         dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
-#         y, x = dims(dfwd)
-#         label --> label(d)
-#         # generate light and dark colours for plot contours, based on supplied colour
-#         # - create a 5-tone palette with the same hue as the passed colour, and select the
-#         # fourth and second entries to provide dark and light shades
-#         colors = sequential_palette(h, 5)[[4,2]]
-
-#         @series begin
-#             levels --> 5*dfwd[:noise].*contourlevels()
-#             linecolor := colors[1]
-#             primary := true
-#             val(x), val(y), data(dfwd)
-#         end
-#         @series begin
-#             levels --> -5*dfwd[:noise].*contourlevels()
-#             linecolor := colors[2]
-#             primary := false
-#             val(x), val(y), data(dfwd)
-#         end
-#         h += 360.0/n
-#     end
-# end
-
-
-
-# @recipe function f(::Type{HasPseudoDimension{D}}, v::Vector{D}; normalize=true) where {D<:NMRData{T,2}} where {T}
-#     @info "plot recipe for vector of pseudo2D NMR data not yet implemented"
-#     delete!(plotattributes, :normalize)
-#     # TODO just make repeat calls to single plot recipe
-#     for d in v
-#         @series begin
-#             HasPseudoDimension{D}, d
-#         end
-#     end
-# end
+@recipe function f(::Type{HasNonFrequencyDimension{D}}, v::Vector{D}) where {D<:NMRData{T,2}} where {T}
+    @warn "plot recipe for series of pseudo-2D NMR data not yet well-defined"
+    # just make repeat calls to single plot recipe
+    for d in v
+        @series begin
+            HasPseudoDimension{D}, d
+        end
+    end
+end
 
 
 end # module
