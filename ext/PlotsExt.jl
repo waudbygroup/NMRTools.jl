@@ -226,7 +226,6 @@ end
         dfwd = reorder(d, ForwardOrdered) # make sure data axes are in forwards order
         # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
         x, y = dims(dfwd)
-        label --> label(dfwd)
         colors = sequential_palette(h, 5)[[4,2]]
         scaling = normalize ? scale(dfwd) : 1
 
@@ -248,7 +247,7 @@ end
             seriestype := :path
             seriescolor := colors[1]
             primary --> true
-            # title := ""
+            label --> label(dfwd)
             [], []
         end
         h += 360.0/n
