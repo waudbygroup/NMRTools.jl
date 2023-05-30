@@ -6,14 +6,14 @@ function loadjdx(filename::String)
     end
 
     fields = [strip(strip(x),'$') for x in split(dat, "##")]
-    dic = Dict{String,Any}()
+    dic = Dict{Symbol,Any}()
     for field in fields
         field == "" && continue # skip empty lines
         x = split(field, "= ")
         if length(x) > 1
             # store keys as uppercase - there's only a couple of annoying exceptions like NusAMOUNT
             # and forcing uppercase makes it easier to access, e.g. as :vclist not :VCLIST
-            dic[uppercase(x[1])] = parsejdxentry(x[2])
+            dic[Symbol(lowercase(x[1]))] = parsejdxentry(x[2])
         end
     end
 

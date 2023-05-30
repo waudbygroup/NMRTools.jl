@@ -18,34 +18,34 @@ loadnmr("exampledata/pseudo2D_XSTE/test.ft1");
 loadnmr("exampledata/pseudo3D_HN_R2/ft/test%03d.ft2");
 ```
 
-bruker import:
+bruker pdata import:
 
 ```julia
 loadnmr("exampledata/1D_19F/pdata/1/");
 ```
 """
-function loadnmr(filename, experimentfolder=nothing)
+function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
+    # 1. get format
     format = getformat(filename)
 
-    # 1. load data
+    # 2. get acqus metadata
+    aqdic = getacqusmetadata(format, filename, experimentfolder)
+
+    # 3. load data
     if format==:nmrpipe
         spectrum = loadnmrpipe(filename)
-        spectrum[:format] = :nmrpipe
-    elseif format==:bruker
-        # TODO bruker import
-        throw(NMRToolsException("bruker import not yet implemented\nfilename = " * filename))
+    elseif format==:pdata
+        # TODO bruker pdata import
+        spectrum = loadpdata(filename, allcomponents)
     else
         # unknown format
         throw(NMRToolsException("unknown file format for loadnmr\nfilename = " * filename))
     end
 
-    # 2. add filename to metadata
-    spectrum[:filename] = filename
+    # 4. merge in acqus metadata
+    merge!(metadata(spectrum), aqdic)
 
-    # 3. load acquisition metadata
-    addexptmetadata!(spectrum, filename, experimentfolder)
-
-    # 4. estimate the spectrum noise level
+    # 5. estimate the spectrum noise level
     estimatenoise!(spectrum)
 
     return spectrum
@@ -55,7 +55,7 @@ end
 """
     getformat(filename)
 
-Take an input filename and return either :nmrpipe, :bruker, or :unknown after checking
+Take an input filename and return either :nmrpipe, :pdata (bruker processed), or :unknown after checking
 whether the filename matches any known format.
 """
 function getformat(filename)
@@ -66,7 +66,7 @@ function getformat(filename)
     # Bruker: match pdata/1, 123/pdata/101, 1/pdata/23/, etc...
     # NB. This relies on identifying the pdata folder, so would fail if the working directory is already the pdata
     isbruker = occursin(r"pdata/[0-9]+/?$", filename)
-    isbruker && return :bruker
+    isbruker && return :pdata
 
     return :unknown
 end
