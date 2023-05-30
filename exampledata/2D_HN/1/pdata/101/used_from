@@ -1,0 +1,16 @@
+##TITLE= Parameter file, TopSpin 4.2.0
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 1	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= chris
+$$ 2023-05-30 18:16:10.846 +0100  chris@eduroam-int-dhcp-98-164-210.ucl.ac.uk
+$$ /Users/chris/.julia/dev/NMRTools/exampledata/2D_HN/1/pdata/101/used_from
+$$ process /opt/topspin4.2.0/prog/mod/proc1d
+##$CUREXP= <ser>
+##$DATPATH= </Users/chris/.julia/dev/NMRTools/exampledata>
+##$EXPNO= 1
+##$NAME= <2D_HN>
+##$PROCNO= 1
+##$PROCNO2= 1
+##END=

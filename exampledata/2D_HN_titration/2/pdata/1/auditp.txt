@@ -19,7 +19,13 @@ $$ /nmrdata/data/ccukier/nmr/RRM12LL_FBPNbox_new/3/pdata/1/auditp.txt
        F1 B2 00 A1 15 07 72 A7 EC B4 61 A9 17 25 8E 71>)
 (   3,<2008-07-01 08:42:29.396 +0100>,<ccukier>,<spec602>,<disknew>,<TOPSPIN 2.0>,
       <processed data deleted>)
+$$ /Users/chris/.julia/dev/NMRTools/exampledata/2D_HN_titration/2/pdata/1/auditp.txt
+(   4,<2023-05-30 18:09:23.961 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<proc2d>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       xfb F2: SI = 2K BC_mod = 6 BCFW = 0.3 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 0 STSI = 1K PHC0 = -276.7961 PHC1 = 107.2 F1: SI = 1K ME_mod = 2 NCOEF = 16 WDW = 4 SSB = 2 FT_mod = 4 FCOR = 1 PHC0 = 90 PHC1 = -180
+       data hash MD5: 1K * 1K
+       F1 B2 00 A1 15 07 72 A7 EC B4 61 A9 17 25 8E 71>)
 ##END=
 
 $$ hash MD5
-$$ 14 FA 42 11 40 69 B2 04 77 2E 83 89 4B F2 21 5F
+$$ 33 F4 B1 CA D6 16 6B 7A F7 12 49 2A 9E FE 05 7D
