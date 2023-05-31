@@ -3,10 +3,10 @@ using Test
 
 
 @testset "NMRBase: dimensions" begin
-    axH = FrequencyDim(8:.1:9)
+    axH = F1Dim(8:.1:9)
     dat = NMRData(0.:1:10, (axH,))
 
-    @test dims(dat,1) isa FrequencyDim
+    @test dims(dat,1) isa FrequencyDimension
     @test dat[1] == 0
     @test dat[1:3] == [0., 1., 2.]
     @test dat[end] == 10
@@ -27,8 +27,8 @@ using Test
     x = 8:.1:9
     y = 100:120
     z = x .+ y'  # 11 x 21
-    axH = FrequencyDim(x)
-    axN = FrequencyDim(y)
+    axH = F1Dim(x)
+    axN = F2Dim(y)
     dat = NMRData(z, (axH, axN))
 
     @test size(dat) == (11, 21)
@@ -40,7 +40,7 @@ end
 
 @testset "NMRBase: metadata" begin
     # create some test data
-    axH = FrequencyDim(8:.1:9)
+    axH = F1Dim(8:.1:9)
     dat = NMRData(0.:1:10, (axH,))
 
     # NMRData metadata
@@ -51,26 +51,26 @@ end
     @test isnothing(units(dat))
 
     # dimension metadata
-    axH = FrequencyDim(8:.1:9)
+    axH = F1Dim(8:.1:9)
     dat = NMRData(0.:1:10, (axH,))
-    @test metadata(dat, 1) isa Metadata{FrequencyDim}
-    @test metadata(dat, 1) == defaultmetadata(FrequencyDim)
+    @test metadata(dat, 1) isa Metadata{FrequencyDimension}
+    @test metadata(dat, 1) == defaultmetadata(FrequencyDimension)
     @test isnothing(metadata(dat, 1)[:window])
     @test label(dims(dat, 1)) == ""
     @test isnothing(units(dims(dat, 1)))
 
-    axH = FrequencyDim(8:.1:9, metadata=NoMetadata())
+    axH = F1Dim(8:.1:9, metadata=NoMetadata())
     dat = NMRData(0.:1:10, (axH,))
-    @test metadata(dat, 1) isa Metadata{FrequencyDim}
-    @test metadata(dat, 1) == defaultmetadata(FrequencyDim)
+    @test metadata(dat, 1) isa Metadata{FrequencyDimension}
+    @test metadata(dat, 1) == defaultmetadata(FrequencyDimension)
     @test isnothing(metadata(dat, 1)[:window])
     @test label(dims(dat, 1)) == ""
     @test isnothing(units(dims(dat, 1)))
 
-    axH = FrequencyDim(8:.1:9, metadata=Metadata{FrequencyDim}(:test=>123))
+    axH = F1Dim(8:.1:9, metadata=Dict{Symbol,Any}(:test=>123))
     dat = NMRData(0.:1:10, (axH,))
-    @test metadata(dat, 1) isa Metadata{FrequencyDim}
-    @test issubset(defaultmetadata(FrequencyDim), metadata(dat, 1))
+    @test metadata(dat, 1) isa Metadata{FrequencyDimension}
+    @test issubset(defaultmetadata(FrequencyDimension), metadata(dat, 1))
     @test isnothing(metadata(dat, 1)[:window])
     @test label(dims(dat, 1)) == ""
     @test isnothing(units(dims(dat, 1)))

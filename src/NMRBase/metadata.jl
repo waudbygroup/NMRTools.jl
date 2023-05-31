@@ -33,8 +33,8 @@ label!(d::NMRDimension, labeltext::AbstractString) = (d[:label] = labeltext)
 
 # acqus accessor functions
 acqus(A::AbstractNMRData) = metadata(A, :acqus)
-acqus(A::AbstractNMRData, key::String) = ismissing(acqus(A)) ? missing : get(acqus(A), uppercase(key), missing)
-acqus(A::AbstractNMRData, key::Symbol) = acqus(A, string(key))
+acqus(A::AbstractNMRData, key::Symbol) = ismissing(acqus(A)) ? missing : get(acqus(A), key, missing)
+acqus(A::AbstractNMRData, key::String) = acqus(A, Symbol(lowercase(key)))
 acqus(A::AbstractNMRData, key, index) = acqus(A, key)[index]
 
 # # Metadata for NMRData #############################################################################

@@ -53,63 +53,80 @@ function loadpdata(filename, allcomponents=false)
         if procdic[:ft_mod] == 0
             dic[:pseudodim] = true
             dic[:label] = ""
-            dic[:npoints] = procdic[:si]
+            dic[:npoints] = procdic[:tdeff] # NB use this and not SI to avoid regions of zeros - trim them out later
             dic[:val] = 1:dic[:npoints] # coordinates for this dimension are just 1 to N
         else # frequency domain
             dic[:pseudodim] = false
             dic[:label] = procdic[:axnuc]
-            dic[:bf] = procdic[:sf]
-            dic[:swhz] = procdic[:sw_p]
+            dic[:bf] = procdic[:sf]  # NB this includes the addition of SR
+            # see bruker processing reference, p. 85
+            # (SR = SF - BF1, where SF is proc par and BF1 is acqu par)
+
+            # extleftppm = procdic[:offset] # edge of extracted region, in ppm
+            extswhz = procdic[:sw_p] # sw of extracted region, in Hz
+            extswppm = extswhz / dic[:bf]
+            
+            # full sw = ftsize / stsi * sw of extracted region
+            dic[:swhz] = procdic[:ftsize] / procdic[:stsi] * procdic[:sw_p]
             dic[:swppm] = dic[:swhz] / dic[:bf]
-            dic[:offsethz] = procdic[:offset]*dic[:bf] - dic[:swhz]/2
-            dic[:offsetppm] = dic[:offsethz] / dic[:bf]
+
+            # chemical shift at point STSR = offset ppm
+            # ppm per point = full sw / ftsize
+            # midpoint = ftsize ÷ 2
+            # true offset = offset + (STSR-midpoint)*ppmperpoint
+            extoffset = procdic[:offset]
+            ppmperpoint = dic[:swppm] / procdic[:ftsize]
+            midpoint = procdic[:ftsize] ÷ 2
+            offsetppm = extoffset + (procdic[:stsr] - midpoint) * ppmperpoint
+
+            dic[:offsetppm] = offsetppm #dic[:offsethz] / dic[:bf]
+            dic[:offsethz] = offsetppm * dic[:bf] #procdic[:offset]*dic[:bf] - dic[:swhz]/2
             dic[:sf] = dic[:offsethz]*1e-6 + dic[:bf]
 
-            if procdic[:lpbin] == 0
-                dic[:td] = procdic[:tdeff]
-            else
-                dic[:td] = procdic[:lpbin]
-            end
-            dic[:tdzf] = procdic[:si]
+            # if procdic[:lpbin] == 0
+            dic[:td] = procdic[:tdeff] ÷ 2  # number of COMPLEX points
+            # else
+            #     dic[:td] = procdic[:lpbin] ÷ 2
+            # end
+            dic[:tdzf] = procdic[:ftsize] ÷ 2  # number of COMPLEX points
+            dic[:aq] = dic[:td] / dic[:swhz]
 
             # get any extracted regions and number of points
+            dic[:npoints] = procdic[:stsi]
             if procdic[:stsr] == 0
                 dic[:region] = missing
-                dic[:npoints] = dic[:tdzf]
             else
                 dic[:region] = procdic[:stsr] : (procdic[:stsr] + procdic[:stsi] - 1)
-                dic[:npoints] = length(dic[:region])
             end
 
             # chemical shift values
-            δ = LinRange(procdic[:offset], procdic[:offset]-dic[:swppm], dic[:npoints]+ 1)
+            δ = LinRange(procdic[:offset], procdic[:offset]-extswppm, dic[:npoints]+ 1)
             dic[:val] = δ[1:end-1]
 
             # create a representation of the window function
             # calculate acquisition time = td / 2*sw
-            taq = 0.5 * dic[:td] / dic[:swhz]
             w = procdic[:wdw]
             if w == 0
-                window = NullWindow(taq)
+                window = NullWindow(dic[:aq])
             elseif w == 1
-                window = ExponentialWindow(procdic[:lb], taq)
+                window = ExponentialWindow(procdic[:lb], dic[:aq])
             elseif w == 2
                 warn("Gaussian window not yet implemented")
-                window = UnknownWindow(taq)
+                window = UnknownWindow(dic[:aq])
             elseif w == 3
                 ssb = procdic[:ssb]
                 if ssb < 1
                     ssb = 1
                 end
-                window = SineWindow(1 - 1.0/ssb, 1, 1, taq) # offset, endpoint, power
+                window = SineWindow(1 - 1.0/ssb, 1, 1, dic[:aq]) # offset, endpoint, power
             elseif w == 4
                 ssb = procdic[:ssb]
                 if ssb < 1
                     ssb = 1
                 end
-                window = SineWindow(1 - 1.0/ssb, 1, 2, taq) # offset, endpoint, power
+                window = SineWindow(1 - 1.0/ssb, 1, 2, dic[:aq]) # offset, endpoint, power
             else
-                window = UnknownWindow(taq)
+                window = UnknownWindow(dic[:aq])
             end
             dic[:window] = window
         end
@@ -148,9 +165,13 @@ function loadpdata(filename, allcomponents=false)
     end
 
     # 10. scale
+    y = Float64.(y)
     scalepdata!(y, procsdics[1])
 
-    # 11. form NMRData and return
+    # 11. trim out any regions of zero data
+    y = y[[1:axesmd[i][:npoints] for i=1:ndim]...]
+
+    # 12. form NMRData and return
     if ndim == 1
         valx = axesmd[1][:val]
         delete!(axesmd[1],:val) # remove values from metadata to prevent confusion when slicing up
@@ -159,30 +180,59 @@ function loadpdata(filename, allcomponents=false)
 
         NMRData(y, (xaxis, ), metadata=md)
     elseif ndim == 2
-        valx = axesmd[1][:val]
-        valy = axesmd[2][:val]
+        val1 = axesmd[1][:val]
+        val2 = axesmd[2][:val]
         delete!(axesmd[1],:val) # remove values from metadata to prevent confusion when slicing up
         delete!(axesmd[2],:val)
         
-        xaxis = F1Dim(valx, metadata=axesmd[1])
+        xaxis = F1Dim(val1, metadata=axesmd[1])
+
         ax2 = axesmd[2][:pseudodim] ? X2Dim : F2Dim
-        yaxis = ax2(valy, metadata=axesmd[2])
-        @show size(xaxis)
-        @show size(yaxis)
-        @show size(y)
+        yaxis = ax2(val2, metadata=axesmd[2])
     
         NMRData(y, (xaxis, yaxis), metadata=md)
     else
-        throw(NMRToolsException("can't load bruker 3D data yet"))
+        # rearrange data into a useful order - always place pseudo-dimension last - and generate axes
+        # 1 is always direct, and should be placed first (i.e. 1 x x)
+        # if is there is a pseudodimension, put that last (i.e. 1 y p)
+        pdim = [axesmd[i][:pseudodim] for i in 1:3]
+        
+        val1 = axesmd[1][:val]
+        val2 = axesmd[2][:val]
+        val3 = axesmd[3][:val]
+        delete!(axesmd[1],:val) # remove values from metadata to prevent confusion when slicing up
+        delete!(axesmd[2],:val)
+        delete!(axesmd[3],:val)
+
+        if pdim[2]
+            # dimensions are x p y => we want ordering 1 3 2
+            xaxis = F1Dim(val1, metadata=axesmd[1])
+            yaxis = F2Dim(val3, metadata=axesmd[3])
+            zaxis = X3Dim(val2, metadata=axesmd[2])
+            y = permutedims(y, [1, 3, 2])
+        elseif pdim[3]
+            # dimensions are x y p => we want ordering 1 2 3
+            xaxis = F1Dim(val1, metadata=axesmd[1])
+            yaxis = F2Dim(val2, metadata=axesmd[2])
+            zaxis = X3Dim(val3, metadata=axesmd[3])
+        else
+            # no pseudodimension, use Z axis not Ti
+            # dimensions are x y z => we want ordering 1 2 3
+            xaxis = F1Dim(val1, metadata=axesmd[1])
+            yaxis = F2Dim(val2, metadata=axesmd[2])
+            zaxis = F3Dim(val3, metadata=axesmd[3])
+        end
+
+        NMRData(y, (xaxis, yaxis, zaxis), metadata=md)
     end
 end
 
 
 function scalepdata!(y, procs, reverse=false)
     if reverse
-        y *= 2.0^(-get(procs,:nc_proc,1))
+        y .*= 2.0^(-get(procs,:nc_proc,1))
     else
-        y *= 2.0^(get(procs,:nc_proc,1))
+        y .*= 2.0^(get(procs,:nc_proc,1))
     end
 end
 

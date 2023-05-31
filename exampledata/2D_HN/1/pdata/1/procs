@@ -1,10 +1,10 @@
 ##TITLE= Parameter file, TopSpin 4.2.0
 ##JCAMPDX= 5.0
 ##DATATYPE= Parameter Values
-##NPOINTS= 27	$$ modification sequence number
+##NPOINTS= 57	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= waudbyc
-$$ 2023-05-30 19:13:47.752 +0100  chris@eduroam-int-dhcp-98-164-210.ucl.ac.uk
+$$ 2023-05-31 15:37:46.232 +0100  chris@eduroam-int-dhcp-98-164-210.ucl.ac.uk
 $$ /Users/chris/.julia/dev/NMRTools/exampledata/2D_HN/1/pdata/1/procs
 $$ process /opt/topspin4.2.0/prog/mod/proc2d
 ##$ABSF1= 0
@@ -119,7 +119,7 @@ $$ process /opt/topspin4.2.0/prog/mod/proc2d
 ##$STSR= 600
 ##$SW_p= 3212.93290043291
 ##$SYMM= 0
-##$S_DEV= 731031
+##$S_DEV= 452039
 ##$TDeff= 2048
 ##$TDoff= 0
 ##$TI= <>
@@ -139,6 +139,6 @@ $$ process /opt/topspin4.2.0/prog/mod/proc2d
 ##$USERP9= <>
 ##$WDW= 4
 ##$XDIM= 1216
-##$YMAX_p= 117361903
-##$YMIN_p= -50193895
+##$YMAX_p= 91058886
+##$YMIN_p= -44320020
 ##END=

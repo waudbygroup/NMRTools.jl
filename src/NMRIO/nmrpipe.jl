@@ -170,6 +170,7 @@ function parsenmrpipeheader(header::Vector{Float32})
             dic[:bf] = pipedic[:FDOBS]
             dic[:swhz] = pipedic[:FDSW]
             dic[:swppm] = dic[:swhz] / dic[:bf]
+            swregion = dic[:swppm]
             dic[:offsetppm] = pipedic[:FDCAR]
             dic[:offsethz] = (dic[:offsetppm]*1e-6 + 1) * dic[:bf]
             dic[:sf] = dic[:offsethz]*1e-6 + dic[:bf]
@@ -179,12 +180,15 @@ function parsenmrpipeheader(header::Vector{Float32})
             else
                 dic[:region] = pipedic[:FDX1] : pipedic[:FDXN]
                 dic[:npoints] = length(dic[:region])
+
+                dic[:swhz] *= dic[:tdzf] / dic[:npoints]
+                dic[:swppm] *= dic[:tdzf] / dic[:npoints]
             end
 
             edge_frq = pipedic[:FDORIG]
             # calculate chemical shift values
             cs_at_edge = edge_frq / dic[:bf]
-            cs_at_other_edge = cs_at_edge + dic[:swppm]
+            cs_at_other_edge = cs_at_edge + swregion
             x = range(cs_at_other_edge, cs_at_edge, length=dic[:npoints]+1);
             dic[:val] = x[2:end];
             # # alternative calculation (without extraction) - this agrees OK
@@ -193,22 +197,22 @@ function parsenmrpipeheader(header::Vector{Float32})
 
             # create a representation of the window function
             # calculate acquisition time = td / sw
-            taq = dic[:td] / dic[:swhz]
+            dic[:aq] = dic[:td] / dic[:swhz]
             #:FDAPODCODE => "Window function used (0=none, 1=SP, 2=EM, 3=GM, 4=TM, 5=ZE, 6=TRI)",
             w = pipedic[:FDAPODCODE]
             q1 = pipedic[:FDAPODQ1]
             q2 = pipedic[:FDAPODQ2]
             q3 = pipedic[:FDAPODQ3]
             if w == 0
-                window = NullWindow(taq)
+                window = NullWindow(dic[:aq])
             elseif w == 1
-                window = SineWindow(q1, q2, q3, taq)
+                window = SineWindow(q1, q2, q3, dic[:aq])
             elseif w == 2
-                window = ExponentialWindow(q1, taq)
+                window = ExponentialWindow(q1, dic[:aq])
             elseif w == 3
-                window = GaussWindow(q1, q2, q3, taq)
+                window = GaussWindow(q1, q2, q3, dic[:aq])
             else
-                window = UnknownWindow(taq)
+                window = UnknownWindow(dic[:aq])
             end
             dic[:window] = window
         end

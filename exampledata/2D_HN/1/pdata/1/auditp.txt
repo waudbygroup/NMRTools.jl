@@ -63,7 +63,81 @@ $$ /Users/chris/.julia/dev/NMRTools/exampledata/2D_HN/1/pdata/1/auditp.txt
        xfb F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 600 STSI = 1200 PHC0 = -247.8906 PHC1 = 218.4 F1: SI = 256 ME_mod = 2 NCOEF = 16 WDW = 3 SSB = 2 FT_mod = 4 FCOR = 1 PHC0 = 90 PHC1 = -180
        data hash MD5: 1216 * 256
        44 3C CC A2 AF BE C9 FA DC 85 74 39 C8 40 A4 C7>)
+(  16,<2023-05-31 10:43:17.450 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F1 SI to 512>)
+(  17,<2023-05-31 10:43:23.855 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<proc2d>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       xfb F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 600 STSI = 1200 PHC0 = -247.8906 PHC1 = 218.4 F1: SI = 512 ME_mod = 2 NCOEF = 16 WDW = 3 SSB = 2 FT_mod = 4 FCOR = 1 PHC0 = 90 PHC1 = -180
+       data hash MD5: 1216 * 512
+       5E B6 E3 B0 3E FD F2 FA FC AD 63 6F C0 6A C4 67>)
+(  18,<2023-05-31 10:43:47.266 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F1 ME_mod to no>)
+(  19,<2023-05-31 10:43:48.452 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<proc2d>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       xfb F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 600 STSI = 1200 PHC0 = -247.8906 PHC1 = 218.4 F1: SI = 512 WDW = 3 SSB = 2 FT_mod = 4 FCOR = 1 PHC0 = 90 PHC1 = -180
+       data hash MD5: 1216 * 512
+       6A F6 29 2D 60 3C CB 6E 48 ED 7F CE E3 CF 51 56>)
+(  20,<2023-05-31 10:44:26.975 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F1 TDeff to 64>)
+(  21,<2023-05-31 10:44:27.501 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<proc2d>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       xfb F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 600 STSI = 1200 PHC0 = -247.8906 PHC1 = 218.4 F1: TDeff = 64 SI = 512 WDW = 3 SSB = 2 FT_mod = 4 FCOR = 1 PHC0 = 90 PHC1 = -180
+       data hash MD5: 1216 * 512
+       A4 6E 01 19 E3 C1 94 5A E2 73 01 02 83 D0 30 B4>)
+(  22,<2023-05-31 10:44:39.296 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F1 ME_mod to LPfc>)
+(  23,<2023-05-31 10:44:40.942 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<proc2d>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       xfb F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 600 STSI = 1200 PHC0 = -247.8906 PHC1 = 218.4 F1: TDeff = 64 SI = 512 ME_mod = 2 NCOEF = 16 WDW = 3 SSB = 2 FT_mod = 4 FCOR = 1 PHC0 = 90 PHC1 = -180
+       data hash MD5: 1216 * 512
+       87 0C 5A C0 C8 D3 D7 53 3A 7F 6A 7F C6 6B 87 45>)
+(  24,<2023-05-31 10:48:54.047 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F2 SR to 1000.00>)
+(  25,<2023-05-31 10:48:54.055 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed status parameter F2 SR to 1000.00>)
+(  26,<2023-05-31 10:48:54.126 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F1 SR to 2000.00>)
+(  27,<2023-05-31 10:48:54.133 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed status parameter F1 SR to 2000.00>)
+(  28,<2023-05-31 10:49:04.636 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F2 SR to 0>)
+(  29,<2023-05-31 10:49:04.649 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed status parameter F2 SR to 0>)
+(  30,<2023-05-31 10:49:04.712 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F1 SR to 0>)
+(  31,<2023-05-31 10:49:04.724 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed status parameter F1 SR to 0>)
+(  32,<2023-05-31 10:49:13.753 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<proc2d>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       xfb F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 600 STSI = 1200 PHC0 = -247.8906 PHC1 = 218.4 F1: TDeff = 64 SI = 512 ME_mod = 2 NCOEF = 16 WDW = 3 SSB = 2 FT_mod = 4 FCOR = 1 PHC0 = 90 PHC1 = -180
+       data hash MD5: 1216 * 512
+       87 0C 5A C0 C8 D3 D7 53 3A 7F 6A 7F C6 6B 87 45>)
+(  33,<2023-05-31 10:49:28.238 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F2 SR to 1000.00>)
+(  34,<2023-05-31 10:49:28.247 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed status parameter F2 SR to 1000.00>)
+(  35,<2023-05-31 10:49:30.399 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<proc2d>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       xfb F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 600 STSI = 1200 PHC0 = -247.8906 PHC1 = 218.4 F1: TDeff = 64 SI = 512 ME_mod = 2 NCOEF = 16 WDW = 3 SSB = 2 FT_mod = 4 FCOR = 1 PHC0 = 90 PHC1 = -180
+       data hash MD5: 1216 * 512
+       87 0C 5A C0 C8 D3 D7 53 3A 7F 6A 7F C6 6B 87 45>)
+(  36,<2023-05-31 10:49:45.131 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F2 SR to 0>)
+(  37,<2023-05-31 10:49:45.142 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed status parameter F2 SR to 0>)
+(  38,<2023-05-31 10:50:09.722 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F2 SR to 0>)
+(  39,<2023-05-31 10:50:10.859 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<proc2d>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       xfb F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 600 STSI = 1200 PHC0 = -247.8906 PHC1 = 218.4 F1: TDeff = 64 SI = 512 ME_mod = 2 NCOEF = 16 WDW = 3 SSB = 2 FT_mod = 4 FCOR = 1 PHC0 = 90 PHC1 = -180
+       data hash MD5: 1216 * 512
+       87 0C 5A C0 C8 D3 D7 53 3A 7F 6A 7F C6 6B 87 45>)
+(  40,<2023-05-31 15:37:46.238 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<proc2d>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       xfb F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 600 STSI = 1200 PHC0 = -247.8906 PHC1 = 218.4 F1: TDeff = 64 SI = 512 ME_mod = 2 NCOEF = 16 WDW = 3 SSB = 2 FT_mod = 4 FCOR = 1 PHC0 = 90 PHC1 = -180
+       data hash MD5: 1216 * 512
+       87 0C 5A C0 C8 D3 D7 53 3A 7F 6A 7F C6 6B 87 45>)
 ##END=
 
 $$ hash MD5
-$$ 77 80 34 F8 D2 BD 78 F9 5A C3 70 DC 93 49 78 DC
+$$ 8F 26 62 9D 47 B9 E4 95 93 B2 4A 7C F4 50 10 25
