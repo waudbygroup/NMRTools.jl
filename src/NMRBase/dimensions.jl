@@ -1,8 +1,10 @@
 abstract type NMRDimension{T} <: DimensionalData.Dimension{T} end
 abstract type FrequencyDimension{T} <: NMRDimension{T} end
-abstract type TimeDimension{T} <: NMRDimension{T} end
-abstract type QuadratureDimension{T} <: NMRDimension{T} end
-abstract type UnknownDimension{T} <: NMRDimension{T} end
+abstract type NonFrequencyDimension{T} <: NMRDimension{T} end
+abstract type TimeDimension{T} <: NonFrequencyDimension{T} end
+# abstract type QuadratureDimension{T} <: NMRDimension{T} end
+abstract type UnknownDimension{T} <: NonFrequencyDimension{T} end
+abstract type GradientDimension{T} <: NonFrequencyDimension{T} end
 
 # override DimensionalData.Dimensions macro to generate default metadata
 macro NMRdim(typ::Symbol, supertyp::Symbol, args...)
@@ -64,16 +66,18 @@ end
 @NMRdim T4Dim TimeDimension
 @NMRdim TrelaxDim TimeDimension
 @NMRdim TkinDim TimeDimension
-@NMRdim Q1Dim QuadratureDimension
-@NMRdim Q2Dim QuadratureDimension
-@NMRdim Q3Dim QuadratureDimension
-@NMRdim Q4Dim QuadratureDimension
+# @NMRdim Q1Dim QuadratureDimension
+# @NMRdim Q2Dim QuadratureDimension
+# @NMRdim Q3Dim QuadratureDimension
+# @NMRdim Q4Dim QuadratureDimension
 @NMRdim X1Dim UnknownDimension
 @NMRdim X2Dim UnknownDimension
 @NMRdim X3Dim UnknownDimension
 @NMRdim X4Dim UnknownDimension
-# @NMRdim QuadratureDim NMRDimension
-# @NMRdim GradientDim NMRDimension
+@NMRdim G1Dim GradientDimension
+@NMRdim G2Dim GradientDimension
+@NMRdim G3Dim GradientDimension
+@NMRdim G4Dim GradientDimension
 # @NMRdim SpatialDim NMRDimension
 
 

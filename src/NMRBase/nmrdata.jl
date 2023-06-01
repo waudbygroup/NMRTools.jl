@@ -157,6 +157,131 @@ function scale(d::AbstractNMRData)
 end
 
 
+"""
+    setkinetictimes(A::NMRData, tvals, units=nothing)
+
+Return a new NMRData with the unknown dimension or time dimension replaced
+with a kinetic time axis containing the passed values (and optionally, units).
+"""
+function setkinetictimes(A::NMRData, tvals, units=nothing)
+    hasnonfrequencydimension(A) || throw(NMRToolsException("cannot set time values: data does not have a non-frequency dimension"))
+
+    nonfreqdims = isa.(dims(A), NonFrequencyDimension)
+    sum(nonfreqdims) == 1 || throw(NMRToolsException("multiple non-frequency dimensions are present - ambiguous command"))
+
+    olddim = findfirst(nonfreqdims)
+    newdim = TkinDim(tvals)
+    newA = replacedimension(A::NMRData, olddim, newdim)
+
+    label!(newA, newdim, "Time elapsed")
+    newA[newdim, :units] = units
+
+    return newA
+end
+
+
+
+"""
+    setrelaxtimes(A::NMRData, tvals, units="s")
+
+Return a new NMRData with the unknown dimension or time dimension replaced
+with a relaxation time axis containing the passed values (and optionally, units).
+"""
+function setrelaxtimes(A::NMRData, tvals, units="s")
+    hasnonfrequencydimension(A) || throw(NMRToolsException("cannot set time values: data does not have a non-frequency dimension"))
+
+    nonfreqdims = isa.(dims(A), NonFrequencyDimension)
+    sum(nonfreqdims) == 1 || throw(NMRToolsException("multiple non-frequency dimensions are present - ambiguous command"))
+
+    olddim = findfirst(nonfreqdims)
+    newdim = TrelaxDim(tvals)
+    newA = replacedimension(A::NMRData, olddim, newdim)
+
+    label!(newA, newdim, "Relaxation time")
+    newA[newdim, :units] = units
+
+    return newA
+end
+
+
+
+"""
+    setgradientlist(A::NMRData, relativegradientlist, Gmax=nothing)
+
+Return a new NMRData with an unknown dimension replaced with a gradient axis
+containing the passed values. A default gradient strength of 0.55 T m⁻¹ will
+be set, but a warning raised for the user.
+"""
+function setgradientlist(A::NMRData, relativegradientlist, Gmax=nothing)
+    hasnonfrequencydimension(A) || throw(NMRToolsException("cannot set gradient values: data does not have a non-frequency dimension"))
+    
+    unknowndims = isa.(dims(A), UnknownDimension)
+    sum(unknowndims) == 1 || throw(NMRToolsException("multiple unknown dimensions are present - ambiguous command"))
+
+    if isnothing(Gmax)
+        warn("a maximum gradient strength of 0.55 T m⁻¹ is being assumed - this is roughly correct for modern Bruker systems but calibration is recommended")
+        gvals = 0.55 * relativegradientlist
+    else
+        gvals = Gmax * relativegradientlist
+    end
+
+    olddim = findfirst(unknowndims)
+    newdim = G1Dim(gvals)
+    newA = replacedimension(A::NMRData, olddim, newdim)
+
+    label!(newA, newdim, "Gradient strength")
+    newA[newdim, :units] = "T m⁻¹"
+
+    return newA
+end
+
+
+
+
+function replacedimension(A::NMRData, olddimnumber, newdim)
+    olddim = dims(A, olddimnumber)
+    length(olddim) == length(newdim) || throw(NMRToolsException("size of old and new dimensions are not compatible"))
+    merge!(metadata(newdim).val, metadata(olddim).val)
+
+    olddims = [dims(A)...]
+    olddims[olddimnumber] = newdim
+    newdims = tuple(olddims...)
+
+    NMRData(A.data, newdims, name=A.name, refdims=A.refdims, metadata=A.metadata)
+end
+
+
+
+# Arithmetic #######################################################################################
+
+# BUG - it would be nice to propagate the noise, but at the moment metadata is shallow-copied during
+# arithmetic operations so the operation changes the original input values as well.
+
+# function Base.:+(a::NMRData, b::NMRData)
+#     c = invoke(+, Tuple{DimensionalData.AbstractDimArray, DimensionalData.AbstractDimArray}, a, b)
+#     c[:noise] = sqrt(get(metadata(a), :noise, 0)^2 + get(metadata(b), :noise, 0)^2)
+#     return c
+# end
+
+# function Base.:-(a::NMRData, b::NMRData)
+#     c = invoke(-, Tuple{DimensionalData.AbstractDimArray, DimensionalData.AbstractDimArray}, a, b)
+#     c[:noise] = sqrt(get(metadata(a), :noise, 0)^2 + get(metadata(b), :noise, 0)^2)
+#     return c
+# end
+
+# function Base.:*(a::Number, b::NMRData)
+#     c = invoke(*, Tuple{Number, DimensionalData.AbstractDimArray}, a, b)
+#     c[:noise] = a * get(metadata(b), :noise, 0)
+#     return c
+# end
+
+# function Base.:/(a::NMRData, b::Number)
+#     c = invoke(/, Tuple{DimensionalData.AbstractDimArray, Number}, a, b)
+#     c[:noise] = get(metadata(a), :noise, 0) / b
+#     return c
+# end
+
+
 # Traits ###########################################################################################
 """
     @traitdef HasNonFrequencyDimension{D}

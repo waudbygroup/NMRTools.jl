@@ -86,17 +86,21 @@ export estimatenoise!
 
 # Dimensions
 export NMRDimension
-export TimeDimension
 export FrequencyDimension
-export QuadratureDimension
+export NonFrequencyDimension
+export TimeDimension
+export GradientDimension
 export UnknownDimension
 export F1Dim, F2Dim, F3Dim, F4Dim
 export T1Dim, T2Dim, T3Dim, T4Dim
 export TrelaxDim, TkinDim
-export Q1Dim, Q2Dim, Q3Dim, Q4Dim
+export G1Dim, G2Dim, G3Dim, G4Dim
 export X1Dim, X2Dim, X3Dim, X4Dim
 # export GradientDim
 # export SpatialDim
+export replacedimension
+export setkinetictimes
+export setgradientlist
 
 # Metadata
 export AbstractMetadata, Metadata, NoMetadata
