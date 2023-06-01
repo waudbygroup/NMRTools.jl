@@ -9,12 +9,12 @@ makedocs(;
         "Examples" => "examples.md",
         "Metadata" => "metadata.md",
     ],
-    repo="https://github.com/chriswaudby/NMRTools.jl/blob/{commit}{path}#L{line}",
+    # repo="https://github.com/waudbygroup/NMRTools.jl/blob/{commit}{path}#L{line}",
     sitename="NMRTools.jl",
     authors="Chris Waudby",
     assets=String[],
 )
 
 deploydocs(;
-    repo="github.com/chriswaudby/NMRTools.jl",
+    repo="github.com/waudbygroup/NMRTools.jl.git",
 )
