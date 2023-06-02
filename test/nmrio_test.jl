@@ -141,6 +141,8 @@ end
     @test dat[2,:swhz] == 1337.9720458984375
     @test dat[2,:swppm] == 21.997074050406937
     @test dat[2,:pseudodim] == false
+
+    @test dat[:noise] == 42605.50537796347
 end
 
 

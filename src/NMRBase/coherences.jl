@@ -34,11 +34,11 @@ end
 Calculate the total coherence order.
 
 ````
-coherenceorder(SQ(H1)) = 1
-coherenceorder(MQ(((H1,1),(C13,1)))) = 2
-coherenceorder(MQ(((H1,1),(C13,-1)))) = 0
-coherenceorder(MQ(((H1,3),(C13,1)))) = 4
-coherenceorder(MQ(((H1,0),))) = 0
+coherenceorder(SQ(H1)) == 1
+coherenceorder(MQ(((H1,1),(C13,1)))) == 2
+coherenceorder(MQ(((H1,1),(C13,-1)))) == 0
+coherenceorder(MQ(((H1,3),(C13,1)))) == 4
+coherenceorder(MQ(((H1,0),))) == 0
 ````
 """
 coherenceorder(c::SQ) = 1
@@ -53,11 +53,11 @@ Calculate the effective gyromagnetic ratio of the coherence. This is equal to
 the product of the individual gyromagnetic ratios with their coherence orders.
 
 ````
-γeff(SQ(H1)) = 2.6752218744e8
-γeff(MQ(((H1,1),(C13,1)))) = 3.3480498744e8
-γeff(MQ(((H1,1),(C13,-1)))) = 2.0023938744e8
-γeff(MQ(((H1,3),(C13,1)))) = 8.698493623199999e8
-γeff(MQ(((H1,0),))) = 0
+γeff(SQ(H1)) == 2.6752218744e8
+γeff(MQ(((H1,1),(C13,1)))) == 3.3480498744e8
+γeff(MQ(((H1,1),(C13,-1)))) == 2.0023938744e8
+γeff(MQ(((H1,3),(C13,1)))) == 8.698493623199999e8
+γeff(MQ(((H1,0),))) == 0
 ````
 """
 γeff(c::SQ) = gyromagneticratio(c.nucleus)

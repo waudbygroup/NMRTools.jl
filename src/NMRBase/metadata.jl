@@ -121,7 +121,7 @@ function metadatahelp()
     d = Dict(:title => "Experiment title (may be multi-line)",
              :label => "Short experiment or axis description",
              :filename => "Original filename or template",
-             :format => ":NMRPipe or :bruker",
+             :format => ":NMRPipe or :pdata",
              :pulseprogram => "Pulse program (PULPROG) from acqus file",
              :ns => "Number of scans",
              :rg => "Receiver gain",

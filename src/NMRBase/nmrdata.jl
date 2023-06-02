@@ -243,7 +243,7 @@ function replacedimension(A::NMRData, olddimnumber, newdim)
     length(olddim) == length(newdim) || throw(NMRToolsException("size of old and new dimensions are not compatible"))
     merge!(metadata(newdim).val, metadata(olddim).val)
 
-    olddims = [dims(A)...]
+    olddims = Vector{NMRDimension}([dims(A)...])
     olddims[olddimnumber] = newdim
     newdims = tuple(olddims...)
 
