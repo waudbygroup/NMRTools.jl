@@ -14,7 +14,7 @@ using Test
     @test pr[1].plotattributes[:yshowaxis] == false
 
     @test pr[1].args[1][1] == -124.16252020246354
-    @test r[1].args[2][1] == 1.2039054352746015
+    @test pr[1].args[2][1] == 1.2039054352746015
 end
 
 @testset "PlotsExt: 2D HN" begin
