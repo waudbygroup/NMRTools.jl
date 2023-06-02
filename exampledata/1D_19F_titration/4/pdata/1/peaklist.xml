@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<PeakList modified="2017-08-07T09:49:52">
+<PeakList modified="2017-08-07T11:25:13">
   <PeakList1D>
-    <PeakList1DHeader creator="sstadmiller" date="2017-08-07T09:49:52" expNo="4" name="F19_T22G_PepS2_Dilute_08.07.17" owner="" procNo="1" source="/opt/home/sstadmiller/data">
-      <PeakPickDetails>F1=-121.573ppm, F2=-123.815ppm, MI=13.32cm, MAXI=16.30cm, PC=1.000
+    <PeakList1DHeader creator="sstadmiller" date="2017-08-07T11:25:13" expNo="10" name="F19_T22G_PepS2_Dilute_08.07.17" owner="" procNo="1" source="/opt/home/sstadmiller/data">
+      <PeakPickDetails>F1=-121.660ppm, F2=-125.314ppm, MI=11.95cm, MAXI=18.41cm, PC=1.000
       </PeakPickDetails>
     </PeakList1DHeader>
-    <Peak1D F1="-122.5808" intensity="15.00" type="0"/>
+    <Peak1D F1="-123.3230" intensity="15.00" type="0"/>
   </PeakList1D>
 </PeakList>

@@ -1,11 +1,11 @@
 ##TITLE= Parameter file, TopSpin 3.5 pl 7
 ##JCAMPDX= 5.0
 ##DATATYPE= Parameter Values
-##NPOINTS= 6	$$ modification sequence number
+##NPOINTS= 2	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= sstadmiller
-$$ 2017-09-13 10:48:58.021 -0400  Sam@DESKTOP-H09PJL6
-$$ C:/Bruker/SH3_SosBinding_PepS2/F19_T22G_PepS2_Dilute_08.07.17/10/pdata/1/proc
+$$ 2017-09-13 10:41:38.437 -0400  Sam@DESKTOP-H09PJL6
+$$ C:/Bruker/SH3_SosBinding_PepS2/F19_T22G_PepS2_Dilute_08.07.17/4/pdata/1/proc
 $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\dataserver.exe
 ##$ABSF1= -90
 ##$ABSF2= -143.4524
@@ -82,8 +82,8 @@ $$ process C:\Bruker\TopSpin3.5pl7\prog\mod\dataserver.exe
 ##$NZP= 0
 ##$OFFSET= -115.13
 ##$PC= 1
-##$PHC0= -86.94765
-##$PHC1= 121.8065
+##$PHC0= -59.36718
+##$PHC1= 40.86555
 ##$PH_mod= 1
 ##$PKNL= yes
 ##$PPARMOD= 0

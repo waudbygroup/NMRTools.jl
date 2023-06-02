@@ -6,7 +6,7 @@ Load in some example data, in NMRPipe format
 
 ```@repl 1
 using NMRTools, Plots;
-spec = loadnmr("../../exampledata/1D_19F/test.ft1")
+spec = loadnmr("../../exampledata/1D_19F/1/test.ft1")
 ```
 
 and then plot it
@@ -33,38 +33,41 @@ savefig("plot-y2.svg"); nothing # hide
 Access metadata associated with the spectrum
 
 ```@repl 1
+label(spec)
 metadata(spec) |> keys
 metadata(spec, :pulseprogram)
 metadata(spec, :ns)
 ```
 
-and with the X axis itself
+and with the axis itself (this can be specified numerically as the first dimension, or by the object `F1Dim`)
 
 ```@repl 1
-metadata(spec, X) |> keys
-metadata(spec, X, :label)
-metadata(spec, X, :offsetppm)
+label(spec, 1)
+metadata(spec, 1) |> keys
+metadata(spec, F1Dim, :swppm)
+metadata(spec, 1, :offsetppm)
 ```
 
 This includes information on the window function, indicating in this case the line broadening applied (in Hz) and the acquisition time (in s)
 
 ```@repl 1
-metadata(spec, X, :window)
+metadata(spec, F1Dim, :window)
 ```
 
 Help is available on metadata entries
 
 ```@repl 1
-metadatahelp(:sf)
-metadata(spec, X, :sf)
+metadatahelp()
+metadatahelp(:rg)
 ```
 
-**Acquisition parameters** are easily accessible
+**Acquisition parameters** are easily accessible (reference using lowercase symbols).
+Individual values can be accessed from arrayed values likes pulses or delays.
 
 ```@repl 1
-acqus(y, :P, 1)
-acqus(y, :P)
-acqus(y, :TE)
+acqus(y, :p, 1)
+acqus(y, :d, 1)
+acqus(y, :te)
 ```
 
 
@@ -74,7 +77,8 @@ Load and plot multiple 1D spectra from a list of filenames
 
 ```@repl 1Ds
 using NMRTools, Plots;
-filenames = ["../../exampledata/1D_19F_titration/2/test.ft1",
+filenames = ["../../exampledata/1D_19F_titration/1/test.ft1",
+            "../../exampledata/1D_19F_titration/2/test.ft1",
             "../../exampledata/1D_19F_titration/3/test.ft1",
             "../../exampledata/1D_19F_titration/4/test.ft1",
             "../../exampledata/1D_19F_titration/5/test.ft1",
@@ -83,8 +87,7 @@ filenames = ["../../exampledata/1D_19F_titration/2/test.ft1",
             "../../exampledata/1D_19F_titration/8/test.ft1",
             "../../exampledata/1D_19F_titration/9/test.ft1",
             "../../exampledata/1D_19F_titration/10/test.ft1",
-            "../../exampledata/1D_19F_titration/11/test.ft1",
-            "../../exampledata/1D_19F_titration/12/test.ft1"];
+            "../../exampledata/1D_19F_titration/11/test.ft1"];
 spectra = [loadnmr(filename) for filename in filenames];
 plot(spectra);
 savefig("plot-1Ds.svg"); nothing # hide
@@ -106,8 +109,8 @@ savefig("plot-1Ds-stack.svg"); nothing # hide
 
 ```@repl 2d
 using NMRTools, Plots;
-spec = loadnmr("../../exampledata/2D_HN/test.ft2")
-contour(spec);
+spec = loadnmr("../../exampledata/2D_HN/1/test.ft2")
+plot(spec);
 savefig("plot-2d.svg"); nothing # hide
 ```
 
@@ -115,12 +118,12 @@ savefig("plot-2d.svg"); nothing # hide
 
 ## Accessing raw spectrum data
 
-Spectrum data and associated axis information, metadata, etc, is encapsulated in an [`NMRData`](@ref) object. Raw arrays of data for the spectrum and axes can be obtained from this using [`data`](@ref), [`xval`](@ref) and [`yval`](@ref) commands
+Spectrum data and associated axis information, metadata, etc, is encapsulated in an [`NMRData`](@ref) object. Raw arrays of data for the spectrum and axes can be obtained from this using the [`data`](@ref) command.
 
 ```@repl 2d
 data(spec)
-xval(spec)
-yval(spec)
+data(dims(spec,1))
+data(dims(spec,2))
 ```
 
 
@@ -142,7 +145,7 @@ filenames  = ["../../exampledata/2D_HN_titration/1/test.ft2",
               "../../exampledata/2D_HN_titration/10/test.ft2",
               "../../exampledata/2D_HN_titration/11/test.ft2"];
 spectra = [loadnmr(filename) for filename in filenames];
-contour(spectra);
+plot(spectra);
 savefig("plot-2Ds.svg"); nothing # hide
 ```
 
@@ -160,7 +163,7 @@ savefig("plot-2Ds-zoom.svg"); nothing # hide
 ![](plot-2Ds-zoom.svg)
 
 
-## Analysis of pseudo-2D diffusion data
+<!-- ## Analysis of pseudo-2D diffusion data
 
 Load in an example pseudo-2D dataset
 
@@ -193,6 +196,7 @@ An estimate of the hydrodynamic radius is determined based on the viscosity of p
 ```julia
 fitdiffusion(spec, selector; δ=0.004, Δ=0.1, σ=0.9, Gmax=0.55, solvent=:h2o, T=298, showplot=true)
 ```
+-->
 
 
 ## Saving plots

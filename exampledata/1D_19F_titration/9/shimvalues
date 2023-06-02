@@ -1,4 +1,4 @@
-# Mon Aug  7 11:01:15 2017
+# Mon Aug  7 09:58:37 2017
 #$$PROBEID=4
 #$$PROBEINFO=5 mm CPQCI 1H/19F-31P/13C/15N/D Z-GRD Z136678/0001
 #$$PICSINFO=Z136678_0001_04.par
@@ -6,12 +6,12 @@
 #
 # Active Shim Gradients
 #
-Z           		1321            
-Z2          		-1667           
-Z3          		523             
-Z4          		92              
-Z5          		-695            
-Z6          		7062            
+Z           		1444            
+Z2          		-1737           
+Z3          		626             
+Z4          		173             
+Z5          		-285            
+Z6          		4868            
 Z7          		-13425          
 Z8          		6100            
 X           		457             
@@ -45,10 +45,10 @@ Y3Z         		-7808
 #
 # Lock Parameter
 #
-FIELD		4123.240
+FIELD		4124.785
 LOCKPHASE		127.200 
 LOCKPOWER		-18.000 
-LOCKGAIN		125.267 
+LOCKGAIN		127.208 
 LOCKDC		-75.000 
 LOCKSHIFT		4.700   
 LOOPGAIN		-5.000  
@@ -59,16 +59,16 @@ IEEE64_VERSION_CODE 1
 #
 # Shim currents 
 #
-SHIM_SETTING [1 ]  -1251.69716280  
-SHIM_SETTING [2 ]  -6031.95236300  
-SHIM_SETTING [3 ]  7835.75141135   
-SHIM_SETTING [4 ]  -860.71427290   
-SHIM_SETTING [5 ]  114.14774485    
-SHIM_SETTING [6 ]  -2760.45914225  
-SHIM_SETTING [7 ]  -1589.38441201  
-SHIM_SETTING [8 ]  25833.22230029  
-SHIM_SETTING [9 ]  -941.11406037   
-SHIM_SETTING [10]  5643.00239174   
+SHIM_SETTING [1 ]  -1156.98854966  
+SHIM_SETTING [2 ]  -5629.71878241  
+SHIM_SETTING [3 ]  8300.62872191   
+SHIM_SETTING [4 ]  1228.66000462   
+SHIM_SETTING [5 ]  110.53851865    
+SHIM_SETTING [6 ]  -3621.77399757  
+SHIM_SETTING [7 ]  -3388.01802035  
+SHIM_SETTING [8 ]  23345.05205055  
+SHIM_SETTING [9 ]  -1487.73629976  
+SHIM_SETTING [10]  4776.99236719   
 SHIM_SETTING [11]  0.00000000      
 SHIM_SETTING [12]  13582.64300000  
 SHIM_SETTING [13]  -2034.02800000  

@@ -1,0 +1,29 @@
+##TITLE= Audit trail, TopSpin 4.2.0
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= chris
+$$ /Users/chris/.julia/dev/NMRTools/exampledata/pseudo3D_HN_R2/1/pdata/1/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2018-12-06 07:10:49.097 +0000>,<ucl>,<CZC33343GD>,<go>,<TOPSPIN 3.2>,
+      <created by zg
+	started at 2018-12-05 11:42:34.957 +0000,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       0D 69 A9 CA AA 5C 28 54 A4 FC B9 21 D1 E9 B4 DD
+       data hash MD5: 4K * 320 * 11
+       0F 5A E7 3C CC C9 38 0B 0C 57 C1 00 45 6D E9 A5>)
+(   2,<2023-05-30 18:16:49.610 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<ftnd>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       ftnd 3
+       F3: SI = 4K BC_mod = 6 BCFW = 1 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 1000 STSI = 500 PHC0 = -62.69231 PHC1 = 0
+       data hash MD5: 512 * 512 * 16
+       D5 57 B4 90 78 53 E8 E2 5F 67 2B 92 19 C3 4B 58>)
+(   3,<2023-05-30 18:16:52.167 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<ftnd>,<TopSpin 4.2.0>,
+      <ftnd 2
+       F2: SI = 512 ME_mod = 2 NCOEF = 16 WDW = 4 SSB = 2 FT_mod = 6 FCOR = 0.5 REVERSE PHC0 = 0 PHC1 = 0
+       data hash MD5: 512 * 512 * 16
+       DC 86 EF A9 41 75 11 E6 C0 FF 32 B3 43 B0 46 A0>)
+##END=
+
+$$ hash MD5
+$$ 4F 06 B4 98 63 C1 83 66 07 15 F4 2D 63 E2 05 6C

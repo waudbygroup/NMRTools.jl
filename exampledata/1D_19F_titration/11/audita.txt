@@ -2,17 +2,17 @@
 ##JCAMPDX= 5.01
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= sstadmiller
-$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/11/audita.txt
+$$ /opt/home/sstadmiller/data/F19_T22G_PepS2_Dilute_08.07.17/3/audita.txt
 ##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
-(   1,<2017-08-07 11:35:26.534 +0200>,<sstadmiller>,<avance500.med.unc.edu>,<go>,<TOPSPIN 3.2>,
+(   1,<2017-08-07 09:28:05.141 +0200>,<sstadmiller>,<avance500.med.unc.edu>,<go>,<TOPSPIN 3.2>,
       <created by zg
-	started at 2017-08-07 11:29:49.887 +0200,
+	started at 2017-08-07 09:22:27.945 +0200,
 	POWCHK enabled, PULCHK disabled,
        configuration hash MD5:
        B7 32 6A 7D E1 13 2D CB 2E 20 51 33 8E E4 D5 59
        data hash MD5: 28194
-       2C FC 8A F7 5F FA EC C7 CA 06 3F 49 04 B1 8C D4>)
+       1E 0C AF 5C 63 C1 50 4B 7D 0A 65 F8 33 9D 62 0F>)
 ##END=
 
 $$ hash MD5
-$$ CC DB DD 6C 61 3F 6E 7A 93 C4 CA F6 10 5B 88 B8
+$$ 47 8B 3B 87 4B 21 7D 1A 4C CE 1A 02 19 8D 7D 7E

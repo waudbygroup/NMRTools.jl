@@ -1,0 +1,23 @@
+##TITLE= Audit trail, TopSpin 4.2.0
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= chris
+$$ /Users/chris/.julia/dev/NMRTools/exampledata/2D_HN/1/pdata/101/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2019-11-20 19:42:08.232 +0000>,<waudbyc>,<cl-nmr-spec602>,<go4>,<TopSpin 3.5.6>,
+      <created by zg
+	started at 2019-11-20 19:40:38.360 +0000,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       BB E2 FF 12 78 12 54 CC F4 26 F7 78 23 1F 98 53
+       data hash MD5: 2K * 128
+       63 89 00 82 B0 DB 30 9F 0E A3 0C B5 2B 76 97 9E>)
+(   2,<2023-05-30 18:16:10.848 +0100>,<chris>,<eduroam-int-dhcp-98-164-210.ucl.ac.uk>,<proc1d>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       efp 1 BC_mod = 6 BCFW = 0.5 LB = 1 FT_mod = 6 PKNL = 1 STSR = 600 STSI = 1200 PHC0 = -247.8906 PHC1 = 218.4 SI = 4K 
+       data hash MD5: 1200
+       DD CA B7 E6 03 B8 5B F0 48 C9 D6 55 F8 D2 10 7C>)
+##END=
+
+$$ hash MD5
+$$ 25 E8 1C 23 9A A7 E9 B0 81 07 D0 1C F1 8E 1B F4

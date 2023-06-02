@@ -9,7 +9,7 @@ Metadata entries are labelled by symbols such as `:ns` or `:pulseprogram`. See b
 
 ```@repl 1
 using NMRTools; # hide
-spec = loadnmr("../../exampledata/2D_HN/test.ft2"); # hide
+spec = loadnmr("../../exampledata/2D_HN/1/test.ft2"); # hide
 metadata(spec, :ns)
 spec[:ns]
 metadata(spec, :title)
@@ -25,13 +25,15 @@ metadatahelp(:td)
 
 ## Accessing axis metadata
 
-Axis metadata can be accessed by providing an addition axis label, i.e. `X`, `Y`, `Z` or `Ti`
+Axis metadata can be accessed by providing an addition axis label, i.e. `F1Dim`, `F2Dim`.
 
 ```@repl 1
-metadata(spec, X, :label)
-spec[X, :label]
-metadata(spec, Y, :label)
-spec[Y, :label]
+metadata(spec, F1Dim, :label)
+spec[F1Dim, :label]
+spec[1, :label]
+metadata(spec, F2Dim, :label)
+spec[F2Dim, :label]
+spec[2, :label]
 ```
 
 
@@ -40,16 +42,16 @@ spec[Y, :label]
 Spectrometer acquisition parameters are automatically parsed from the `acqus` file when data are loaded. This is stored as a dictionary in the `:acqus` entry of the spectrum metadata, but can more conveniently be accessed through the convenience function `acqus(spec, :parametername)`. Note that parameter names are not case sensitive.
 
 ```@repl 1
-acqus(spec, :BF1)
+acqus(spec, :bf1)
 acqus(spec, :te)
 ```
 
 Arrayed parameters such as pulse lengths can be accessed as lists or by supplying an additional index parameter
 
 ```@repl 1
-acqus(spec, :P)
-acqus(spec, :P, 1)
-acqus(spec, :CNST, 4)
+acqus(spec, :p)
+acqus(spec, :p, 1)
+acqus(spec, :cnst, 4)
 ```
 
 !!! note

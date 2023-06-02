@@ -1,12 +1,12 @@
-##TITLE= Parameter file, TOPSPIN		Version 2.0
+##TITLE= Parameter file, TopSpin 4.2.0
 ##JCAMPDX= 5.0
 ##DATATYPE= Parameter Values
-##NPOINTS= 8	$$ modification sequence number
+##NPOINTS= 9	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= ccukier
-$$ 2008-06-30 11:38:49.383 +0100  ccukier@spec602
-$$ /nmrdata/data/ccukier/nmr/RRM12LL_FBPNbox_new/3/pdata/1/proc2s
-$$ process /opt/topspin/prog/mod/proc2d
+$$ 2023-05-30 18:09:23.958 +0100  chris@eduroam-int-dhcp-98-164-210.ucl.ac.uk
+$$ /Users/chris/.julia/dev/NMRTools/exampledata/2D_HN_titration/2/pdata/1/proc2s
+$$ process /opt/topspin4.2.0/prog/mod/proc2d
 ##$ABSF1= 0
 ##$ABSF2= 0
 ##$ABSG= 0
@@ -35,6 +35,7 @@ $$ process /opt/topspin/prog/mod/proc2d
 ##$DC= 0
 ##$DFILT= <>
 ##$DTYPP= 0
+##$ERETIC= no
 ##$F1P= 0
 ##$F2P= 0
 ##$FCOR= 1
@@ -53,6 +54,29 @@ $$ process /opt/topspin/prog/mod/proc2d
 ##$MEAN= 0
 ##$ME_mod= 2
 ##$MI= 1
+##$MddCEXP= no
+##$MddCT_SP= no
+##$MddF180= no
+##$MddLAMBDA= 0
+##$MddMEMORY= 0
+##$MddMERGE= 0
+##$MddNCOMP= 0
+##$MddNITER= 0
+##$MddNOISE= 0
+##$MddPHASE= 0
+##$MddSEED= 0
+##$MddSRSIZE= 0
+##$Mdd_CsALG= 0
+##$Mdd_CsLAMBDA= 0
+##$Mdd_CsNITER= 0
+##$Mdd_CsNORM= 0
+##$Mdd_CsVE= yes
+##$Mdd_CsZF= 0
+##$Mdd_LrLAMBDA= 0
+##$Mdd_LrNITER= 0
+##$Mdd_LrRANK= 0
+##$Mdd_LrZF= 0
+##$Mdd_mod= 0
 ##$NCOEF= 16
 ##$NC_proc= -10
 ##$NLEV= 6
@@ -74,6 +98,12 @@ $$ process /opt/topspin/prog/mod/proc2d
 ##$PPRESOL= 1
 ##$PSCAL= 1
 ##$PSIGN= 0
+##$PYNMP= <proc.py>
+##$RDF1= 0
+##$RDF2= 0
+##$RDFWHM= 0
+##$RDINT= 0
+##$RDPOS= 0
 ##$REVERSE= no
 ##$SF= 60.789771
 ##$SI= 1024
@@ -81,6 +111,8 @@ $$ process /opt/topspin/prog/mod/proc2d
 ##$SIGF2= 0
 ##$SINO= 16
 ##$SIOLD= 1024
+##$SPECTYP= <>
+##$SREF_mod= 1
 ##$SREGLST= <.MeOH>
 ##$SSB= 2
 ##$STSI= 1024
@@ -96,10 +128,15 @@ $$ process /opt/topspin/prog/mod/proc2d
 ##$TM2= 0
 ##$TOPLEV= 0
 ##$USERP1= <user>
+##$USERP10= <>
 ##$USERP2= <user>
 ##$USERP3= <user>
 ##$USERP4= <user>
 ##$USERP5= <user>
+##$USERP6= <>
+##$USERP7= <>
+##$USERP8= <>
+##$USERP9= <>
 ##$WDW= 4
 ##$XDIM= 1024
 ##$YMAX_p= 185879795

@@ -2,26 +2,26 @@
 ##JCAMPDX= 5.01
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= Sam
-$$ C:/Bruker/SH3_SosBinding_PepS2/F19_T22G_PepS2_Dilute_08.07.17/9/pdata/1/auditp.txt
+$$ C:/Bruker/SH3_SosBinding_PepS2/F19_T22G_PepS2_Dilute_08.07.17/5/pdata/1/auditp.txt
 ##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
-(   1,<2017-08-07 11:01:15.200 +0200>,<sstadmiller>,<avance500.med.unc.edu>,<go>,<TOPSPIN 3.2>,
+(   1,<2017-08-07 09:59:23.069 +0200>,<sstadmiller>,<avance500.med.unc.edu>,<go>,<TOPSPIN 3.2>,
       <created by zg
-	started at 2017-08-07 10:55:38.030 +0200,
+	started at 2017-08-07 09:53:46.417 +0200,
 	POWCHK enabled, PULCHK disabled,
        configuration hash MD5:
        B7 32 6A 7D E1 13 2D CB 2E 20 51 33 8E E4 D5 59
        data hash MD5: 28194
-       87 F8 97 C9 DF 0E 65 5A 32 7B 9C CC A8 B6 B2 F8>)
-(   2,<2017-09-13 10:59:55.154 -0400>,<Sam>,<DESKTOP-H09PJL6>,<proc1d>,<TopSpin 3.5.7>,
+       27 A7 80 91 CA 47 87 E6 B2 62 D5 65 DF 18 E5 A6>)
+(   2,<2017-09-13 10:52:58.254 -0400>,<Sam>,<DESKTOP-H09PJL6>,<proc1d>,<TopSpin 3.5.7>,
       <Start of raw data processing
-       efp LB = 10 FT_mod = 6 PKNL = 1 PHC0 = -65.74415 PHC1 = 60.86555 SI = 32K 
+       efp LB = 10 FT_mod = 6 PKNL = 1 PHC0 = -85.49453 PHC1 = 144.8656 SI = 32K 
        data hash MD5: 32K
-       12 1B 5D 59 EA 8F 54 A0 E5 72 8B 2B 1D 27 FB 91>)
-(   3,<2017-09-13 10:59:56.077 -0400>,<Sam>,<DESKTOP-H09PJL6>,<proc1d>,<TopSpin 3.5.7>,
+       27 97 74 40 61 D8 D6 93 1A 05 1C BA 2C 4E AD 32>)
+(   3,<2017-09-13 10:52:59.137 -0400>,<Sam>,<DESKTOP-H09PJL6>,<proc1d>,<TopSpin 3.5.7>,
       <abs ABSG = 5 
        data hash MD5: 32K
-       74 2D C8 B0 B2 24 F6 CE 37 D6 B8 97 F2 DE C9 20>)
+       A9 30 19 EE 00 73 F9 CF ED 7C 85 0E 52 43 3C F3>)
 ##END=
 
 $$ hash MD5
-$$ 11 A0 6A 60 7F 1B BE 5A A6 D7 3E 65 38 97 4E 2F
+$$ 8F EF 5A FE 70 74 23 DE F8 4C 82 AF 96 AA 1B 63

@@ -1,12 +1,12 @@
-##TITLE= Parameter file, TOPSPIN		Version 2.0
+##TITLE= Parameter file, TopSpin 4.2.0
 ##JCAMPDX= 5.0
 ##DATATYPE= Parameter Values
-##NPOINTS= 3	$$ modification sequence number
+##NPOINTS= 5	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= ccukier
-$$ 2008-06-30 10:30:34.858 +0100  ccukier@spec602
-$$ /nmrdata/data/ccukier/nmr/RRM12LL_FBPNbox_new/2/pdata/1/proc2
-$$ process /opt/topspin/prog/mod/dataserver
+$$ 2023-05-30 18:10:14.506 +0100  chris@eduroam-int-dhcp-98-164-210.ucl.ac.uk
+$$ /Users/chris/.julia/dev/NMRTools/exampledata/2D_HN_titration/1/pdata/1/proc2
+$$ process /opt/topspin4.2.0/prog/mod/dataserver
 ##$ABSF1= 1000
 ##$ABSF2= -1000
 ##$ABSG= 5
@@ -63,7 +63,7 @@ $$ process /opt/topspin/prog/mod/dataserver
 ##$NZP= 1
 ##$OFFSET= 134.0024
 ##$PC= 4
-##$PHC0= 90
+##$PHC0= -109.3999
 ##$PHC1= -180
 ##$PH_mod= 1
 ##$PKNL= yes
@@ -76,11 +76,11 @@ $$ process /opt/topspin/prog/mod/dataserver
 ##$PSIGN= 0
 ##$REVERSE= no
 ##$SF= 60.789771
-##$SI= 1024
+##$SI= 512
 ##$SIGF1= 0
 ##$SIGF2= 0
 ##$SINO= 16
-##$SIOLD= 1024
+##$SIOLD= 512
 ##$SREGLST= <.MeOH>
 ##$SSB= 2
 ##$STSI= 0
