@@ -29,9 +29,8 @@ function axislabel(dim::NMRDimension)
     end
 end
 
-# 1D plot
-@recipe function f(A::NMRData{T,1}; normalize=true) where T
-    @info plotattributes
+# 1D plot (frequency)
+@recipe function f(A::NMRData{T,1, Tuple{D}}; normalize=true) where {T, D<:FrequencyDimension}
     Afwd = reorder(A, ForwardOrdered) # make sure data axes are in forwards order
     x = dims(Afwd, 1)
 
@@ -51,6 +50,52 @@ end
     yguide --> ""
     yshowaxis --> false
     yticks --> nothing
+
+    delete!(plotattributes, :normalize)
+    data(x), data(Afwd) ./ (normalize ? scale(Afwd) : 1)
+end
+
+
+
+# 1D plot (non-frequency)
+@recipe function f(A::NMRData{T,1, Tuple{D}}; normalize=true) where {T, D<:NonFrequencyDimension}
+    Afwd = reorder(A, ForwardOrdered) # make sure data axes are in forwards order
+    x = dims(Afwd, 1)
+
+    # recommend 1D to be a scatter plot
+    seriestype --> :scatter
+
+    # set default title
+    title --> ifelse(isempty(refdims(Afwd)), label(Afwd), refdims_title(Afwd))
+    legend --> false
+
+    xguide --> axislabel(A)
+    xflip --> false
+    xtick_direction --> :out
+    
+    yguide --> "Intensity"
+    yshowaxis --> true
+    yticks --> :out
+    # yerror --> A[:noise] * ones(length(A)) ./ (normalize ? scale(Afwd) : 1)
+
+    widen --> true
+    if minimum(x) < 0
+        if maximum(x) < 0
+            xlims --> (-Inf, 0)
+        end
+    else
+        xlims --> (0, Inf)
+    end
+    if minimum(A) < 0
+        if maximum(A) < 0
+            ylims --> (-Inf, 0)
+        end
+    else
+        ylims --> (0, Inf)
+    end
+    
+    grid --> false
+    frame --> :box
 
     delete!(plotattributes, :normalize)
     data(x), data(Afwd) ./ (normalize ? scale(Afwd) : 1)
