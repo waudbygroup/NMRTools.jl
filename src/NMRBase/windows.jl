@@ -104,3 +104,35 @@ struct LorentzToGaussWindow <: GaussWindow
     tmax::Float64
     LorentzToGaussWindow(expHz=0.0, gaussHz=0.0, tmax=Inf) = new(expHz, gaussHz, tmax)
 end
+
+
+## lineshapes for various window functions
+function lineshape(ax, δ, R2)
+    lineshape(getω(ax, δ), R2, getω(ax), ax[:window])
+end
+
+function lineshape(ω, R, ωobs, w::WindowFunction)
+    # generic case - return a plain Lorentzian
+    return @. R / ((ωobs - ω)^2 + R^2)
+end
+
+function lineshape(ω, R, ωobs, w::ExponentialWindow)
+    x = @. -R + 1im*(ωobs - ω) - π*w.lb
+    T = w.tmax
+    return @. -real((1 - exp(T*x)) / x)
+end
+
+function lineshape(ω, R, ωobs, w::CosWindow)
+    x = @. -R + 1im*(ωobs - ω)
+    T = w.tmax
+    Tx = T * x
+    return @. real(T * (π*exp(Tx) + 2*Tx) / (π^2 + 4*Tx^2))
+end
+  
+function lineshape(ω, R, ωobs, w::Cos²Window)
+    x = @. -R + 1im*(ωobs - ω)
+    Tx = w.tmax * x
+    return @. real((π^2*(1-exp(Tx)) + 2*Tx^2) / ((π^2 + Tx^2) * x))
+end
+  
+Base.Broadcast.broadcastable(w::WindowFunction) = Ref(w)

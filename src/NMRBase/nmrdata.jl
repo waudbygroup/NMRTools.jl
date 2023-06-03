@@ -219,7 +219,7 @@ function setgradientlist(A::NMRData, relativegradientlist, Gmax=nothing)
     sum(unknowndims) == 1 || throw(NMRToolsException("multiple unknown dimensions are present - ambiguous command"))
 
     if isnothing(Gmax)
-        warn("a maximum gradient strength of 0.55 T m⁻¹ is being assumed - this is roughly correct for modern Bruker systems but calibration is recommended")
+        @warn("a maximum gradient strength of 0.55 T m⁻¹ is being assumed - this is roughly correct for modern Bruker systems but calibration is recommended")
         gvals = 0.55 * relativegradientlist
     else
         gvals = Gmax * relativegradientlist

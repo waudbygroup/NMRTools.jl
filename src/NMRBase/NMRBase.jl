@@ -98,6 +98,7 @@ export G1Dim, G2Dim, G3Dim, G4Dim
 export X1Dim, X2Dim, X3Dim, X4Dim
 # export GradientDim
 # export SpatialDim
+export getω
 export replacedimension
 export setkinetictimes
 export setgradientlist
@@ -119,5 +120,6 @@ export SineWindow
 export GeneralSineWindow, CosWindow, Cos²Window
 export GaussWindow
 export GeneralGaussWindow, LorentzToGaussWindow
+export lineshape
 
 end

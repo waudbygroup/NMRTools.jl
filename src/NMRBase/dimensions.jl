@@ -83,3 +83,6 @@ end
 
 # Getters ########
 data(d::NMRDimension) = d.val.data
+
+getω(ax::FrequencyDimension) = 2π * ax[:bf] * (data(ax) .- ax[:offsetppm])
+getω(ax::FrequencyDimension, δ) = 2π * ax[:bf] * (δ .- ax[:offsetppm])
