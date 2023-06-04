@@ -3,7 +3,7 @@ using Test
 
 
 @testset "PlotsExt: 1D 19F" begin
-    dat = loadnmr("../exampledata/1D_19F/1/test.ft1");
+    dat = loadnmr("../exampledata/1D_19F/1/pdata/1");
 
     pr=Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(), dat)
 
