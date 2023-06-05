@@ -6,7 +6,18 @@
 [![Codecov](https://codecov.io/gh/waudbygroup/NMRTools.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/waudbygroup/NMRTools.jl)
 [![DOI](https://zenodo.org/badge/251587402.svg)](https://zenodo.org/badge/latestdoi/251587402)
 
+<!-- ![NMRTools logo](logo.png) -->
 
 NMRTools.jl is a simple library for importing and plotting NMR data.
+
+Usage examples are provided in the documentation, and additional examples are provided as Pluto workbooks. To run these:
+```julia
+# add Pluto if needed through package manager
+]add Pluto
+
+# launch Pluto
+using Pluto
+Pluto.run()
+```
 
 > **NOTE**: This package is under active development and it may be a while before its features and syntax stabilises. Please take a look at the examples in the documentation for a guide to getting started.
