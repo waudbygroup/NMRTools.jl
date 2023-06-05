@@ -9,12 +9,13 @@ using InteractiveUtils
 # add packages
 begin
 	using Pkg
-	Pkg.add(url="https://github.com/waudbygroup/NMRTools.jl", rev="master")
+	Pkg.add("NMRTools")
+	Pkg.add("Plots")
 	Pkg.add("LsqFit")
 	Pkg.add("Measurements")
-	Pkg.add("Plots")
 	Pkg.add("PlutoUI")
-	using NMRTools, Plots
+	using NMRTools
+	using Plots
 	using LsqFit
 	using Measurements
 	using PlutoUI
