@@ -252,6 +252,44 @@ end
 
 
 
+"decimate signal into n-point averages"
+function decimate(signal, n, dims=1)
+	np = size(signal, dims) ÷ n
+	y = selectdim(signal, dims, 1:(np*n))
+	
+	sz = [size(signal)...]
+	sz[dims] = np
+	insert!(sz, dims, n)
+	
+	y = reshape(y, sz...)
+	y = sum(y, dims=dims) / n
+
+	outsz = [size(signal)...]
+	outsz[dims] = np
+	reshape(y, outsz...)
+end
+
+"decimate NMR data into n-point averages"
+function decimate(expt::NMRData, n, dims=1)
+	np = size(expt, dims) ÷ n
+	out = selectdim(expt, dims, 1:n:(np*n)) # preallocate decimated NMRData
+	
+	sz = [size(out)...]
+	insert!(sz, dims, n)
+	
+	y = selectdim(data(expt), dims, 1:(np*n))
+	y = reshape(y, sz...)
+	y = reduce(+, y, dims=dims) / n
+	
+	outsz = [size(out)...]
+	outsz[dims] = np
+	data(out) .= reshape(y, outsz...)
+
+	out
+end
+
+
+
 # Arithmetic #######################################################################################
 
 # BUG - it would be nice to propagate the noise, but at the moment metadata is shallow-copied during
@@ -259,24 +297,32 @@ end
 
 # function Base.:+(a::NMRData, b::NMRData)
 #     c = invoke(+, Tuple{DimensionalData.AbstractDimArray, DimensionalData.AbstractDimArray}, a, b)
+#     c = NMRData(c.data, dims(c), name=c.name, refdims=c.refdims, metadata=copy(metadata(c)))
+#     delete!(metadata(c), :noise) # delete old entry
 #     c[:noise] = sqrt(get(metadata(a), :noise, 0)^2 + get(metadata(b), :noise, 0)^2)
 #     return c
 # end
 
 # function Base.:-(a::NMRData, b::NMRData)
 #     c = invoke(-, Tuple{DimensionalData.AbstractDimArray, DimensionalData.AbstractDimArray}, a, b)
+#     c = NMRData(c.data, dims(c), name=c.name, refdims=c.refdims, metadata=copy(metadata(c)))
+#     delete!(metadata(c), :noise) # delete old entry
 #     c[:noise] = sqrt(get(metadata(a), :noise, 0)^2 + get(metadata(b), :noise, 0)^2)
 #     return c
 # end
 
 # function Base.:*(a::Number, b::NMRData)
 #     c = invoke(*, Tuple{Number, DimensionalData.AbstractDimArray}, a, b)
+#     c = NMRData(c.data, dims(c), name=c.name, refdims=c.refdims, metadata=copy(metadata(c)))
+#     delete!(metadata(c), :noise) # delete old entry
 #     c[:noise] = a * get(metadata(b), :noise, 0)
 #     return c
 # end
 
 # function Base.:/(a::NMRData, b::Number)
 #     c = invoke(/, Tuple{DimensionalData.AbstractDimArray, Number}, a, b)
+#     c = NMRData(c.data, dims(c), name=c.name, refdims=c.refdims, metadata=copy(metadata(c)))
+#     delete!(metadata(c), :noise) # delete old entry
 #     c[:noise] = get(metadata(a), :noise, 0) / b
 #     return c
 # end

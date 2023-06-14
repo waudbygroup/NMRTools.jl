@@ -13,7 +13,8 @@ NMRTools.jl is a simple library for importing and plotting NMR data.
 Usage examples are provided in the documentation, and additional examples are provided as Pluto workbooks. To run these:
 ```julia
 # add Pluto if needed through package manager
-]add Pluto
+using Pkg
+Pkg.add("Pluto")
 
 # launch Pluto
 using Pluto

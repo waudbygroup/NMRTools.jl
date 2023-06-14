@@ -83,6 +83,7 @@ export set, rebuild, reorder, modify, broadcast_dims, broadcast_dims!, ForwardOr
 # NMR properties
 export scale
 export estimatenoise!
+export decimate
 
 # Dimensions
 export NMRDimension
