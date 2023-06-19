@@ -136,7 +136,7 @@ function lineshape(ω, R, ωax, w::ExponentialWindow, ::ComplexLineshape)
 
     return @. (1 - exp(-T*x)) / x
 end
-lineshape(ω, R, ωax, w::ExponentialWindow, ::RealLineshape) = real(lineshape(ω, R, ωax, w, ::ComplexLineshape))
+lineshape(ω, R, ωax, w::ExponentialWindow, ::RealLineshape) = real(lineshape(ω, R, ωax, w, ComplexLineshape()))
 
 
 # cosine
@@ -147,7 +147,7 @@ function lineshape(ω, R, ωax, w::CosWindow, ::ComplexLineshape)
     Tx = T * x
     return @. 2 * T * (π*exp(-Tx) + 2*Tx) / (π^2 + 4*Tx^2)
 end
-lineshape(ω, R, ωax, w::CosWindow, ::RealLineshape) = real(lineshape(ω, R, ωax, w, ::ComplexLineshape))
+lineshape(ω, R, ωax, w::CosWindow, ::RealLineshape) = real(lineshape(ω, R, ωax, w, ComplexLineshape()))
   
 function lineshape(ω, R, ωax, w::Cos²Window, ::ComplexLineshape)
     x = @. R + 1im*(ω - ωax)
@@ -155,6 +155,6 @@ function lineshape(ω, R, ωax, w::Cos²Window, ::ComplexLineshape)
     
     return @. (π^2*(1-exp(-Tx)) + 2*Tx^2) / (2 * (π^2 + Tx^2) * x)
 end
-lineshape(ω, R, ωax, w::Cos²Window, ::RealLineshape) = real(lineshape(ω, R, ωax, w, ::ComplexLineshape))
+lineshape(ω, R, ωax, w::Cos²Window, ::RealLineshape) = real(lineshape(ω, R, ωax, w, ComplexLineshape()))
   
 Base.Broadcast.broadcastable(w::WindowFunction) = Ref(w)

@@ -46,6 +46,7 @@ include("windows.jl")
 include("nmrdata.jl")
 include("metadata.jl")
 include("noise.jl")
+include("pcls.jl")
 
 macro exportinstances(enum)
     eval = GlobalRef(Core, :eval)
