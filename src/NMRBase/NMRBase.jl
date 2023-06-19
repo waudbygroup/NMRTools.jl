@@ -15,6 +15,7 @@ const DDarraydocs = joinpath(DDdocs, "#DimensionalData.AbstractDimensionalArray"
 # const DDselectordocs = joinpath(DDdocs, "#DimensionalData.Selector")
 # const DDtidocs = joinpath(DDdocs, "#DimensionalData.Ti")
 
+using LinearAlgebra
 using SimpleTraits
 using Optim
 using Statistics
@@ -122,5 +123,8 @@ export GeneralSineWindow, CosWindow, Cos²Window
 export GaussWindow
 export GeneralGaussWindow, LorentzToGaussWindow
 export lineshape
+
+# phase-constrained least squares
+export pcls
 
 end
