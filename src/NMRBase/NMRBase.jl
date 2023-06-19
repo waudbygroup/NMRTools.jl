@@ -124,6 +124,10 @@ export GaussWindow
 export GeneralGaussWindow, LorentzToGaussWindow
 export lineshape
 
+export LineshapeComplexity
+export RealLineshape
+export ComplexLineshape
+
 # phase-constrained least squares
 export pcls
 
