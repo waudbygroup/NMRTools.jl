@@ -153,15 +153,24 @@ function loadpdata(filename, allcomponents=false)
         y = first(dat)
     elseif ndim == 1
         if length(dat) == 1
-            warn("unable to find imaginary data for import of $filename - returning real values only")
+            @warn "unable to find imaginary data for import of $filename - returning real values only"
             y = dat
         else
             y = dat[1] + 1im .* dat[2]
         end
     else
-        # TODO
-        warn("import of multicomplex data not yet implemented - returning real values only")
-        y = dat
+        if length(dat) == 1
+            @warn "unable to find imaginary data for import of $filename - returning real values only"
+            y = dat
+        elseif length(dat) == 2
+            # only two components - return complex data regardless of what particular files are present
+            # (see https://rdrr.io/github/ssokolen/rnmrfit/man/read_processed_2d.html for similar approach)
+            y = dat[1] + 1im .* dat[2]
+        else
+            # TODO
+            @warn "import of multicomplex data not yet implemented - returning real values only"
+            y = dat
+        end
     end
 
     # 10. scale
