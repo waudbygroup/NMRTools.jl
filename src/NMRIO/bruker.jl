@@ -174,7 +174,7 @@ function loadpdata(filename, allcomponents=false)
     end
 
     # 10. scale
-    y = Float64.(y)
+    y = one(Float64) * y
     scalepdata!(y, procsdics[1])
 
     # 11. trim out any regions of zero data
