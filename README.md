@@ -6,7 +6,7 @@
 [![Codecov](https://codecov.io/gh/waudbygroup/NMRTools.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/waudbygroup/NMRTools.jl)
 [![DOI](https://zenodo.org/badge/251587402.svg)](https://zenodo.org/badge/latestdoi/251587402)
 
-<!-- ![NMRTools logo](logo.png) -->
+![NMRTools logo](logo.png)
 
 NMRTools.jl is a simple library for importing and plotting NMR data.
 
