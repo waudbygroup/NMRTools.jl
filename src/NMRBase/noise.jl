@@ -10,7 +10,13 @@ function estimatenoise!(d::NMRData)
     n0 = length(d)
     step = Int(ceil(n0/nsamples))
 
-    y = sort(vec(data(d))[1:step:end])
+    if isreal(data(d))
+        vd = vec(data(d))
+    else
+        # TODO consider multicomplex
+        vd = vec(real(data(d)))
+    end
+    y = sort(vd[1:step:end])
     n = length(y)
 
     # select central subset of points
