@@ -72,6 +72,7 @@ export γeff
 export AbstractNMRData
 export NMRData
 # Selectors
+export Selector, IntSelector, ArraySelector
 export At, Between, Touches, Contains, Near, Where, All, ..
 # getter methods
 export data, parent, dims, refdims, lookup, bounds, missingval
