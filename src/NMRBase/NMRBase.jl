@@ -125,6 +125,7 @@ export GeneralSineWindow, CosWindow, Cos²Window
 export GaussWindow
 export GeneralGaussWindow, LorentzToGaussWindow
 export lineshape
+export apod
 
 export LineshapeComplexity
 export RealLineshape

@@ -158,3 +158,35 @@ end
 lineshape(ω, R, ωax, w::Cos²Window, ::RealLineshape) = real(lineshape(ω, R, ωax, w, ComplexLineshape()))
   
 Base.Broadcast.broadcastable(w::WindowFunction) = Ref(w)
+
+
+
+## get data for apodization
+apod(spec::NMRData, ax) = apod(dims(spec,ax))
+
+function apod(ax::FrequencyDimension)
+    td = ax[:td]
+    tdzf = ax[:tdzf]
+    sw = ax[:swhz]
+    window = ax[:window]
+  
+    dt = 1/sw
+    t = dt * (0:(td-1))
+  
+    w = zeros(tdzf)
+    
+    w[1:td] = apod(t, window)
+    
+    return w
+end
+
+function apod(t, w::WindowFunction)
+    @warn "time-domain apodization function not yet defined for window $w - treating as no apodization"
+    ones(length(t))
+end
+
+apod(t, ::NullWindow) = ones(length(t))
+apod(t, w::ExponentialWindow) = exp.(-π * w.lb * t)
+apod(t, w::GeneralSineWindow) = @. sin(π*w.offset + π*((w.endpoint - w.offset) * t / w.tmax))^w.power
+apod(t, w::CosWindow) = @. cos(π/2 * t / w.tmax)
+apod(t, w::Cos²Window) = @. cos(π/2 * t / w.tmax)^2
