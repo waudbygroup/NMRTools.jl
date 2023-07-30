@@ -161,29 +161,37 @@ Base.Broadcast.broadcastable(w::WindowFunction) = Ref(w)
 
 
 
-## get data for apodization
-apod(spec::NMRData, ax) = apod(dims(spec,ax))
+"""
+    apod(spec::NMRData, dimension)
 
-function apod(ax::FrequencyDimension)
+Return the time-domain apodization function for the specified axis,
+as a vector of values.
+"""
+apod(spec::NMRData, dimension, zerofill=true) = apod(dims(spec,dimension), zerofill)
+
+function apod(ax::FrequencyDimension, zerofill=true)
     td = ax[:td]
-    tdzf = ax[:tdzf]
     sw = ax[:swhz]
     window = ax[:window]
-  
+    
     dt = 1/sw
     t = dt * (0:(td-1))
-  
-    w = zeros(tdzf)
     
+    if zerofill
+        tdzf = ax[:tdzf]
+        w = zeros(tdzf)
+    else
+        w = zeros(td)
+    end
     w[1:td] = apod(t, window)
-    
+
     return w
 end
 
-function apod(t, w::WindowFunction)
-    @warn "time-domain apodization function not yet defined for window $w - treating as no apodization"
-    ones(length(t))
-end
+# function apod(t, w::WindowFunction)
+#     @warn "time-domain apodization function not yet defined for window $w - treating as no apodization"
+#     ones(length(t))
+# end
 
 apod(t, ::NullWindow) = ones(length(t))
 apod(t, w::ExponentialWindow) = exp.(-π * w.lb * t)
