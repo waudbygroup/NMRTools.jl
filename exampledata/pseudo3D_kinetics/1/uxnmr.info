@@ -1,0 +1,157 @@
+CONFIGURATION INFORMATION
+=========================
+
+Path         : /opt/topspin/conf/instr/spect/uxnmr.info
+Date         : Wed Nov 11 10:33:09 2020
+Release      : TopSpin 3.5 pl 6
+Installed in : /opt/topspin
+Host         : cl-nmr-spec950
+OS           : CentOS Linux release 7.2.1511 (Core) 
+CPU          : Intel(R) Xeon(R) CPU E5-1620 0 @ 3.60GHz (8 cores at 1806 MHz with Hyperthreading)
+User         : kellyg2 (Geoffrey Kelly)
+System       : Avance III HD 950 NMR spectrometer
+1H-frequency : 950.45 MHz
+Description  : Avance III HD 950 X
+Location     : The Francis Crick Institute London
+Bruker Order : 10099181
+Configured in: cl-nmr-spec950:/opt/topspin/conf/instr/spect
+
+IPSO: connected to spectrometer subnet
+- TCP/IP address = 149.236.99.90
+ - IPSO type: 19"
+- Tctrl : 1
+- Fctrls: 5
+- Gctrl1: without digital preemphasis
+- Rctrl : none
+- FREDs : none
+- DPP : none
+
+DRU1: AQS DRU-E Z102520/03727 ECL 07.00
+- TCP/IP address = 149.236.99.89
+- Firmware Version = 151014
+- DRU1 controls AQS-Rack and HPPR/2
+DRU2: AQS DRU-E Z102520/03730 ECL 07.00
+- TCP/IP address = 149.236.99.88
+- Firmware Version = 151014
+
+AQS: connected to 149.236.99.89:/dev/tty10
+  _Slot_ SBSB _____________________Board_____________________
+  Number Addr Type HW-VS FW-VS ID  ECL Name   Description
+  -----------------------------------------------------------
+     0   0x24 0x33     0        S  1.3 SGU-1  AQS SGU/3 1200 (2CH) Z117130/00223 ECL 01.03 FPGA-Vs=20131031
+     2   0x10 0x53   0x5    CD  R  0.2 REC-1  AQS RXAD/2 1000 Z130589/111 ECL 00.02
+     3   0x34 0xda   0x1        X  0.2 REF-1  
+     6   0x11 0x53   0x5    CD  R  0.2 REC-2  AQS RXAD/2 1000 Z130589/110 ECL 00.02
+     7   0x26 0x33     0        S  1.3 SGU-2  AQS SGU/3 1200 (2CH) Z117130/00216 ECL 01.03 FPGA-Vs=20131031
+     8   0x28 0x33     0        S  1.3 SGU-3  AQS SGU/3 1200 (2CH) Z117130/00209 ECL 01.03 FPGA-Vs=20131031
+    13   0xa0 0x93     0        V  0.1 PS-1   
+    14   0xa1 0x91     0        V  1.2 PS-2   AQS PSM-D Power Supply Module
+    --   0x20 0xd8     0        B  1.1 MASTER AQS/3+ Chassis
+     1   0x20  0x7     0        B      MASTER AQS Rack Master
+  Logical Receiver/SGU configuration:
+
+
+Router: none installed
+
+
+Transmitters at the spectrometer subnet:
+----------------------------------------
+BLA_W1345500_0025 W1345500/0025 ECL 20:
+- TCP/IP address = 149.236.99.96
+- Firmware VS    = 20120627
+- Amplifier      = BLAXH2H500/100/250 E 800-1000MHZ INR: W1345500/0025 ECL 20
+- Router         = BLMMR32 RF AMPLIFIER MODULE: W1345204/5554 ECL 21
+- Controller     = BLA CONTROL BOARD 6 2CH: W1522050/011363 ECL 60
+BLA_W1345529_0133 W1345529/0133 ECL 01:
+- TCP/IP address = 149.236.99.91
+- Firmware VS    = 20120627
+- Amplifier      = BLAX1000 E 6-405MHZ INR OUTR: W1345529/0133 ECL 01
+- Router         = BLMMR31 RF AMPLIFIER MODULE: W1345212/2582 ECL 20
+- Controller     = BLA CONTROL BOARD 6 2CH: W1522050/7795 ECL 50
+LTRX Z109896/00009 ECL 01.01:
+- TCP/IP address = 149.236.99.20
+- Amplifier      = BSMS/2 LOCK TRANSCEIVER 950: Z109896/00009 ECL 01.01
+
+BSMS: BSMS/2 connected to ethernet
+- TCP/IP address = 149.236.99.20
+- ELCB firmware version = 20161026
+- GAB current limits = 0.0/X, 0.0/Y, 10.0/Z (in A)
+- SCB channels = 40
+- Shim System = BOSS3-SB
+- L-TRX = BSMS/2 LOCK TRANSCEIVER 950: Z109896/00009 ECL 01.01
+- Lock: on L-TRX board
+- VTU_SPB = BSMS/2 SPB SENSOR & PNEUMATIC BD: Z115191/00411 ECL 02.03
+- VTU_VPSB1 = BSMS/2 VARIABLE POWER SUPPLY BD: Z115193/01459 ECL 01.05
+
+VTU: in BSMS/2 connected to ethernet
+- TCP/IP address = 149.236.99.20
+
+Bruker Automatic Changer: device connected to 149.236.99.90:/dev/tty04
+- Capacity: 24 holders
+- Firmware: 970111
+- use BACS air  = yes
+- BACS sx delay = 0 s
+- Sample Rail fast changer mode = no
+
+Cryo Controller CRCO: device connected to 149.236.99.90:/dev/tty06
+
+Bruker Magnet Pump Control BMPC: device connected to 149.236.99.90:/dev/tty05
+
+Preamplifiers :
+HPPR2: - HPPR/2 preamplifier connected to 149.236.99.89:/dev/tty10
+    Type      : HPPR/2
+    Controller: Cover/2, with DRU Application firmware = c.
+                no LED display for tuning and matching
+    Module  1 : HPLNA 19F1H (virtual 50 Ohm reference: 100.5%/0.2deg, reflection meter)
+                PN=Z106278, SN=00014 from 20130805
+    Module  2 : 2H
+                PN=Z106273, SN=00014 from 20130723
+    Module  3 : XBB31P 2HS
+                PN=Z106274, SN=00016 from 20130724
+    Module  4 : XBB31P 2HS
+                PN=Z106274, SN=00015 from 20130701
+    Module  5 : 15N
+                PN=Z106276, SN=00015 from 20130724
+    Module  6 : 13C
+                PN=Z106275, SN=00206 from 20150917
+
+
+
+Gradient Controller cable connections
+--------------------------------------------------------------------
+GCtrl1: connected to GAB in BSMS
+
+RF cable connections (detected)
+--------------------------------------------------------------------
+SGU1 NORM output -> input 1 of transmitter 1 (BLAXH2H500/100/250 E 800-1000MHZBLAX1000 E 6-405MHZ INR OUTR W1345500/0025 at TCP/IP 149.236.99.96)
+SGU1 AUX  output -> TUNE signal input of HPPR
+SGU2 NORM output -> input 2 of transmitter 1 (BLAXH2H500/100/250 E 800-1000MHZBLAX1000 E 6-405MHZ INR OUTR W1345500/0025 at TCP/IP 149.236.99.96)
+SGU2 AUX  output -> TUNE signal input of HPPR
+SGU3 NORM output -> input 3 of transmitter 1 (BLAXH2H500/100/250 E 800-1000MHZBLAX1000 E 6-405MHZ INR OUTR W1345500/0025 at TCP/IP 149.236.99.96)
+SGU3 AUX  output -> input 4 of transmitter 1 (BLAXH2H500/100/250 E 800-1000MHZBLAX1000 E 6-405MHZ INR OUTR W1345500/0025 at TCP/IP 149.236.99.96)
+SGU4 NORM output -> input 1 of transmitter 2 (BLAX1000 E 6-405MHZ INR OUTR W1345529/0133 at TCP/IP 149.236.99.91)
+SGU4 AUX  output -> open
+SGU5 NORM output -> input 2 of transmitter 2 (BLAX1000 E 6-405MHZ INR OUTR W1345529/0133 at TCP/IP 149.236.99.91)
+SGU5 AUX  output -> open
+
+Blanking cable connections (detected)
+--------------------------------------------------------------------
+transmitter 1 = BLAXH2H500/100/250 E 800-1000MHZBLAX1000 E 6-405MHZ INR OUTR W1345500/0025 at TCP/IP 149.236.99.96:
+- amplifier 1H-100W uses blanking 2
+- amplifier X-500W uses blanking 1
+- amplifier 2H-250W uses blanking 7
+
+transmitter 2 = BLAX1000 E 6-405MHZ INR OUTR W1345529/0133 at TCP/IP 149.236.99.91:
+- amplifier X-1000W uses blanking 3
+- amplifier X-300W uses blanking 3
+
+transmitter 3 = BSMS/2 LOCK TRANSCEIVER 950 Z109896/00009 at TCP/IP 149.236.99.20:
+- amplifier 2H-5W needs no blanking
+
+
+Switchbox (unknown: no outputs) routing
+--------------------------------------------------------------------
+transmitter 2 = BLAX1000 E 6-405MHZ INR OUTR W1345529/0133 at TCP/IP 149.236.99.91:
+- amplifier X-1000W at blanking 3 can be routed to switchbox output 1 (unknown) and output 2 (unknown)
+
+

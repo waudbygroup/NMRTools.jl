@@ -1,0 +1,29 @@
+##TITLE= Audit trail, TopSpin 4.2.0
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= chris
+$$ /Users/chris/Documents/Work/mylona/kinetics/revision-measurements/chris_cJun_wt_211221/410/pdata/1/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2021-12-24 11:27:39.012 +0000>,<waudbyc>,<cl-nmr-spec950>,<go4>,<TopSpin 3.5.6>,
+      <created by zg
+	started at 2021-12-23 18:26:19.927 +0000,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       7D 8D 03 1C F2 47 DD 85 73 4D 92 1E 67 18 21 23
+       data hash MD5: 3K * 128 * 512
+       94 CB C0 69 68 7C 13 3C F2 BF 02 98 5F EF CA 92>)
+(   2,<2023-07-23 18:52:40.191 +0100>,<chris>,<johann.cust.communityfibre.co.uk>,<ftnd>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       ftnd 3
+       F3: SI = 4K BC_mod = 4 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 890 STSI = 400 PHC0 = 0.09423995 PHC1 = 0
+       data hash MD5: 400 * 128 * 256
+       1C 54 3F B2 34 C3 AD 93 63 BE 6E 59 99 54 10 8D>)
+(   3,<2023-07-23 18:54:19.315 +0100>,<chris>,<johann.cust.communityfibre.co.uk>,<ftnd>,<TopSpin 4.2.0>,
+      <ftnd 2
+       F2: SI = 128 ME_mod = 2 NCOEF = 16 WDW = 4 SSB = 2 FT_mod = 4 FCOR = 1 PHC0 = 90 PHC1 = -180
+       data hash MD5: 400 * 128 * 256
+       E3 F4 D6 58 1C 07 0B 7E CE E1 88 ED 40 0C B6 04>)
+##END=
+
+$$ hash MD5
+$$ B3 B3 F5 A4 D3 C9 9B FF 4B A2 68 2E BD A9 49 75
