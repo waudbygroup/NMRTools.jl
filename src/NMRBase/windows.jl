@@ -167,7 +167,7 @@ Base.Broadcast.broadcastable(w::WindowFunction) = Ref(w)
 Return the time-domain apodization function for the specified axis,
 as a vector of values.
 """
-apod(spec::NMRData, dimension, zerofill=true) = apod(dims(spec,dimension), zerofill)
+apod(spec::AbstractNMRData, dimension, zerofill=true) = apod(dims(spec,dimension), zerofill)
 
 function apod(ax::FrequencyDimension, zerofill=true)
     td = ax[:td]
