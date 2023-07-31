@@ -14,8 +14,6 @@ using SimpleTraits
 using Colors
 using ColorSchemes
 
-@info "PlotsExt being loaded"
-
 struct ContourLike end
 
 contourlevels(spacing=1.7, n=12) = (spacing^i for i=0:(n-1))
