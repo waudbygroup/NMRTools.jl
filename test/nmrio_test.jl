@@ -230,6 +230,8 @@ end
 
 
 @testset "NMRIO: 1D 19F (Bruker pdata)" begin
+    dat = loadnmr("../exampledata/1D_19F/1");
+    dat = loadnmr("../exampledata/1D_19F/1/");
     dat = loadnmr("../exampledata/1D_19F/1/pdata/1");
     dat = loadnmr("../exampledata/1D_19F/1/pdata/1/");
 

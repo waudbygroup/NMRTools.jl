@@ -14,18 +14,25 @@ function getacqusmetadata(format, filename, experimentfolder=nothing)
                 experimentfolder = dirname(experimentfolder)
             end
         elseif format == :pdata
+            # move up two directories from X/pdata/Y to X
             if isdir(filename)
-                experimentfolder = filename
+                if isdirpath(filename)
+                    # filename = X/pdata/Y/
+                    # dirname = X/pdata/Y
+                    experimentfolder = dirname(dirname(dirname(filename)))
+                else
+                    # filename = X/pdata/Y
+                    # dirname = X/pdata
+                    experimentfolder = dirname(dirname(filename))
+                end
             else
-                experimentfolder = dirname(filename)
+                experimentfolder = dirname(dirname(dirname(filename)))
             end
-            # move up two directories
-            experimentfolder = dirname(dirname(experimentfolder))
         end
     else
         # if the passed experiment folder isn't a directory, use the enclosing directory
         if !isdir(experimentfolder)
-            warn("passed experiment folder $experimentfolder is not a directory")
+            @warn "passed experiment folder $experimentfolder is not a directory"
             if isfile(experimentfolder)
                 experimentfolder = dirname(experimentfolder)
             end
