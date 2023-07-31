@@ -204,6 +204,7 @@ end
 
 
 # pseudo-2D
+# TODO FIX need to treat differently if user asks for a heatmap
 @recipe function f(::Type{HasNonFrequencyDimension{D}}, d::D) where {D<:NMRData{T, 2} where T}
     z = reorder(d, ForwardOrdered) # make sure data axes are in forwards order
     # z = DimensionalData.maybe_permute(z, (YDim, XDim))
@@ -226,50 +227,58 @@ end
     yflip --> false
     ygrid --> false
     ytick_direction --> :out
-
-    gradient = get(plotattributes, :usegradient, false)
-    delete!(plotattributes, :usegradient)
-    
+   
     normalize = get(plotattributes, :normalize, true)
     delete!(plotattributes, :normalize)
 
     scaling = normalize ? scale(z) : 1
 
-    palettesize = length(y)
-    if palettesize > 64
-        palettesize = floor(palettesize/4)
-    elseif palettesize > 48
-        palettesize = floor(palettesize/3)
-    elseif palettesize > 32
-        palettesize = floor(palettesize/2)
-    elseif palettesize > 16
-        palettesize = 16
-    end
+    stype = get(plotattributes, :seriestype, nothing)
+    if stype == :heatmap
+        # heatmap
+        data(x), data(y), permutedims(data(z)) ./ scaling
+    else
+        # default
+
+        # TODO - BUG - this attribute isn't recognised
+        gradient = get(plotattributes, :usegradient, false)
+        delete!(plotattributes, :usegradient)
     
-    # don't set a gradient palette if colours already specified
-    setpalette = :seriescolor ∉ keys(plotattributes) ||
-        :linecolor ∉ keys(plotattributes)
-
-    xones = ones(length(x))
-    for i=1:length(y)
-        @series begin
-            seriestype --> :path3d
-            seriescolor --> i
-
-            if gradient
-                line_z --> data(z)[:,i]  # colour by height
-                palette --> :darkrainbow
-            else
-                if setpalette
-                    palette --> palette(:phase,11)
+        palettesize = length(y)
+        if palettesize > 64
+            palettesize = floor(palettesize/4)
+        elseif palettesize > 48
+            palettesize = floor(palettesize/3)
+        elseif palettesize > 32
+            palettesize = floor(palettesize/2)
+        elseif palettesize > 16
+            palettesize = 16
+        end
+        
+        # don't set a gradient palette if colours already specified
+        setpalette = :seriescolor ∉ keys(plotattributes) ||
+            :linecolor ∉ keys(plotattributes)
+    
+        xones = ones(length(x))
+        for i=1:length(y)
+            @series begin
+                seriestype --> :path3d
+                seriescolor --> i
+    
+                if gradient
+                    line_z --> data(z)[:,i]  # colour by height
+                    palette --> :darkrainbow
+                else
+                    if setpalette
+                        palette --> palette(:phase,11)
+                    end
                 end
+                primary --> (i==1)
+                fillrange --> 0 # not currently implemented in plots for 3D data
+                data(x), xones * y[i], data(z)[:,i] / scaling
             end
-            primary --> (i==1)
-            fillrange --> 0 # not currently implemented in plots for 3D data
-            data(x), xones * y[i], data(z)[:,i] / scaling
         end
     end
-    # data(x), data(y), permutedims(data(z)) ./ scaling
 end
 
 
