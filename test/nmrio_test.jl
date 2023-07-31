@@ -278,7 +278,7 @@ end
     @test dat[1,:pseudodim] == false
 
     # load complex spectrum
-    dat2 = loadnmr("exampledata/1D_19F/1/pdata/1",allcomponents=true)
+    dat2 = loadnmr("../exampledata/1D_19F/1/pdata/1",allcomponents=true)
     @test dat2[100] == 4920.725646972656 - 17351.53515625im
 end
 
@@ -423,7 +423,7 @@ end
 
 
 @testset "pseudo3D data (Bruker pdata)" begin
-    dat = loadnmr("exampledata/pseudo3D_HN_R2/1/pdata/1");
+    dat = loadnmr("../exampledata/pseudo3D_HN_R2/1/pdata/1");
     @test size(dat) == (512, 512, 11)
     @test dat[5,6,7] == 2370.09375
 end

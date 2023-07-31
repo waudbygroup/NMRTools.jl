@@ -5,7 +5,7 @@ using Test
 @testset "NMRBase: NMRData" begin
     dat1a = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1");
     dat1b = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1");
-    dat2 = loadnmr("exampledata/1D_19F/1/pdata/1");
+    dat2 = loadnmr("../exampledata/1D_19F/1/pdata/1");
     dat2b = NMRData(dat2) # create NMRData from another NMRData object
     @test dat1a == dat1b # test equality
     @test dat1a ≠ dat2
@@ -168,7 +168,7 @@ end
     @test decimate(1:10,2) == [1.5, 3.5, 5.5, 7.5, 9.5]
     
     # NMR data
-    dat=loadnmr("exampledata/pseudo2D_XSTE/1/pdata/1");
+    dat=loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1");
     @test size(decimate(dat, 10, 1)) == (204, 10)
     @test decimate(dat,10,1)[2,2] == 43.59735595703125
     @test size(decimate(dat, 3, 2)) == (2048, 3)
