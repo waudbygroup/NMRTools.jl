@@ -34,7 +34,7 @@ end
 @testset "PlotsExt: visual regression testing" begin
     dat1 = loadnmr("../exampledata/1D_19F/1/")
     @plottest begin
-        plot(dat)
+        plot(dat1)
     end "plot_1D_19F.png" false
 
     dat2 = loadnmr("../exampledata/2D_HN/1")
@@ -65,7 +65,7 @@ end
     end "plot_2D_HN_titration.png" false
     @plottest begin
         plot(dat5[1])
-        plot!(dat5[11],c=:red)
+        plot!(dat5[11], c=:red)
         xlims!(7,8)
         ylims!(115,120)
     end "plot_2D_HN_overlay.png" false
