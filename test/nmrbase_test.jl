@@ -21,9 +21,10 @@ using Test
     @test ndims(dat3) == 1
     @test dat3 isa NMRData{Float64,1}
     @test size(dat3) == (2048,)
+    
     dat3b = dat1a[100,:]  # slicing
     @test ndims(dat3b) == 1
-    @test size(dat3) == (10,)
+    @test size(dat3b) == (10,)
 
     @test data(dat2)[1] == 4671.5184326171875
     @test data(dat2,1)[1] == -119.5922
