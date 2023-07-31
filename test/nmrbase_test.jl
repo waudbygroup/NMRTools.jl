@@ -11,24 +11,24 @@ using Test
     @test dat1a ≠ dat2
     @test dat2b == dat2
 
-    @test Array(dat) isa Matrix{Float64}
-    @test Array(dat)[1,1] == 167.84442138671875
+    @test Array(dat1a) isa Matrix{Float64}
+    @test Array(dat1a)[1,1] == 167.84442138671875
 
-    @test collect(dat) isa Matrix{Float64}
-    @test collect(dat)[1,1] == 167.84442138671875
+    @test collect(dat1a) isa Matrix{Float64}
+    @test collect(dat1a)[1,1] == 167.84442138671875
 
-    dat3 = dat[:,3]  # slicing
+    dat3 = dat1a[:,3]  # slicing
     @test ndims(dat3) == 1
     @test dat3 isa NMRData{Float64,1}
     @test size(dat3) == (2048,)
-    dat3b = dat[100,:]  # slicing
+    dat3b = dat1a[100,:]  # slicing
     @test ndims(dat3b) == 1
     @test size(dat3) == (10,)
 
     @test data(dat2)[1] == 4671.5184326171875
     @test data(dat2,1)[1] == -119.5922
     
-    @test hasnonfrequencydimension(dat) == true
+    @test hasnonfrequencydimension(dat1a) == true
     @test hasnonfrequencydimension(dat2) == false
 end
 

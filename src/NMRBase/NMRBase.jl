@@ -105,6 +105,7 @@ export X1Dim, X2Dim, X3Dim, X4Dim
 export getω
 export replacedimension
 export setkinetictimes
+export setrelaxtimes
 export setgradientlist
 
 # Metadata
