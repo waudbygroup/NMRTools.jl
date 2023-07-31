@@ -231,6 +231,7 @@ end
 
 @testset "NMRIO: 1D 19F (Bruker pdata)" begin
     dat = loadnmr("../exampledata/1D_19F/1/pdata/1");
+    dat = loadnmr("../exampledata/1D_19F/1/pdata/1/");
 
     @test size(dat) == (5000,)
     @test length(dat) == 5000
@@ -275,6 +276,10 @@ end
     @test dat[1,:swhz] == 14097.744360902296
     @test dat[1,:swppm] == 29.95804208728246
     @test dat[1,:pseudodim] == false
+
+    # load complex spectrum
+    dat2 = loadnmr("exampledata/1D_19F/1/pdata/1",allcomponents=true)
+    @test dat2[100] == 4920.725646972656 - 17351.53515625im
 end
 
 
@@ -388,4 +393,37 @@ end
     @test dat[2,:swhz] == 1337.97163500134
     @test dat[2,:swppm] == 21.999694151751253
     @test dat[2,:pseudodim] == false
+end
+
+
+
+@testset "NMRIO: pseudo-2D (Bruker pdata)" begin
+    dat = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1");
+    datC = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1", allcomponents=true);
+
+    @test size(dat) == (2048,10)
+    
+    @test parent(dat) isa Matrix{Float64}
+    @test parent(datC) isa Matrix{ComplexF64}
+
+    @test dat[2,3] == -32.08953857421875
+    @test datC[2,3] == -32.08953857421875 + 87.19561767578125im
+
+
+    @test dat[:title] == "15N aSyn, 283 K - XSTE\nDELTA = 100ms, delta = 4ms, G = 5-95%"
+    
+    @test acqus(dat, :pulprog) == "stebpgp1s19xn.jk"
+    
+    @test dims(dat,1) isa F1Dim
+    @test dims(dat,2) isa X2Dim
+    @test dat[1,:window] == Cos²Window(0.0512)
+    @test dat[1,:pseudodim] == false
+    @test dat[2,:pseudodim] == true
+end
+
+
+@testset "pseudo3D data (Bruker pdata)" begin
+    dat = loadnmr("exampledata/pseudo3D_HN_R2/1/pdata/1");
+    @test size(dat) == (512, 512, 11)
+    @test dat[5,6,7] == 2370.09375
 end
