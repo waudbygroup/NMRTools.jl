@@ -175,3 +175,29 @@ end
     @test size(decimate(dat, 3, 2)) == (2048, 3)
     @test decimate(dat,3,2)[2,2] == -31.345370822482636
 end
+
+
+@testset "NMRBase: stack" begin
+    specs = [
+        loadnmr("../exampledata/1D_19F_titration/1"),
+        loadnmr("../exampledata/1D_19F_titration/2"),
+        loadnmr("../exampledata/1D_19F_titration/3")
+    ]
+    stacked = stack(specs)
+    @test size(stacked) == (32768, 3)
+
+    specs2 = [
+        loadnmr("../exampledata/1D_19F_titration/1"),
+        loadnmr("../exampledata/2D_HN/1")
+    ]
+    @test_throws DimensionMismatch stack(specs2)
+
+    specs3 = [
+        loadnmr("exampledata/2D_HN_titration/1/test.ft2"),
+        loadnmr("exampledata/2D_HN_titration/2/test.ft2"),
+        loadnmr("exampledata/2D_HN_titration/3/test.ft2"),
+        loadnmr("exampledata/2D_HN_titration/4/test.ft2")
+    ]
+    stacked = stack(specs3)
+    @test size(stacked) == (32768, 3)
+end

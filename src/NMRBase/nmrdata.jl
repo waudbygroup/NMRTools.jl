@@ -137,6 +137,13 @@ end
 # DD.dimconstructor(::Tuple{<:Dimension{<:AbstractProjected},Vararg{<:Dimension}}) = NMRData
 
 
+
+
+
+
+
+
+
 # Getters ##########################################################################################
 data(A::NMRData) = A.data
 data(A::NMRData, dim) = data(dims(A, dim))
@@ -156,6 +163,8 @@ function scale(d::AbstractNMRData)
     return ns * rg * conc
 end
 
+
+# Set pseudo-dimension data
 
 """
     setkinetictimes(A::NMRData, tvals, units=nothing)
@@ -236,8 +245,6 @@ function setgradientlist(A::NMRData, relativegradientlist, Gmax=nothing)
 end
 
 
-
-
 function replacedimension(A::NMRData, olddimnumber, newdim)
     olddim = dims(A, olddimnumber)
     length(olddim) == length(newdim) || throw(NMRToolsException("size of old and new dimensions are not compatible"))
@@ -286,6 +293,48 @@ function decimate(expt::NMRData, n, dims=1)
 	data(out) .= reshape(y, outsz...)
 
 	out
+end
+
+
+"""
+    stack(expts::Vector{NMRData})
+
+Combine a collection of equally-sized NMRData into one larger array, by arranging them
+along a new dimension, of type `UnknownDimension`.
+
+Throws a `DimensionMismatch` if data are not of compatible shapes.
+"""
+function Base.stack(expts::Vector{D}) where {D <: AbstractNMRData{T,N}} where {T,N}
+    # construct new data
+    newdata = stack(data, expts)
+    
+    # construct new dimensions
+    n = length(expts)
+    if N==1
+        newdim = X2Dim(1:n)
+    elseif N==2
+        newdim = X3Dim(1:n)
+    elseif N==3
+        newdim = X4Dim(1:n)
+    end
+    newdims = [dims(expts[1])..., newdim]
+    # push!(newdims, newdim)
+    newdims = tuple(newdims...)
+
+    # check and warn if dimensions don't match
+    allequal(map(dims, expts)) || warn("stack: dimensions of expts 1 and $i are not equal")
+
+    # construct new metadata, based on metadata for first spectrum
+    newmd = deepcopy(metadata(first(expts)))
+    newmd[:ndim] = N + 1
+
+    # check and warn if ns don't match between experiments
+    ns = map(e -> e[:ns], expts)
+    allequal(ns) || @warn "stack: experiments do not have same ns" ns
+    rg = map(e -> e[:rg], expts)
+    allequal(rg) || @warn "stack: experiments do not have same rg" rg
+   
+    NMRData(newdata, newdims, metadata=newmd)
 end
 
 
