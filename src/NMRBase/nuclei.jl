@@ -1,3 +1,7 @@
+"""
+Nucleus
+Enumeration of common NMR-active nuclei.
+"""
 @enum Nucleus begin
     H1
     H2
@@ -9,6 +13,17 @@
     P31
 end
 
+"""
+    spin(n::Nucleus)
+
+Return the spin quantum number of nucleus `n`.
+
+# Arguments
+- `n`: Nucleus enum
+
+# Returns
+- Spin as a `Rational` or `nothing` if not found
+"""
 function spin(n::Nucleus)
     dic = Dict(H1 => 1 // 2,
                H2 => 1,
@@ -21,6 +36,17 @@ function spin(n::Nucleus)
     return get(dic, n, nothing)
 end
 
+"""
+    gyromagneticratio(n::Nucleus)
+
+Return the gyromagnetic ratio in Hz/T of nucleus `n`.
+
+# Arguments
+- `n`: Nucleus enum
+
+# Returns
+- Gyromagnetic ratio in Hz/T as a `Float64`, or `nothing` if not found
+"""
 function gyromagneticratio(n::Nucleus)
     dic = Dict(H1 => 267.52218744e6,
                H2 => 41.065e6,
