@@ -198,6 +198,6 @@ end
         loadnmr("../exampledata/2D_HN_titration/3/test.ft2"),
         loadnmr("../exampledata/2D_HN_titration/4/test.ft2")
     ]
-    stacked = stack(specs3)
-    @test size(stacked) == (32768, 3)
+    # expect warning that experiments do not have same rg
+    @test (@test_logs (:warn,) size(stack(specs3))) == (768, 512, 4)
 end
