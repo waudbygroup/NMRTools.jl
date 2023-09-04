@@ -175,28 +175,34 @@ end
     ygrid --> false
     ytick_direction --> :out
 
-    # generate light and dark colours for plot contours, based on supplied colour
-    # - create a 5-tone palette with the same hue as the passed colour, and select the
-    # fourth and second entries to provide dark and light shades
-    basecolor = get(plotattributes, :seriescolor, :blue)
-    
-    colors = sequential_palette(hue(convert(HSV,parse(Colorant, basecolor))),5)[[4,2]]
-
     normalize = get(plotattributes, :normalize, true)
     delete!(plotattributes, :normalize)
     scaling = normalize ? scale(dfwd) : 1
-    
-    @series begin
-        levels --> 5 * dfwd[:noise] / scaling .* contourlevels()
-        seriescolor := colors[1]
-        primary --> true
+
+    stype = get(plotattributes, :seriestype, nothing)
+    if stype ∈ [:heatmap, :wireframe]
+        # heatmap
         data(x), data(y), permutedims(data(dfwd / scaling))
-    end
-    @series begin
-        levels --> -5 * dfwd[:noise] / scaling .* contourlevels()
-        seriescolor := colors[2]
-        primary := false
-        data(x), data(y), permutedims(data(dfwd / scaling))
+    else
+        # generate light and dark colours for plot contours, based on supplied colour
+        # - create a 5-tone palette with the same hue as the passed colour, and select the
+        # fourth and second entries to provide dark and light shades
+        basecolor = get(plotattributes, :seriescolor, :blue)
+        
+        colors = sequential_palette(hue(convert(HSV,parse(Colorant, basecolor))),5)[[4,2]]
+        
+        @series begin
+            levels --> 5 * dfwd[:noise] / scaling .* contourlevels()
+            seriescolor := colors[1]
+            primary --> true
+            data(x), data(y), permutedims(data(dfwd / scaling))
+        end
+        @series begin
+            levels --> -5 * dfwd[:noise] / scaling .* contourlevels()
+            seriescolor := colors[2]
+            primary := false
+            data(x), data(y), permutedims(data(dfwd / scaling))
+        end
     end
 end
 
@@ -232,7 +238,7 @@ end
     scaling = normalize ? scale(z) : 1
 
     stype = get(plotattributes, :seriestype, nothing)
-    if stype == :heatmap
+    if stype ∈ [:heatmap, :wireframe]
         # heatmap
         data(x), data(y), permutedims(data(z)) ./ scaling
     else
@@ -286,52 +292,59 @@ end
 
 
 @recipe function f(::Type{Not{HasNonFrequencyDimension{D}}}, v::Vector{D}) where {D<:NMRData{T,2}} where {T}
-    @info "plotting vector of 2D NMR data"
     n = length(v)
     hues = map(h->HSV(h,0.5,0.5), (0:n-1) .* (360/n))
-
+    
     seriestype --> :contour
-
+    
     dfwd = reorder(v[1], ForwardOrdered) # make sure data axes are in forwards order
     # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
     x, y = dims(dfwd)
-
+    
     # set default title
     title --> ""
     # legend --> :outerright
     colorbar --> nothing
     framestyle --> :box
-
+    
     xguide --> axislabel(x)
     xflip --> true
     xgrid --> false
     xtick_direction --> :out
-
+    
     yguide --> axislabel(y)
     yflip --> true
     ygrid --> false
     ytick_direction --> :out
-
+    
     normalize = get(plotattributes, :normalize, true)
     delete!(plotattributes, :normalize)
+
+    @info "plotting vector of 2D NMR data (normalize = $normalize)"
     
     h = 0.
+
     for d in v
         dfwd = reorder(d, ForwardOrdered) # make sure data axes are in forwards order
         # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
         x, y = dims(dfwd)
         colors = sequential_palette(h, 5)[[4,2]]
-        scaling = normalize ? scale(dfwd) : 1
-
+        if normalize
+            scaling = scale(dfwd)
+            σ = first(v)[:noise] / scale(first(v)) # use the first experiment to set contour levels from noise
+        else
+            scaling = 1
+            σ = dfwd[:noise]
+        end
         @series begin
-            levels --> 5 * dfwd[:noise] / scaling .* contourlevels()
+            levels --> 5σ .* contourlevels()
             seriescolor := colors[1]
             primary := false # true
             label := nothing
             data(x), data(y), permutedims(data(dfwd / scaling))
         end
         @series begin
-            levels --> -5 * dfwd[:noise] / scaling .* contourlevels()
+            levels --> -5σ .* contourlevels()
             seriescolor := colors[2]
             primary := false
             label := nothing
