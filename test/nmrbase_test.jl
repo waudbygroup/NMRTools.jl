@@ -193,10 +193,10 @@ end
     @test_throws DimensionMismatch stack(specs2)
 
     specs3 = [
-        loadnmr("exampledata/2D_HN_titration/1/test.ft2"),
-        loadnmr("exampledata/2D_HN_titration/2/test.ft2"),
-        loadnmr("exampledata/2D_HN_titration/3/test.ft2"),
-        loadnmr("exampledata/2D_HN_titration/4/test.ft2")
+        loadnmr("../exampledata/2D_HN_titration/1/test.ft2"),
+        loadnmr("../exampledata/2D_HN_titration/2/test.ft2"),
+        loadnmr("../exampledata/2D_HN_titration/3/test.ft2"),
+        loadnmr("../exampledata/2D_HN_titration/4/test.ft2")
     ]
     stacked = stack(specs3)
     @test size(stacked) == (32768, 3)
