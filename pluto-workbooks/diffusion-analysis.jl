@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.26
+# v0.19.27
 
 using Markdown
 using InteractiveUtils
@@ -27,12 +27,14 @@ md"# NMRTools diffusion analysis"
 # ╔═╡ 35a2b544-ff30-4b52-a82d-401fc6f73f8f
 begin
 	# select input data
-	inputfile = "/Users/chris/.julia/dev/NMRTools/exampledata/pseudo2D_XSTE/1/pdata/1"
+	# inputfile = "/Users/chris/.julia/dev/NMRTools/exampledata/pseudo2D_XSTE/1/pdata/1"
+	# inputfile = "/Users/chris/Documents/Work/anders/2field/anders_asyn_monomer_041218/16"
+	inputfile = "/Users/chris/Documents/Work/anders/anders_asyn_fibrils_300519/24"
 	dat = loadnmr(inputfile)
 
 	# specify gradient points
-	gradients = LinRange(0.05, 0.95, 10)
-	Gmax = 0.50 # T/m
+	gradients = LinRange(0.02, 0.98, 8)
+	Gmax = 0.55 # T/m
 	
 	coherence = SQ(H1)             # coherence for diffusion encoding
 								   # for MQ coherences, try e.g. MQ(((H1,3),))
@@ -42,7 +44,7 @@ begin
 
 	# select chemical shift ranges for plotting and fitting
 	plotrange = Between(6, 10)
-	selector = Between(7.6, 8.6)
+	selector = Between(7.7, 8.6)
 
 	# estimate solution viscosity to determine the hydrodynamic radius
 	solvent = :h2o # or :d2o
@@ -139,7 +141,7 @@ begin
 end
 
 # ╔═╡ 5ff5982c-6159-4c5e-97bc-f5e29133bb3a
-wireframe(spec[selector,:])
+plot(spec[selector,:])
 
 # ╔═╡ 37a5b150-a23d-4209-b089-db9e0da878f6
 heatmap(spec[plotrange,:])
