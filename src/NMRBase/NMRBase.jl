@@ -54,7 +54,7 @@ macro exportinstances(enum)
 end
 
 # Exceptions
-export NMRToolsException
+export NMRToolsError
 
 # Nuclei
 export Nucleus

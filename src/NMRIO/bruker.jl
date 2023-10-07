@@ -10,7 +10,7 @@ function loadpdata(filename, allcomponents=false)
     else
         pdir = dirname(filename)
     end
-    isdir(pdir) || throw(NMRToolsException("can't load bruker data, pdata directory $pdir does not exist"))
+    isdir(pdir) || throw(NMRToolsError("can't load bruker data, pdata directory $pdir does not exist"))
 
     # 2. get a list of pdata input files (which depends on the dimension of the spectrum)
     ndim = 0
@@ -25,7 +25,7 @@ function loadpdata(filename, allcomponents=false)
         ndim = 3
         datafiles = ["3rrr", "3rri", "3rir", "3rii", "3irr", "3iri", "3iir", "3iii"]
     end
-    ndim > 0 || throw(NMRToolsException("can't load bruker data, pdata directory $pdir does not contain binary data files (1r/2rr/3rrr etc.)"))
+    ndim > 0 || throw(NMRToolsError("can't load bruker data, pdata directory $pdir does not contain binary data files (1r/2rr/3rrr etc.)"))
 
     # 2b. only include the realest component unless requested
     if !allcomponents

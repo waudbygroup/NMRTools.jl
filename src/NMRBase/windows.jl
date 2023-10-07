@@ -1,24 +1,36 @@
-# WindowFunction
-#     NullWindow
-#     UnknownWindow
-#     ExponentialWindow
+"""
+    WindowFunction
 
+Abstract type to represent apodization functions.
+
+Window functions are represented by subtypes of the abstract type `WindowFunction`,
+each of which contain appropriate parameters to specify the particular function
+applied. In addition, the acquisition time `tmax` is also stored (calculated at
+the point the window function is applied, i.e. after linear prediction but before
+zero filling).
+"""
 abstract type WindowFunction end
+
+Base.Broadcast.broadcastable(w::WindowFunction) = Ref(w)
+
+
 
 """
     NullWindow(tmax)
 
-No apodization applied.
+No apodization applied. Acquisition time is `tmax`.
 """
 struct NullWindow <: WindowFunction
     tmax::Float64
     NullWindow(tmax=Inf) = new(tmax)
 end
 
+
+
 """
     UnknownWindow(tmax)
 
-Unknown apodization applied.
+Unknown apodization applied. Acquisition time is `tmax`.
 """
 struct UnknownWindow <: WindowFunction
     tmax::Float64
@@ -26,11 +38,11 @@ struct UnknownWindow <: WindowFunction
 end
 
 
+
 """
     ExponentialWindow(lb, tmax)
 
-EM: Exponential Multiply Window.
- -lb    expHz  [0.0]  Exponential Broaden, Hz. (Q1)
+Exponential window function, with a line broadening of `lb` Hz. Acquisition time is `tmax`.
 """
 struct ExponentialWindow <: WindowFunction
     lb::Float64
@@ -38,15 +50,29 @@ struct ExponentialWindow <: WindowFunction
     ExponentialWindow(lb=0.0, tmax=Inf) = new(lb, tmax)
 end
 
+
+
 """
     SineWindow(offset, endpoint, power, tmax)
 
-SP: Adjustable Sine Window. [SINE]
- -off   offset [0.0]  Sine Start*PI.  (Q1)
- -end   end    [1.0]  Sine End*PI.    (Q2)
- -pow   exp    [1.0]  Sine Exponent.  (Q3)
- """
+Abstract window function representing multiplication by sine/cosine functions.
+Acquisition time is `tmax`.
+```math
+\\sin\\left(
+    \\pi\\cdot\\mathrm{offset} +
+    \\pi\\cdot\\left(\\mathrm{end} - \\mathrm{offset}\\right) \\cdot \\frac{t}{\\mathrm{tmax}}
+    \\right)^\\mathrm{power}
+```
+
+Specialises to `CosWindow`, `Cos²Window` or `GeneralSineWindow`.
+
+# Arguments
+- `offset`: initial value is ``\\sin(\\mathrm{offset}\\cdot\\pi)`` (0 to 1)
+- `endpoint`: initial value is ``\\sin(\\mathrm{endpoint}\\cdot\\pi)`` (0 to 1)
+- `pow`: sine exponent
+"""
 abstract type SineWindow <: WindowFunction end
+
 function SineWindow(offset=0.0, endpoint=1.0, power=1.0, tmax=Inf)
     if power ≈ 1.0 && offset ≈ 0.5
         return CosWindow(endpoint * tmax)
@@ -64,24 +90,45 @@ struct GeneralSineWindow <: SineWindow
     tmax::Float64
 end
 
+
+
+"""
+    CosWindow(tmax)
+
+Apodization by a pure cosine function. Acquisition time is `tmax`.
+
+See also [`Cos²Window`](@ref), [`SineWindow`](@ref).
+"""
 struct CosWindow <: SineWindow
     tmax::Float64
 end
 
+
+
+"""
+    Cos²Window(tmax)
+
+Apodization by a pure cosine squared function. Acquisition time is `tmax`.
+
+See also [`CosWindow`](@ref), [`SineWindow`](@ref).
+"""
 struct Cos²Window <: SineWindow
     tmax::Float64
 end
 
 
-"""
-GaussWindow(expHz, gaussHz, center, tmax)
 
-GM: Lorentz-to-Gauss Window.
- -g1    expHz   [0.0]  Inverse Exponential, Hz. (Q1)
- -g2    gausHz  [0.0]  Gaussian Width, Hz.      (Q2)
- -g3    center  [0.0]  Center, 0 to 1.          (Q3)
+"""
+    GaussWindow(expHz, gaussHz, center, tmax)
+
+Abstract representation of Lorentz-to-Gauss window functions, applying an inverse
+exponential of `expHz` Hz, and a gaussian broadening of `gaussHz` Hz, with maximum
+at `center` (between 0 and 1). Acquisition time is `tmax`.
+
+Specialises to `LorentzToGaussWindow` when `center` is zero, otherwise `GeneralGaussWindow`.
 """
 abstract type GaussWindow <: WindowFunction end
+
 function GaussWindow(expHz=0.0, gaussHz=0.0, center=0.0, tmax=Inf)
     if center ≈ 0.0
         return LorentzToGaussWindow(expHz, gaussHz, tmax)
@@ -106,63 +153,99 @@ struct LorentzToGaussWindow <: GaussWindow
 end
 
 
+
+"""
+    LineshapeComplexity
+
+Abstract type to specify calculation of `RealLineshape` or `ComplexLineshape` in function calls.
+"""
 abstract type LineshapeComplexity end
+
+"""
+    RealLineshape
+
+Return a real-valued lineshape when used in calculations
+"""
 struct RealLineshape <: LineshapeComplexity end
+
+"""
+    ComplexLineshape
+
+Return a complex-valued lineshape when used in calculations
+"""
 struct ComplexLineshape <: LineshapeComplexity end
 
-## lineshapes for various window functions
+
+
+"""
+    lineshape(axis, δ, R2, complexity=RealLineshape())
+
+Return a simulated real- or complex-valued spectrum for a resonance with chemical
+shift `δ` and relaxation rate `R2`, using the parameters and window function associated
+with the specified axis.
+"""
 function lineshape(ax, δ, R2, complexity::LineshapeComplexity)
-    lineshape(getω(ax, δ), R2, getω(ax), ax[:window], complexity)
+    _lineshape(getω(ax, δ), R2, getω(ax), ax[:window], complexity)
 end
-lineshape(ax, δ, R2) = lineshape(ax, δ, R2, RealLineshape()) # default to a real return type
+# default to a real return type
+lineshape(ax, δ, R2) = lineshape(ax, δ, R2, RealLineshape())
 
 
-# generic case - return a default Lorentzian
 
-function lineshape(ω, R, ωax, ::WindowFunction, ::RealLineshape)
+"""
+    _lineshape(ω, R2, ωaxis, window, complexity)
+
+Internal function to calculate a resonance lineshape with frequency `ω` and
+relaxation rate `R2`, calculated at frequencies `ωaxis` and with apodization according
+to the specified window function.
+"""
+function _lineshape end
+
+function _lineshape(ω, R, ωax, ::WindowFunction, ::RealLineshape)
+    # generic case - return a default real-valued Lorentzian
     @. R / ((ωax - ω)^2 + R^2)
 end
 
-function lineshape(ω, R, ωax, ::WindowFunction, ::ComplexLineshape)
+function _lineshape(ω, R, ωax, ::WindowFunction, ::ComplexLineshape)
+    # generic case - return a default (complex-valued) Lorentzian
     @. 1 / (R + 1im*(ω - ωax))
 end
 
 
 # exponential functions
 
-function lineshape(ω, R, ωax, w::ExponentialWindow, ::ComplexLineshape)
+function _lineshape(ω, R, ωax, w::ExponentialWindow, ::ComplexLineshape)
     x = @. R + 1im*(ω - ωax) + π*w.lb
     T = w.tmax
 
     return @. (1 - exp(-T*x)) / x
 end
-lineshape(ω, R, ωax, w::ExponentialWindow, ::RealLineshape) = real(lineshape(ω, R, ωax, w, ComplexLineshape()))
+_lineshape(ω, R, ωax, w::ExponentialWindow, ::RealLineshape) = real(_lineshape(ω, R, ωax, w, ComplexLineshape()))
 
 
 # cosine
 
-function lineshape(ω, R, ωax, w::CosWindow, ::ComplexLineshape)
+function _lineshape(ω, R, ωax, w::CosWindow, ::ComplexLineshape)
     x = @. R + 1im*(ω - ωax)
     T = w.tmax
     Tx = T * x
     return @. 2 * T * (π*exp(-Tx) + 2*Tx) / (π^2 + 4*Tx^2)
 end
-lineshape(ω, R, ωax, w::CosWindow, ::RealLineshape) = real(lineshape(ω, R, ωax, w, ComplexLineshape()))
+_lineshape(ω, R, ωax, w::CosWindow, ::RealLineshape) = real(_lineshape(ω, R, ωax, w, ComplexLineshape()))
   
-function lineshape(ω, R, ωax, w::Cos²Window, ::ComplexLineshape)
+function _lineshape(ω, R, ωax, w::Cos²Window, ::ComplexLineshape)
     x = @. R + 1im*(ω - ωax)
     Tx = w.tmax * x
     
     return @. (π^2*(1-exp(-Tx)) + 2*Tx^2) / (2 * (π^2 + Tx^2) * x)
 end
-lineshape(ω, R, ωax, w::Cos²Window, ::RealLineshape) = real(lineshape(ω, R, ωax, w, ComplexLineshape()))
+_lineshape(ω, R, ωax, w::Cos²Window, ::RealLineshape) = real(_lineshape(ω, R, ωax, w, ComplexLineshape()))
   
-Base.Broadcast.broadcastable(w::WindowFunction) = Ref(w)
 
 
 
 """
-    apod(spec::NMRData, dimension)
+    apod(spec::NMRData, dimension, zerofill=true)
 
 Return the time-domain apodization function for the specified axis,
 as a vector of values.

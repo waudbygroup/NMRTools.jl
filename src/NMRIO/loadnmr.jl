@@ -4,7 +4,7 @@
 Main function for loading NMR data. `experimentfolder` contains the path to an experiment directory,
 for identification of metadata, if the filename is not directly within an experiment.
 
-Returns an `NMRData` structure, or throws an `NMRToolsException` is there is a problem.
+Returns an `NMRData` structure, or throws an `NMRToolsError` is there is a problem.
 
 # Examples
 
@@ -42,7 +42,7 @@ function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
         spectrum = loadpdata(filename, allcomponents)
     else
         # unknown format
-        throw(NMRToolsException("unknown file format for loadnmr\nfilename = " * filename))
+        throw(NMRToolsError("unknown file format for loadnmr\nfilename = " * filename))
     end
 
     # 4. merge in acqus metadata

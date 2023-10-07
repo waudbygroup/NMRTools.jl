@@ -1,6 +1,9 @@
 """
-Nucleus
+    Nucleus
+
 Enumeration of common NMR-active nuclei.
+
+See also [`spin`](@ref), [`gyromagneticratio`](@ref), [`Coherence`](@ref).
 """
 @enum Nucleus begin
     H1
@@ -13,16 +16,20 @@ Enumeration of common NMR-active nuclei.
     P31
 end
 
+
+
 """
     spin(n::Nucleus)
 
-Return the spin quantum number of nucleus `n`.
+Return the spin quantum number of nucleus `n`, or `nothing` if not defined.
 
-# Arguments
-- `n`: Nucleus enum
+# Examples
+```jldoctest
+julia> spin(H1)
+1//2
+```
 
-# Returns
-- Spin as a `Rational` or `nothing` if not found
+See also [`Coherence`](@ref).
 """
 function spin(n::Nucleus)
     dic = Dict(H1 => 1 // 2,
@@ -36,16 +43,19 @@ function spin(n::Nucleus)
     return get(dic, n, nothing)
 end
 
+
+
 """
     gyromagneticratio(n::Nucleus)
 
-Return the gyromagnetic ratio in Hz/T of nucleus `n`.
+Return the gyromagnetic ratio in Hz/T of nucleus `n`, or `nothing` if not defined.
 
-# Arguments
-- `n`: Nucleus enum
-
-# Returns
-- Gyromagnetic ratio in Hz/T as a `Float64`, or `nothing` if not found
+# Examples
+```jldoctest
+julia> gyromagneticratio(H1)
+2.6752218744e8
+```
+See also [`Nucleus`](@ref), [`Coherence`](@ref).
 """
 function gyromagneticratio(n::Nucleus)
     dic = Dict(H1 => 267.52218744e6,

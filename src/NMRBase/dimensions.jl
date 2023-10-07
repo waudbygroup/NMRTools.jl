@@ -1,10 +1,75 @@
+"""
+    NMRDimension
+
+Abstract supertype for all axes used in NMRData objects.
+
+See also [`FrequencyDimension`](@ref) and [`NonFrequencyDimension`](@ref).
+"""
 abstract type NMRDimension{T} <: DimensionalData.Dimension{T} end
+
+
+
+"""
+    FrequencyDimension <: NMRDimension
+
+Abstract supertype for frequency dimensions used in NMRData objects.
+Concrete types `F1Dim`, `F2Dim`, `F3Dim` and `F4Dim` are generated for
+use in creating objects.
+
+See also [`NonFrequencyDimension`](@ref).
+"""
 abstract type FrequencyDimension{T} <: NMRDimension{T} end
+
+
+
+"""
+    NonFrequencyDimension <: NMRDimension
+
+Abstract supertype for non-frequency dimensions used in NMRData objects.
+Sub-types include [`TimeDimension`](@ref), [`GradientDimension`](@ref), 
+and [`UnknownDimension`](@ref).
+
+See also [`FrequencyDimension`](@ref).
+"""
 abstract type NonFrequencyDimension{T} <: NMRDimension{T} end
+
+
+
+"""
+    TimeDimension <: NonFrequencyDimension <: NMRDimension
+
+Abstract supertype for time dimensions used in NMRData objects.
+Concrete types `T1Dim`, `T2Dim`, `T3Dim` and `T4Dim` are generated for
+time-domains representing frequency evolution, and `TrelaxDim` and
+`TkinDim` are generated for representing relaxation and real-time
+kinetics.
+"""
 abstract type TimeDimension{T} <: NonFrequencyDimension{T} end
 # abstract type QuadratureDimension{T} <: NMRDimension{T} end
+
+
+
+"""
+    UnknownDimension <: NonFrequencyDimension <: NMRDimension
+
+Abstract supertype for unknown, non-frequency dimensions used in NMRData objects.
+Concrete types `X1Dim`, `X2Dim`, `X3Dim` and `X4Dim` are generated for
+use in creating objects.
+"""
 abstract type UnknownDimension{T} <: NonFrequencyDimension{T} end
+
+
+
+"""
+    GradientDimension <: NonFrequencyDimension <: NMRDimension
+
+Abstract supertype for gradient-encoded dimensions used in NMRData objects.
+Concrete types `G1Dim`, `G2Dim`, `G3Dim` and `G4Dim` are generated for
+use in creating objects.
+"""
 abstract type GradientDimension{T} <: NonFrequencyDimension{T} end
+
+
 
 # override DimensionalData.Dimensions macro to generate default metadata
 macro NMRdim(typ::Symbol, supertyp::Symbol, args...)
@@ -82,9 +147,27 @@ end
 
 
 # Getters ########
+"""
+    data(nmrdimension)
+
+Return the numerical data associated with an NMR dimension.
+"""
 data(d::NMRDimension) = d.val.data
 
+
+"""
+    getω(axis)
+
+Return the offsets (in rad/s) for points along a frequency axis.
+"""
 getω(ax::FrequencyDimension) = 2π * ax[:bf] * (data(ax) .- ax[:offsetppm])
+
+
+"""
+    getω(axis, δ)
+
+Return the offset (in rad/s) for a chemical shift (or list of shifts) on a frequency axis.
+"""
 getω(ax::FrequencyDimension, δ) = 2π * ax[:bf] * (δ .- ax[:offsetppm])
 
 

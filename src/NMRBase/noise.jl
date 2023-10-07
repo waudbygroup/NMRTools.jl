@@ -1,7 +1,29 @@
 """
-    estimatenoise(d::NMRData)
+    estimatenoise!(nmrdata)
 
 Estimate the rms noise level in the data and update `:noise` metadata.
+
+If called on an `Array` of data, each item will be updated.
+
+# Algorithm
+Data are sorted into numerical order, and the highest and lowest 12.5% of data are discarded
+(so that 75% of the data remain). These values are then fitted to a truncated gaussian
+distribution via maximum likelihood analysis.
+
+The likelihood function is:
+```math
+\\log \\scrL(\\mu, \\sigma) = \\sum_i{\\log P(y_i, \\mu, \\sigma)}
+```
+where the likelihood of an individual data point is:
+```math
+\\log P(y,\\mu,\\sigma) =
+    \\log\\frac{
+        \\phi\\left(\\frac{x-\\mu}{\\sigma}\\right)
+    }{
+        \\sigma \\cdot \\left[\\Phi\\left(\\frac{b-\\mu}{\\sigma}\\right) -
+            \\Phi\\left(\\frac{a-\\mu}{\\sigma}\\right)\\right]}
+```
+and ``\\phi(x)`` and ``\\Phi(x)`` are the standard normal pdf and cdf functions.
 """
 function estimatenoise!(d::NMRData)
     α = 0.25 # fraction of data to discard for noise estimation
@@ -14,6 +36,7 @@ function estimatenoise!(d::NMRData)
         vd = vec(data(d))
     else
         # TODO consider multicomplex
+        @warn "estimatenoise! doesn't handle multicomplex numbers correctly. Working with real values only."
         vd = vec(real(data(d)))
     end
     y = sort(vd[1:step:end])
@@ -42,11 +65,4 @@ function estimatenoise!(d::NMRData)
     d[:noise] = abs(p[2])
 end
 
-
-
-"""
-    estimatenoise(spectra::Array{<:NMRData,1})
-
-Estimate the rms noise level and update `:noise` metadata for a list of spectra.
-"""
-estimatenoise!(spectra::Array{<:NMRData,1}) = map(estimatenoise!, spectra)
+estimatenoise!(spectra::Array{<:NMRData}) = map(estimatenoise!, spectra)

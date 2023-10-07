@@ -16,7 +16,7 @@ function loadnmrpipe(filename)
     elseif ndim == 3
         loadnmrpipe3d(filename, md, mdax)
     else
-        throw(NMRToolsException("can't load data $(filename), unsupported number of dimensions."))
+        throw(NMRToolsError("can't load data $(filename), unsupported number of dimensions."))
     end
 end
 
@@ -28,7 +28,7 @@ expandpipetemplate(template, n) = replace(template, "%03d"=>lpad(n,3,"0"), "%04d
 
 function loadnmrpipeheader(filename)
     # check file exists
-    isfile(filename) || throw(NMRToolsException("cannot load $(filename), not a recognised file."))
+    isfile(filename) || throw(NMRToolsError("cannot load $(filename), not a recognised file."))
 
     # preallocate header
     header = zeros(Float32, 512)

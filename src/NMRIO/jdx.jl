@@ -1,5 +1,5 @@
 function loadjdx(filename::String)
-    isfile(filename) || throw(NMRToolsException("loading JCAMP-DX data: $(filename) is not a valid file"))
+    isfile(filename) || throw(NMRToolsError("loading JCAMP-DX data: $(filename) is not a valid file"))
 
     dat = open(filename) do f
         read(f, String)
