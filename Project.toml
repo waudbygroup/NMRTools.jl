@@ -24,7 +24,7 @@ PlotsExt = "Plots"
 [compat]
 ColorSchemes = "3.23"
 Colors = "0.12"
-DimensionalData = "0.24"
+DimensionalData = "0.24, 0.25"
 Optim = "1.7"
 Plots = "1.39"
 PrecompileTools = "1.2"
