@@ -77,7 +77,7 @@ function coherenceorder end
 
 coherenceorder(c::SQ) = 1
 function coherenceorder(c::MQ)
-    return sum([t[2] for t ∈ c.transitions])
+    return sum([t[2] for t ∈ c.coherences])
 end
 
 
@@ -111,5 +111,5 @@ function γeff end
 
 γeff(c::SQ) = gyromagneticratio(c.nucleus)
 function γeff(c::MQ)
-    return sum([gyromagneticratio(t[1])*t[2] for t ∈ c.transitions])
+    return sum([gyromagneticratio(t[1])*t[2] for t ∈ c.coherences])
 end

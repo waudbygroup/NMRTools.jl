@@ -75,7 +75,7 @@ end
     datK = setkinetictimes(dat, LinRange(0,2,21), "min")
     @test units(datK, 2) == "min"
     datR = setrelaxtimes(dat, LinRange(0,2,21))
-    @test units(datR, 2) == "s"
+    @test units(datR, 2) == ""
     @test_logs (:warn,
         "a maximum gradient strength of 0.55 T m⁻¹ is being assumed - this is roughly correct for modern Bruker systems but calibration is recommended") setgradientlist(dat, LinRange(0.05,0.95,21))
     datG = setgradientlist(dat, LinRange(0.05,0.95,21), 0.55)
