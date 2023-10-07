@@ -1,5 +1,7 @@
 module PlotsExt
 
+@info "Loading PlotsExt"
+
 """
 notes on testing:
 ]activate --temp
