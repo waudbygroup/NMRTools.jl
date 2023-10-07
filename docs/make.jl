@@ -1,5 +1,4 @@
 using Documenter, NMRTools, Plots
-ENV["GKSwstype"] = "100" # https://github.com/jheinen/GR.jl/issues/278
 
 makedocs(;
     modules=[NMRTools],
@@ -9,7 +8,7 @@ makedocs(;
         "Examples" => "examples.md",
         "Metadata" => "metadata.md",
     ],
-    # repo="https://github.com/waudbygroup/NMRTools.jl/blob/{commit}{path}#L{line}",
+    repo=GitHub("waudbygroup", "NMRTools.jl")
     sitename="NMRTools.jl",
     authors="Chris Waudby",
     assets=String[],
@@ -17,4 +16,5 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/waudbygroup/NMRTools.jl.git",
+    versions = ["stable" => "v^", "v#.#", "dev" => "master"],
 )

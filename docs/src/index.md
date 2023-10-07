@@ -11,5 +11,5 @@ NMRTools.jl is a simple library for importing and plotting NMR data. Documentati
 ```
 
 ```@autodocs
-Modules = [NMRTools]
+Modules = [NMRTools.NMRBase, NMRTools.NMRIO]
 ```
