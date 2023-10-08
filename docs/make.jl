@@ -11,7 +11,6 @@ makedocs(;
     # repo=GitHub("waudbygroup", "NMRTools.jl"),
     sitename="NMRTools.jl",
     authors="Chris Waudby",
-    assets=String[],
 )
 
 deploydocs(;
