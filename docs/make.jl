@@ -1,5 +1,7 @@
 using Documenter, NMRTools, Plots
 
+DocMeta.setdocmeta!(NMRTools, :DocTestSetup, :(using NMRTools); recursive=true)
+
 makedocs(;
     modules=[NMRTools],
     format=Documenter.HTML(),
