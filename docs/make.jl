@@ -7,8 +7,8 @@ makedocs(;
     format=Documenter.HTML(),
     pages=[
         "Home" => "index.md",
-        "Examples" => "examples.md",
-        "Metadata" => "metadata.md",
+        # "Examples" => "examples.md",
+        # "Metadata" => "metadata.md",
     ],
     # repo=GitHub("waudbygroup", "NMRTools.jl"),
     sitename="NMRTools.jl",
