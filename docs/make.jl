@@ -8,7 +8,7 @@ makedocs(;
         "Examples" => "examples.md",
         "Metadata" => "metadata.md",
     ],
-    repo=GitHub("waudbygroup", "NMRTools.jl"),
+    # repo=GitHub("waudbygroup", "NMRTools.jl"),
     sitename="NMRTools.jl",
     authors="Chris Waudby",
     assets=String[],
