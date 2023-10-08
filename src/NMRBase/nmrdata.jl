@@ -79,9 +79,7 @@ A generic [`AbstractNMRData`](@ref) for NMR array data. It holds memory-backed a
     is used on a multi-layered file like a NetCDF.
 - `missingval`: value representing missing data, normally detected from the file. Set manually
     when you know the value is not specified or is incorrect. This will *not* change any
-    values in the NMRData, it simply assigns which value is treated as missing. To replace all of
-    the missing values in the NMRData, use [`replace_missing`](@ref).
-- `metadata`: `ArrayMetadata` object for the array, or `NoMetadata()`.
+    values in the NMRData, it simply assigns which value is treated as missing.
 
 # Internal Keywords
 
