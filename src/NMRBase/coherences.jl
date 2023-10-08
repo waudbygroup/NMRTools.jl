@@ -102,7 +102,7 @@ julia> γeff(MQ(((H1,3),(C13,1))))
 8.698493623199999e8
 
 julia> γeff(MQ(((H1,0),)))
-0
+0.0
 ```
 
 See also [`Nucleus`](@ref), [`SQ`](@ref), [`MQ`](@ref).
