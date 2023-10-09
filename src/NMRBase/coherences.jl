@@ -7,8 +7,6 @@ See also [`SQ`](@ref), [`MQ`](@ref).
 """
 abstract type Coherence end
 
-
-
 """
     SQ(nucleus::Nucleus, label=="")
 
@@ -21,8 +19,6 @@ struct SQ <: Coherence
     label::String
     SQ(nuc, label="") = new(nuc, label)
 end
-
-
 
 """
     MQ(coherences, label=="")
@@ -46,8 +42,6 @@ struct MQ <: Coherence
     label::String
     MQ(coherences, label="") = new(coherences, label)
 end
-
-
 
 """
     coherenceorder(coherence)
@@ -77,10 +71,8 @@ function coherenceorder end
 
 coherenceorder(c::SQ) = 1
 function coherenceorder(c::MQ)
-    return sum([t[2] for t ∈ c.coherences])
+    return sum([t[2] for t in c.coherences])
 end
-
-
 
 """
     γeff(coherence)
@@ -111,5 +103,5 @@ function γeff end
 
 γeff(c::SQ) = gyromagneticratio(c.nucleus)
 function γeff(c::MQ)
-    return sum([gyromagneticratio(t[1])*t[2] for t ∈ c.coherences])
+    return sum([gyromagneticratio(t[1]) * t[2] for t in c.coherences])
 end

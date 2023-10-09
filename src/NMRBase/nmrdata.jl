@@ -37,7 +37,8 @@ missingval(A::AbstractNMRData) = A.missingval
 
 # Rebuild types of AbstractNMRData
 function DD.rebuild(X::A, data, dims::Tuple, refdims, name,
-                    metadata=metadata(X), missingval=missingval(X)) where {A<:AbstractNMRData}
+                    metadata=metadata(X),
+                    missingval=missingval(X)) where {A<:AbstractNMRData}
     # HACK use A.name.wrapper to return the type (i.e. constructor) stripped of parameters.
     # This may not be a stable feature. See discussions:
     # - https://discourse.julialang.org/t/get-generic-constructor-of-parametric-type/57189/5
@@ -100,7 +101,8 @@ struct NMRData{T,N,D<:Tuple,R<:Tuple,A<:AbstractArray{T,N},Na,Me,Mi} <:
 end
 
 function NMRData(A::AbstractArray, dims::Tuple;
-                 refdims=(), name=Symbol(""), metadata=defaultmetadata(NMRData), missingval=missing)
+                 refdims=(), name=Symbol(""), metadata=defaultmetadata(NMRData),
+                 missingval=missing)
     return NMRData(A, Dimensions.format(dims, A), refdims, name, metadata, missingval)
 end
 
@@ -134,14 +136,6 @@ end
 # TODO ??
 # DD.dimconstructor(::Tuple{<:Dimension{<:AbstractProjected},Vararg{<:Dimension}}) = NMRData
 
-
-
-
-
-
-
-
-
 # Getters ##########################################################################################
 """
     data(nmrdata)
@@ -149,8 +143,6 @@ end
 Return the numerical data associated with the specified NMRData.
 """
 data(A::NMRData) = A.data
-
-
 
 """
     data(nmrdata, dim)
@@ -177,7 +169,6 @@ function scale(d::AbstractNMRData)
     return ns * rg * conc
 end
 
-
 # Set pseudo-dimension data
 
 """
@@ -187,10 +178,12 @@ Return a new NMRData with the unknown dimension or time dimension replaced
 with a kinetic time axis containing the passed values (and optionally, units).
 """
 function setkinetictimes(A::NMRData, tvals, units=nothing)
-    hasnonfrequencydimension(A) || throw(NMRToolsError("cannot set time values: data does not have a non-frequency dimension"))
+    hasnonfrequencydimension(A) ||
+        throw(NMRToolsError("cannot set time values: data does not have a non-frequency dimension"))
 
     nonfreqdims = isa.(dims(A), NonFrequencyDimension)
-    sum(nonfreqdims) == 1 || throw(NMRToolsError("multiple non-frequency dimensions are present - ambiguous command"))
+    sum(nonfreqdims) == 1 ||
+        throw(NMRToolsError("multiple non-frequency dimensions are present - ambiguous command"))
 
     olddim = findfirst(nonfreqdims)
     newdim = TkinDim(tvals)
@@ -202,8 +195,6 @@ function setkinetictimes(A::NMRData, tvals, units=nothing)
     return newA
 end
 
-
-
 """
     setrelaxtimes(A::NMRData, tvals, units="")
 
@@ -211,10 +202,12 @@ Return a new NMRData with the unknown dimension or time dimension replaced
 with a relaxation time axis containing the passed values (and optionally, units).
 """
 function setrelaxtimes(A::NMRData, tvals, units="")
-    hasnonfrequencydimension(A) || throw(NMRToolsError("cannot set time values: data does not have a non-frequency dimension"))
+    hasnonfrequencydimension(A) ||
+        throw(NMRToolsError("cannot set time values: data does not have a non-frequency dimension"))
 
     nonfreqdims = isa.(dims(A), NonFrequencyDimension)
-    sum(nonfreqdims) == 1 || throw(NMRToolsError("multiple non-frequency dimensions are present - ambiguous command"))
+    sum(nonfreqdims) == 1 ||
+        throw(NMRToolsError("multiple non-frequency dimensions are present - ambiguous command"))
 
     olddim = findfirst(nonfreqdims)
     newdim = TrelaxDim(tvals)
@@ -226,8 +219,6 @@ function setrelaxtimes(A::NMRData, tvals, units="")
     return newA
 end
 
-
-
 """
     setgradientlist(A::NMRData, relativegradientlist, Gmax=nothing)
 
@@ -236,10 +227,12 @@ containing the passed values. A default gradient strength of 0.55 T m⁻¹ will
 be set, but a warning raised for the user.
 """
 function setgradientlist(A::NMRData, relativegradientlist, Gmax=nothing)
-    hasnonfrequencydimension(A) || throw(NMRToolsError("cannot set gradient values: data does not have a non-frequency dimension"))
-    
+    hasnonfrequencydimension(A) ||
+        throw(NMRToolsError("cannot set gradient values: data does not have a non-frequency dimension"))
+
     unknowndims = isa.(dims(A), UnknownDimension)
-    sum(unknowndims) == 1 || throw(NMRToolsError("multiple unknown dimensions are present - ambiguous command"))
+    sum(unknowndims) == 1 ||
+        throw(NMRToolsError("multiple unknown dimensions are present - ambiguous command"))
 
     if isnothing(Gmax)
         @warn("a maximum gradient strength of 0.55 T m⁻¹ is being assumed - this is roughly correct for modern Bruker systems but calibration is recommended")
@@ -258,8 +251,6 @@ function setgradientlist(A::NMRData, relativegradientlist, Gmax=nothing)
     return newA
 end
 
-
-
 """
     replacedimension(nmrdata, olddimnumber, newdim)
 
@@ -267,19 +258,16 @@ Return a new NMRData, in which the numbered axis is replaced by a new `Dimension
 """
 function replacedimension(A::NMRData, olddimnumber, newdim)
     olddim = dims(A, olddimnumber)
-    length(olddim) == length(newdim) || throw(NMRToolsError("size of old and new dimensions are not compatible"))
+    length(olddim) == length(newdim) ||
+        throw(NMRToolsError("size of old and new dimensions are not compatible"))
     merge!(metadata(newdim).val, metadata(olddim).val)
 
     olddims = Vector{NMRDimension}([dims(A)...])
     olddims[olddimnumber] = newdim
     newdims = tuple(olddims...)
 
-    NMRData(A.data, newdims, name=A.name, refdims=A.refdims, metadata=A.metadata)
+    return NMRData(A.data, newdims; name=A.name, refdims=A.refdims, metadata=A.metadata)
 end
-
-
-
-
 
 """
     decimate(data, n dims=1)
@@ -288,42 +276,38 @@ Decimate NMR data into n-point averages along the specified dimension.
 Note that data are *averaged* and not *summed*. Noise metadata is not updated.
 """
 function decimate(expt::NMRData, n, dims=1)
-	np = size(expt, dims) ÷ n
-	out = selectdim(expt, dims, 1:n:(np*n)) # preallocate decimated NMRData
-	
-	sz = [size(out)...]
-	insert!(sz, dims, n)
-	
-	y = selectdim(data(expt), dims, 1:(np*n))
-	y = reshape(y, sz...)
-	y = reduce(+, y, dims=dims) / n
-	
-	outsz = [size(out)...]
-	outsz[dims] = np
-	data(out) .= reshape(y, outsz...)
+    np = size(expt, dims) ÷ n
+    out = selectdim(expt, dims, 1:n:(np * n)) # preallocate decimated NMRData
 
-	out
+    sz = [size(out)...]
+    insert!(sz, dims, n)
+
+    y = selectdim(data(expt), dims, 1:(np * n))
+    y = reshape(y, sz...)
+    y = reduce(+, y; dims=dims) / n
+
+    outsz = [size(out)...]
+    outsz[dims] = np
+    data(out) .= reshape(y, outsz...)
+
+    return out
 end
-
-
 
 function decimate(signal, n, dims=1)
-	np = size(signal, dims) ÷ n
-	y = selectdim(signal, dims, 1:(np*n))
-	
-	sz = [size(signal)...]
-	sz[dims] = np
-	insert!(sz, dims, n)
-	
-	y = reshape(y, sz...)
-	y = sum(y, dims=dims) / n
+    np = size(signal, dims) ÷ n
+    y = selectdim(signal, dims, 1:(np * n))
 
-	outsz = [size(signal)...]
-	outsz[dims] = np
-	reshape(y, outsz...)
+    sz = [size(signal)...]
+    sz[dims] = np
+    insert!(sz, dims, n)
+
+    y = reshape(y, sz...)
+    y = sum(y; dims=dims) / n
+
+    outsz = [size(signal)...]
+    outsz[dims] = np
+    return reshape(y, outsz...)
 end
-
-
 
 """
     stack(expts::Vector{NMRData})
@@ -333,17 +317,17 @@ along a new dimension, of type `UnknownDimension`.
 
 Throws a `DimensionMismatch` if data are not of compatible shapes.
 """
-function Base.stack(expts::Vector{D}) where {D <: AbstractNMRData{T,N}} where {T,N}
+function Base.stack(expts::Vector{D}) where {D<:AbstractNMRData{T,N}} where {T,N}
     # construct new data
     newdata = stack(data, expts)
-    
+
     # construct new dimensions
     n = length(expts)
-    if N==1
+    if N == 1
         newdim = X2Dim(1:n)
-    elseif N==2
+    elseif N == 2
         newdim = X3Dim(1:n)
-    elseif N==3
+    elseif N == 3
         newdim = X4Dim(1:n)
     end
     newdims = [dims(expts[1])..., newdim]
@@ -362,11 +346,9 @@ function Base.stack(expts::Vector{D}) where {D <: AbstractNMRData{T,N}} where {T
     allequal(ns) || @warn "stack: experiments do not have same ns" ns
     rg = map(e -> e[:rg], expts)
     allequal(rg) || @warn "stack: experiments do not have same rg" rg
-   
-    NMRData(newdata, newdims, metadata=newmd)
+
+    return NMRData(newdata, newdims; metadata=newmd)
 end
-
-
 
 # Arithmetic #######################################################################################
 
@@ -405,7 +387,6 @@ end
 #     return c
 # end
 
-
 # Traits ###########################################################################################
 """
     @traitdef HasNonFrequencyDimension{D}
@@ -423,8 +404,12 @@ A trait indicating whether the data object has a non-frequency domain dimension.
 
 # adapted from expansion of @traitimpl
 # this is a pure function because it only depends on the type definition of NMRData
-Base.@pure function SimpleTraits.trait(t::Type{HasNonFrequencyDimension{D}}) where D<:NMRData{T,N,A} where {T,N,A}
-    if any(map(dim->(typeintersect(dim, FrequencyDimension) == Union{}), A.parameters))
+Base.@pure function SimpleTraits.trait(t::Type{HasNonFrequencyDimension{D}}) where {D<:NMRData{T,
+                                                                                               N,
+                                                                                               A}} where {T,
+                                                                                                          N,
+                                                                                                          A}
+    if any(map(dim -> (typeintersect(dim, FrequencyDimension) == Union{}), A.parameters))
         HasNonFrequencyDimension{D}
     else
         Not{HasNonFrequencyDimension{D}}
@@ -448,5 +433,6 @@ true
 ```
 """
 function hasnonfrequencydimension(spectrum::NMRData{T,N,A}) where {T,N,A}
-    any(map(dim->(typeintersect(dim, FrequencyDimension) == Union{}), A.parameters))
+    return any(map(dim -> (typeintersect(dim, FrequencyDimension) == Union{}),
+                   A.parameters))
 end

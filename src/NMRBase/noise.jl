@@ -14,6 +14,7 @@ The likelihood function is:
 ```math
 \\log \\scrL(\\mu, \\sigma) = \\sum_i{\\log P(y_i, \\mu, \\sigma)}
 ```
+
 where the likelihood of an individual data point is:
 ```math
 \\log P(y,\\mu,\\sigma) =
@@ -23,6 +24,7 @@ where the likelihood of an individual data point is:
         \\sigma \\cdot \\left[\\Phi\\left(\\frac{b-\\mu}{\\sigma}\\right) -
             \\Phi\\left(\\frac{a-\\mu}{\\sigma}\\right)\\right]}
 ```
+
 and ``\\phi(x)`` and ``\\Phi(x)`` are the standard normal pdf and cdf functions.
 """
 function estimatenoise!(d::NMRData)

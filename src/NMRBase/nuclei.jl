@@ -16,8 +16,6 @@ See also [`spin`](@ref), [`gyromagneticratio`](@ref), [`Coherence`](@ref).
     P31
 end
 
-
-
 """
     spin(n::Nucleus)
 
@@ -42,8 +40,6 @@ function spin(n::Nucleus)
                P31 => 1 // 2)
     return get(dic, n, nothing)
 end
-
-
 
 """
     gyromagneticratio(n::Nucleus)

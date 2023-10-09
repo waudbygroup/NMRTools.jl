@@ -13,8 +13,6 @@ abstract type WindowFunction end
 
 Base.Broadcast.broadcastable(w::WindowFunction) = Ref(w)
 
-
-
 """
     NullWindow(tmax)
 
@@ -25,8 +23,6 @@ struct NullWindow <: WindowFunction
     NullWindow(tmax=Inf) = new(tmax)
 end
 
-
-
 """
     UnknownWindow(tmax)
 
@@ -36,8 +32,6 @@ struct UnknownWindow <: WindowFunction
     tmax::Float64
     UnknownWindow(tmax=Inf) = new(tmax)
 end
-
-
 
 """
     ExponentialWindow(lb, tmax)
@@ -50,18 +44,16 @@ struct ExponentialWindow <: WindowFunction
     ExponentialWindow(lb=0.0, tmax=Inf) = new(lb, tmax)
 end
 
-
-
 """
     SineWindow(offset, endpoint, power, tmax)
 
 Abstract window function representing multiplication by sine/cosine functions.
 Acquisition time is `tmax`.
 ```math
-\\sin\\left(
+\\left[\\sin\\left(
     \\pi\\cdot\\mathrm{offset} +
-    \\pi\\cdot\\left(\\mathrm{end} - \\mathrm{offset}\\right) \\cdot \\frac{t}{\\mathrm{tmax}}
-    \\right)^\\mathrm{power}
+    \\frac{\\left(\\mathrm{end} - \\mathrm{offset}\\right)\\pi t}{\\mathrm{tmax}}
+    \\right)\\right]^\\mathrm{power}
 ```
 
 Specialises to `CosWindow`, `Cos²Window` or `GeneralSineWindow`.
@@ -90,8 +82,6 @@ struct GeneralSineWindow <: SineWindow
     tmax::Float64
 end
 
-
-
 """
     CosWindow(tmax)
 
@@ -103,8 +93,6 @@ struct CosWindow <: SineWindow
     tmax::Float64
 end
 
-
-
 """
     Cos²Window(tmax)
 
@@ -115,8 +103,6 @@ See also [`CosWindow`](@ref), [`SineWindow`](@ref).
 struct Cos²Window <: SineWindow
     tmax::Float64
 end
-
-
 
 """
     GaussWindow(expHz, gaussHz, center, tmax)
@@ -142,7 +128,9 @@ struct GeneralGaussWindow <: GaussWindow
     gaussHz::Float64
     center::Float64
     tmax::Float64
-    GeneralGaussWindow(expHz=0.0, gaussHz=0.0, center=0.0, tmax=Inf) = new(expHz, gaussHz, center, tmax)
+    function GeneralGaussWindow(expHz=0.0, gaussHz=0.0, center=0.0, tmax=Inf)
+        return new(expHz, gaussHz, center, tmax)
+    end
 end
 
 struct LorentzToGaussWindow <: GaussWindow
@@ -151,8 +139,6 @@ struct LorentzToGaussWindow <: GaussWindow
     tmax::Float64
     LorentzToGaussWindow(expHz=0.0, gaussHz=0.0, tmax=Inf) = new(expHz, gaussHz, tmax)
 end
-
-
 
 """
     LineshapeComplexity
@@ -175,8 +161,6 @@ Return a complex-valued lineshape when used in calculations
 """
 struct ComplexLineshape <: LineshapeComplexity end
 
-
-
 """
     lineshape(axis, δ, R2, complexity=RealLineshape())
 
@@ -185,12 +169,10 @@ shift `δ` and relaxation rate `R2`, using the parameters and window function as
 with the specified axis.
 """
 function lineshape(ax, δ, R2, complexity::LineshapeComplexity)
-    _lineshape(getω(ax, δ), R2, getω(ax), ax[:window], complexity)
+    return _lineshape(getω(ax, δ), R2, getω(ax), ax[:window], complexity)
 end
 # default to a real return type
 lineshape(ax, δ, R2) = lineshape(ax, δ, R2, RealLineshape())
-
-
 
 """
     _lineshape(ω, R2, ωaxis, window, complexity)
@@ -208,41 +190,45 @@ end
 
 function _lineshape(ω, R, ωax, ::WindowFunction, ::ComplexLineshape)
     # generic case - return a default (complex-valued) Lorentzian
-    @. 1 / (R + 1im*(ω - ωax))
+    @. 1 / (R + 1im * (ω - ωax))
 end
-
 
 # exponential functions
 
 function _lineshape(ω, R, ωax, w::ExponentialWindow, ::ComplexLineshape)
-    x = @. R + 1im*(ω - ωax) + π*w.lb
+    x = @. R + 1im * (ω - ωax) + π * w.lb
     T = w.tmax
 
-    return @. (1 - exp(-T*x)) / x
+    return @. (1 - exp(-T * x)) / x
 end
-_lineshape(ω, R, ωax, w::ExponentialWindow, ::RealLineshape) = real(_lineshape(ω, R, ωax, w, ComplexLineshape()))
 
+function _lineshape(ω, R, ωax, w::ExponentialWindow, ::RealLineshape)
+    return real(_lineshape(ω, R, ωax, w, ComplexLineshape()))
+end
 
 # cosine
 
 function _lineshape(ω, R, ωax, w::CosWindow, ::ComplexLineshape)
-    x = @. R + 1im*(ω - ωax)
+    x = @. R + 1im * (ω - ωax)
     T = w.tmax
     Tx = T * x
-    return @. 2 * T * (π*exp(-Tx) + 2*Tx) / (π^2 + 4*Tx^2)
+    return @. 2 * T * (π * exp(-Tx) + 2 * Tx) / (π^2 + 4 * Tx^2)
 end
-_lineshape(ω, R, ωax, w::CosWindow, ::RealLineshape) = real(_lineshape(ω, R, ωax, w, ComplexLineshape()))
-  
+
+function _lineshape(ω, R, ωax, w::CosWindow, ::RealLineshape)
+    return real(_lineshape(ω, R, ωax, w, ComplexLineshape()))
+end
+
 function _lineshape(ω, R, ωax, w::Cos²Window, ::ComplexLineshape)
-    x = @. R + 1im*(ω - ωax)
+    x = @. R + 1im * (ω - ωax)
     Tx = w.tmax * x
-    
-    return @. (π^2*(1-exp(-Tx)) + 2*Tx^2) / (2 * (π^2 + Tx^2) * x)
+
+    return @. (π^2 * (1 - exp(-Tx)) + 2 * Tx^2) / (2 * (π^2 + Tx^2) * x)
 end
-_lineshape(ω, R, ωax, w::Cos²Window, ::RealLineshape) = real(_lineshape(ω, R, ωax, w, ComplexLineshape()))
-  
 
-
+function _lineshape(ω, R, ωax, w::Cos²Window, ::RealLineshape)
+    return real(_lineshape(ω, R, ωax, w, ComplexLineshape()))
+end
 
 """
     apod(spec::NMRData, dimension, zerofill=true)
@@ -250,16 +236,18 @@ _lineshape(ω, R, ωax, w::Cos²Window, ::RealLineshape) = real(_lineshape(ω, R
 Return the time-domain apodization function for the specified axis,
 as a vector of values.
 """
-apod(spec::AbstractNMRData, dimension, zerofill=true) = apod(dims(spec,dimension), zerofill)
+function apod(spec::AbstractNMRData, dimension, zerofill=true)
+    return apod(dims(spec, dimension), zerofill)
+end
 
 function apod(ax::FrequencyDimension, zerofill=true)
     td = ax[:td]
     sw = ax[:swhz]
     window = ax[:window]
-    
-    dt = 1/sw
-    t = dt * (0:(td-1))
-    
+
+    dt = 1 / sw
+    t = dt * (0:(td - 1))
+
     if zerofill
         tdzf = ax[:tdzf]
         w = zeros(tdzf)
@@ -278,6 +266,8 @@ end
 
 apod(t, ::NullWindow) = ones(length(t))
 apod(t, w::ExponentialWindow) = exp.(-π * w.lb * t)
-apod(t, w::GeneralSineWindow) = @. sin(π*w.offset + π*((w.endpoint - w.offset) * t / w.tmax))^w.power
-apod(t, w::CosWindow) = @. cos(π/2 * t / w.tmax)
-apod(t, w::Cos²Window) = @. cos(π/2 * t / w.tmax)^2
+function apod(t, w::GeneralSineWindow)
+    @. sin(π * w.offset + π * ((w.endpoint - w.offset) * t / w.tmax))^w.power
+end
+apod(t, w::CosWindow) = @. cos(π / 2 * t / w.tmax)
+apod(t, w::Cos²Window) = @. cos(π / 2 * t / w.tmax)^2

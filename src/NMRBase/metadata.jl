@@ -3,7 +3,6 @@
 # struct NMRMetadata <: DimensionalData.Dimensions.LookupArrays.AbstractMetadata
 # Metadata() = Metadata(Dict{Symbol,Any}())
 
-
 # getters ##########################################################################################
 
 # metadata accessor functions
@@ -47,15 +46,14 @@ metadata(A::AbstractNMRData, key::Symbol) = get(metadata(A), key, nothing)
 metadata(A::AbstractNMRData, dim, key::Symbol) = get(metadata(A, dim), key, nothing)
 metadata(d::NMRDimension, key::Symbol) = get(metadata(d), key, nothing)
 
-
 Base.getindex(A::AbstractNMRData, key::Symbol) = metadata(A, key)
 Base.getindex(A::AbstractNMRData, dim, key::Symbol) = metadata(A, dim, key)
 Base.getindex(d::NMRDimension, key::Symbol) = metadata(d, key)
 Base.setindex!(A::AbstractNMRData, v, key::Symbol) = setindex!(metadata(A), v, key)  #(A[key] = v  =>  metadata(A)[key] = v)
-Base.setindex!(A::AbstractNMRData, v, dim, key::Symbol) = setindex!(metadata(A,dim), v, key)  #(A[dim, key] = v  =>  metadata(A, dim)[key] = v)
+function Base.setindex!(A::AbstractNMRData, v, dim, key::Symbol)
+    return setindex!(metadata(A, dim), v, key)
+end  #(A[dim, key] = v  =>  metadata(A, dim)[key] = v)
 Base.setindex!(d::NMRDimension, v, key::Symbol) = setindex!(metadata(d), v, key)  #(d[key] = v  =>  metadata(d)[key] = v)
-
-
 
 """
     units(nmrdata)
@@ -68,7 +66,6 @@ function units end
 units(A::AbstractNMRData) = metadata(A, :units)
 units(A::AbstractNMRData, dim) = metadata(A, dim, :units)
 units(d::NMRDimension) = get(metadata(d), :units, nothing)
-
 
 """
     label(nmrdata)
@@ -86,8 +83,6 @@ label(A::AbstractNMRData) = metadata(A, :label)
 label(A::AbstractNMRData, dim) = metadata(A, dim, :label)
 label(d::NMRDimension) = get(metadata(d), :label, nothing)
 
-
-
 """
     label!(nmrdata, labeltext)
     label!(nmrdata, dim, labeltext)
@@ -101,7 +96,6 @@ function label! end
 label!(A::AbstractNMRData, labeltext::AbstractString) = (A[:label] = labeltext)
 label!(A::AbstractNMRData, dim, labeltext::AbstractString) = (A[dim, :label] = labeltext)
 label!(d::NMRDimension, labeltext::AbstractString) = (d[:label] = labeltext)
-
 
 """
     acqus(nmrdata)
@@ -133,7 +127,9 @@ julia> acqus(expt, :vclist)
 See also [`metadata`](@ref).
 """
 acqus(A::AbstractNMRData) = metadata(A, :acqus)
-acqus(A::AbstractNMRData, key::Symbol) = ismissing(acqus(A)) ? missing : get(acqus(A), key, missing)
+function acqus(A::AbstractNMRData, key::Symbol)
+    return ismissing(acqus(A)) ? missing : get(acqus(A), key, missing)
+end
 acqus(A::AbstractNMRData, key::String) = acqus(A, Symbol(lowercase(key)))
 acqus(A::AbstractNMRData, key, index) = acqus(A, key)[index]
 
@@ -153,8 +149,7 @@ function defaultmetadata(::Type{<:AbstractNMRData})
     return Metadata{NMRData}(defaults)
 end
 
-
-# # Metadata for Dimensions ##########################################################################
+# Metadata for Dimensions ##########################################################################
 
 function defaultmetadata(T::Type{<:NMRDimension})
     defaults = Dict{Symbol,Any}(:label => "",
@@ -206,9 +201,8 @@ function defaultmetadata(::Type{<:UnknownDimension})
     return Metadata{UnknownDimension}(defaults)
 end
 
-
 # Metadata entry definitions and help ##############################################################
-function metadatahelp(A::Type{T}) where {T <: Union{NMRData,NMRDimension}}
+function metadatahelp(A::Type{T}) where {T<:Union{NMRData,NMRDimension}}
     m = Metadata{A}()
     return Dict(map(kv -> kv[1] => metadatahelp(kv[1]), m))
 end

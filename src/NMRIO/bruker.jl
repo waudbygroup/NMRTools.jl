@@ -10,7 +10,8 @@ function loadpdata(filename, allcomponents=false)
     else
         pdir = dirname(filename)
     end
-    isdir(pdir) || throw(NMRToolsError("can't load bruker data, pdata directory $pdir does not exist"))
+    isdir(pdir) ||
+        throw(NMRToolsError("can't load bruker data, pdata directory $pdir does not exist"))
 
     # 2. get a list of pdata input files (which depends on the dimension of the spectrum)
     ndim = 0
@@ -25,7 +26,8 @@ function loadpdata(filename, allcomponents=false)
         ndim = 3
         datafiles = ["3rrr", "3rri", "3rir", "3rii", "3irr", "3iri", "3iir", "3iii"]
     end
-    ndim > 0 || throw(NMRToolsError("can't load bruker data, pdata directory $pdir does not contain binary data files (1r/2rr/3rrr etc.)"))
+    ndim > 0 ||
+        throw(NMRToolsError("can't load bruker data, pdata directory $pdir does not contain binary data files (1r/2rr/3rrr etc.)"))
 
     # 2b. only include the realest component unless requested
     if !allcomponents
@@ -33,22 +35,22 @@ function loadpdata(filename, allcomponents=false)
     end
 
     # 2c. check these files actually exist
-    datafiles = map(x->joinpath(pdir, x), datafiles)
+    datafiles = map(x -> joinpath(pdir, x), datafiles)
     filter!(isfile, datafiles)
 
     # 3. read procs files (containing axis metadata)
     procsfiles = ["procs", "proc2s", "proc3s", "proc4s"]
-    procsdics = [loadjdx(joinpath(pdir, procsfiles[i])) for i=1:ndim]
+    procsdics = [loadjdx(joinpath(pdir, procsfiles[i])) for i in 1:ndim]
 
     # 4. TODO parse procs into main axis metadata
     md = Dict{Symbol,Any}()  # main dictionary for metadata
     md[:ndim] = ndim
     # populate metadata for each dimension
     axesmd = []
-    for i=1:ndim
+    for i in 1:ndim
         dic = Dict{Symbol,Any}()
         procdic = procsdics[i]
-        
+
         # add some data in a nice format
         if procdic[:ft_mod] == 0
             dic[:pseudodim] = true
@@ -65,7 +67,7 @@ function loadpdata(filename, allcomponents=false)
             # extleftppm = procdic[:offset] # edge of extracted region, in ppm
             extswhz = procdic[:sw_p] # sw of extracted region, in Hz
             extswppm = extswhz / dic[:bf]
-            
+
             # full sw = ftsize / stsi * sw of extracted region
             dic[:swhz] = procdic[:ftsize] / procdic[:stsi] * procdic[:sw_p]
             dic[:swppm] = dic[:swhz] / dic[:bf]
@@ -81,7 +83,7 @@ function loadpdata(filename, allcomponents=false)
 
             dic[:offsetppm] = offsetppm #dic[:offsethz] / dic[:bf]
             dic[:offsethz] = offsetppm * dic[:bf] #procdic[:offset]*dic[:bf] - dic[:swhz]/2
-            dic[:sf] = dic[:offsethz]*1e-6 + dic[:bf]
+            dic[:sf] = dic[:offsethz] * 1e-6 + dic[:bf]
 
             # if procdic[:lpbin] == 0
             dic[:td] = procdic[:tdeff] ÷ 2  # number of COMPLEX points
@@ -96,12 +98,12 @@ function loadpdata(filename, allcomponents=false)
             if procdic[:stsr] == 0
                 dic[:region] = missing
             else
-                dic[:region] = procdic[:stsr] : (procdic[:stsr] + procdic[:stsi] - 1)
+                dic[:region] = procdic[:stsr]:(procdic[:stsr] + procdic[:stsi] - 1)
             end
 
             # chemical shift values
-            δ = LinRange(procdic[:offset], procdic[:offset]-extswppm, dic[:npoints]+ 1)
-            dic[:val] = δ[1:end-1]
+            δ = LinRange(procdic[:offset], procdic[:offset] - extswppm, dic[:npoints] + 1)
+            dic[:val] = δ[1:(end - 1)]
 
             # create a representation of the window function
             # calculate acquisition time = td / 2*sw
@@ -118,13 +120,13 @@ function loadpdata(filename, allcomponents=false)
                 if ssb < 1
                     ssb = 1
                 end
-                window = SineWindow(1 - 1.0/ssb, 1, 1, dic[:aq]) # offset, endpoint, power
+                window = SineWindow(1 - 1.0 / ssb, 1, 1, dic[:aq]) # offset, endpoint, power
             elseif w == 4
                 ssb = procdic[:ssb]
                 if ssb < 1
                     ssb = 1
                 end
-                window = SineWindow(1 - 1.0/ssb, 1, 2, dic[:aq]) # offset, endpoint, power
+                window = SineWindow(1 - 1.0 / ssb, 1, 2, dic[:aq]) # offset, endpoint, power
             else
                 window = UnknownWindow(dic[:aq])
             end
@@ -136,8 +138,8 @@ function loadpdata(filename, allcomponents=false)
     end
 
     # 5. determine shape and submatrix size
-    shape = [procs[:si] for procs ∈ procsdics]
-    submatrix = [procs[:xdim] for procs ∈ procsdics]
+    shape = [procs[:si] for procs in procsdics]
+    submatrix = [procs[:xdim] for procs in procsdics]
 
     # 6. check data format (default to Int32)
     dtype = get(procsdics[1], :dtypp, 1) == 2 ? Float64 : Int32
@@ -146,7 +148,8 @@ function loadpdata(filename, allcomponents=false)
     endian = get(procsdics[1], :bytordp, 0) == 1 ? "b" : "l"
 
     # 8. read the data files
-    dat = map(datafile -> readpdatabinary(datafile, shape, submatrix, dtype, endian), datafiles)
+    dat = map(datafile -> readpdatabinary(datafile, shape, submatrix, dtype, endian),
+              datafiles)
 
     # 9. combine into real/complex/multicomplex output
     if !allcomponents
@@ -178,89 +181,86 @@ function loadpdata(filename, allcomponents=false)
     scalepdata!(y, procsdics[1])
 
     # 11. trim out any regions of zero data
-    y = y[[1:axesmd[i][:npoints] for i=1:ndim]...]
+    y = y[[1:axesmd[i][:npoints] for i in 1:ndim]...]
 
     # 12. form NMRData and return
     if ndim == 1
         valx = axesmd[1][:val]
-        delete!(axesmd[1],:val) # remove values from metadata to prevent confusion when slicing up
+        delete!(axesmd[1], :val) # remove values from metadata to prevent confusion when slicing up
 
-        xaxis = F1Dim(valx, metadata=axesmd[1])
+        xaxis = F1Dim(valx; metadata=axesmd[1])
 
-        NMRData(y, (xaxis, ), metadata=md)
+        NMRData(y, (xaxis,); metadata=md)
     elseif ndim == 2
         val1 = axesmd[1][:val]
         val2 = axesmd[2][:val]
-        delete!(axesmd[1],:val) # remove values from metadata to prevent confusion when slicing up
-        delete!(axesmd[2],:val)
-        
-        xaxis = F1Dim(val1, metadata=axesmd[1])
+        delete!(axesmd[1], :val) # remove values from metadata to prevent confusion when slicing up
+        delete!(axesmd[2], :val)
+
+        xaxis = F1Dim(val1; metadata=axesmd[1])
 
         ax2 = axesmd[2][:pseudodim] ? X2Dim : F2Dim
-        yaxis = ax2(val2, metadata=axesmd[2])
-    
-        NMRData(y, (xaxis, yaxis), metadata=md)
+        yaxis = ax2(val2; metadata=axesmd[2])
+
+        NMRData(y, (xaxis, yaxis); metadata=md)
     else
         # rearrange data into a useful order - always place pseudo-dimension last - and generate axes
         # 1 is always direct, and should be placed first (i.e. 1 x x)
         # if is there is a pseudodimension, put that last (i.e. 1 y p)
         pdim = [axesmd[i][:pseudodim] for i in 1:3]
-        
+
         val1 = axesmd[1][:val]
         val2 = axesmd[2][:val]
         val3 = axesmd[3][:val]
-        delete!(axesmd[1],:val) # remove values from metadata to prevent confusion when slicing up
-        delete!(axesmd[2],:val)
-        delete!(axesmd[3],:val)
+        delete!(axesmd[1], :val) # remove values from metadata to prevent confusion when slicing up
+        delete!(axesmd[2], :val)
+        delete!(axesmd[3], :val)
 
         if pdim[2]
             # dimensions are x p y => we want ordering 1 3 2
-            xaxis = F1Dim(val1, metadata=axesmd[1])
-            yaxis = F2Dim(val3, metadata=axesmd[3])
-            zaxis = X3Dim(val2, metadata=axesmd[2])
+            xaxis = F1Dim(val1; metadata=axesmd[1])
+            yaxis = F2Dim(val3; metadata=axesmd[3])
+            zaxis = X3Dim(val2; metadata=axesmd[2])
             y = permutedims(y, [1, 3, 2])
         elseif pdim[3]
             # dimensions are x y p => we want ordering 1 2 3
-            xaxis = F1Dim(val1, metadata=axesmd[1])
-            yaxis = F2Dim(val2, metadata=axesmd[2])
-            zaxis = X3Dim(val3, metadata=axesmd[3])
+            xaxis = F1Dim(val1; metadata=axesmd[1])
+            yaxis = F2Dim(val2; metadata=axesmd[2])
+            zaxis = X3Dim(val3; metadata=axesmd[3])
         else
             # no pseudodimension, use Z axis not Ti
             # dimensions are x y z => we want ordering 1 2 3
-            xaxis = F1Dim(val1, metadata=axesmd[1])
-            yaxis = F2Dim(val2, metadata=axesmd[2])
-            zaxis = F3Dim(val3, metadata=axesmd[3])
+            xaxis = F1Dim(val1; metadata=axesmd[1])
+            yaxis = F2Dim(val2; metadata=axesmd[2])
+            zaxis = F3Dim(val3; metadata=axesmd[3])
         end
 
-        NMRData(y, (xaxis, yaxis, zaxis), metadata=md)
+        NMRData(y, (xaxis, yaxis, zaxis); metadata=md)
     end
 end
-
 
 function scalepdata!(y, procs, reverse=false)
     if reverse
-        y .*= 2.0^(-get(procs,:nc_proc,1))
+        y .*= 2.0^(-get(procs, :nc_proc, 1))
     else
-        y .*= 2.0^(get(procs,:nc_proc,1))
+        y .*= 2.0^(get(procs, :nc_proc, 1))
     end
 end
-
 
 function readpdatabinary(filename, shape, submatrix, dtype, endian)
     # preallocate header
     np = foldl(*, shape)
     y = zeros(dtype, np)
-    
+
     # read the file
     open(filename) do f
-        read!(f, y)
+        return read!(f, y)
     end
-    convertor = endian=="b" ? ntoh : ltoh # get convertor function for big/little-to-host
+    convertor = endian == "b" ? ntoh : ltoh # get convertor function for big/little-to-host
     y = convertor(y)
 
-    reordersubmatrix(y, shape, submatrix)
+    return reordersubmatrix(y, shape, submatrix)
 end
-
 
 function reordersubmatrix(yin, shape, submatrix, reverse=false)
     ndim = length(shape)
@@ -268,7 +268,7 @@ function reordersubmatrix(yin, shape, submatrix, reverse=false)
         # do nothing to 1D data
         return yin
     end
-    
+
     nsub = @. Int(ceil(shape / submatrix))
     nsubs = foldl(*, nsub)
     N = length(yin)
@@ -282,16 +282,16 @@ function reordersubmatrix(yin, shape, submatrix, reverse=false)
     end
 
     ci = CartesianIndices(ones(nsub...))
-    for n = 1:nsubs
+    for n in 1:nsubs
         idx = ci[n]
-        slices = [(1+(idx[i]-1)*submatrix[i]):idx[i]*submatrix[i] for i=1:ndim]
-        vecslice = 1+(n-1)*sublength:n*sublength
+        slices = [(1 + (idx[i] - 1) * submatrix[i]):(idx[i] * submatrix[i]) for i in 1:ndim]
+        vecslice = (1 + (n - 1) * sublength):(n * sublength)
         if reverse
             yout[vecslice] = yin[slices...]
         else
             yout[slices...] = yin[vecslice]
         end
     end
-    
+
     return yout
 end

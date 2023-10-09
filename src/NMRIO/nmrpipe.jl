@@ -20,29 +20,26 @@ function loadnmrpipe(filename)
     end
 end
 
-
-
-expandpipetemplate(template, n) = replace(template, "%03d"=>lpad(n,3,"0"), "%04d"=>lpad(n,4,"0"))
-
-
+function expandpipetemplate(template, n)
+    return replace(template, "%03d" => lpad(n, 3, "0"), "%04d" => lpad(n, 4, "0"))
+end
 
 function loadnmrpipeheader(filename)
     # check file exists
-    isfile(filename) || throw(NMRToolsError("cannot load $(filename), not a recognised file."))
+    isfile(filename) ||
+        throw(NMRToolsError("cannot load $(filename), not a recognised file."))
 
     # preallocate header
     header = zeros(Float32, 512)
 
     # read the file
     open(filename) do f
-        read!(f, header)
+        return read!(f, header)
     end
 
     # parse the header, returning md and mdax
-    parsenmrpipeheader(header)
+    return parsenmrpipeheader(header)
 end
-
-
 
 """
     parsenmrpipeheader(header)
@@ -63,52 +60,48 @@ function parsenmrpipeheader(header::Vector{Float32})
     # declare constants for clarity in accessing nmrPipe header
 
     # general parameters (independent of number of dimensions)
-    genpars = Dict(
-        :FDMAGIC => 1,
-        :FDFLTFORMAT => 2,
-        :FDFLTORDER => 3,
-        :FDPIPEFLAG => (Int, 58),  #Dimension code of data stream
-        :FDCUBEFLAG => (Int, 448),
-        :FDSIZE => (Int, 100),
-        :FDSPECNUM => (Int, 220),
-        :FDQUADFLAG => (Int, 107),
-        :FD2DPHASE => (Int, 257),
-        :FDTRANSPOSED => (Int, 222),
-        :FDDIMCOUNT => (Int, 10),
-        :FDDIMORDER => (Int, 25:28),
-        :FDFILECOUNT => (Int, 443),
-        :FDSIZE => (Int, (100, 220, 16, 33)),
-    )
+    genpars = Dict(:FDMAGIC => 1,
+                   :FDFLTFORMAT => 2,
+                   :FDFLTORDER => 3,
+                   :FDPIPEFLAG => (Int, 58),  #Dimension code of data stream
+                   :FDCUBEFLAG => (Int, 448),
+                   :FDSIZE => (Int, 100),
+                   :FDSPECNUM => (Int, 220),
+                   :FDQUADFLAG => (Int, 107),
+                   :FD2DPHASE => (Int, 257),
+                   :FDTRANSPOSED => (Int, 222),
+                   :FDDIMCOUNT => (Int, 10),
+                   :FDDIMORDER => (Int, 25:28),
+                   :FDFILECOUNT => (Int, 443),
+                   :FDSIZE => (Int, (100, 220, 16, 33)))
     # dimension-specific parameters
     dimlabels = (17:18, 19:20, 21:22, 23:24) # UInt8
-    dimpars = Dict(
-        :FDAPOD => (Int, (96, 429, 51, 54, )),
-        :FDSW => (101, 230, 12, 30, ),
-        :FDOBS => (120, 219, 11, 29, ),
-        :FDOBSMID => (379, 380, 381, 382, ),
-        :FDORIG => (102, 250, 13, 31, ),
-        :FDUNITS => (Int, (153, 235, 59, 60, )),
-        :FDQUADFLAG => (Int, (57, 56, 52, 55, )),
-        :FDFTFLAG => (Int, (221, 223, 14, 32, )),
-        :FDCAR => (67, 68, 69, 70, ),
-        :FDCENTER => (80, 81, 82, 83, ),
-        :FDOFFPPM => (481, 482, 483, 484, ),
-        :FDP0 => (110, 246, 61, 63, ),
-        :FDP1 => (111, 247, 62, 64, ),
-        :FDAPODCODE => (Int, (414, 415, 401, 406, )),
-        :FDAPODQ1 => (416, 421, 402, 407, ),
-        :FDAPODQ2 => (417, 422, 403, 408, ),
-        :FDAPODQ3 => (418, 423, 404, 409, ),
-        :FDLB => (112, 244, 373, 374, ),
-        :FDGB => (375, 276, 377, 378, ),
-        :FDGOFF => (383, 384, 385, 386, ),
-        :FDC1 => (419, 424, 405, 410, ),
-        :FDZF => (Int, (109, 438, 439, 440, )),
-        :FDX1 => (Int, (258, 260, 262, 264, )),
-        :FDXN => (Int, (259, 261, 263, 265, )),
-        :FDFTSIZE => (Int, (97, 99, 201, 202, )),
-        :FDTDSIZE => (Int, (387, 388, 389, 390, ))
-    )
+    dimpars = Dict(:FDAPOD => (Int, (96, 429, 51, 54)),
+                   :FDSW => (101, 230, 12, 30),
+                   :FDOBS => (120, 219, 11, 29),
+                   :FDOBSMID => (379, 380, 381, 382),
+                   :FDORIG => (102, 250, 13, 31),
+                   :FDUNITS => (Int, (153, 235, 59, 60)),
+                   :FDQUADFLAG => (Int, (57, 56, 52, 55)),
+                   :FDFTFLAG => (Int, (221, 223, 14, 32)),
+                   :FDCAR => (67, 68, 69, 70),
+                   :FDCENTER => (80, 81, 82, 83),
+                   :FDOFFPPM => (481, 482, 483, 484),
+                   :FDP0 => (110, 246, 61, 63),
+                   :FDP1 => (111, 247, 62, 64),
+                   :FDAPODCODE => (Int, (414, 415, 401, 406)),
+                   :FDAPODQ1 => (416, 421, 402, 407),
+                   :FDAPODQ2 => (417, 422, 403, 408),
+                   :FDAPODQ3 => (418, 423, 404, 409),
+                   :FDLB => (112, 244, 373, 374),
+                   :FDGB => (375, 276, 377, 378),
+                   :FDGOFF => (383, 384, 385, 386),
+                   :FDC1 => (419, 424, 405, 410),
+                   :FDZF => (Int, (109, 438, 439, 440)),
+                   :FDX1 => (Int, (258, 260, 262, 264)),
+                   :FDXN => (Int, (259, 261, 263, 265)),
+                   :FDFTSIZE => (Int, (97, 99, 201, 202)),
+                   :FDTDSIZE => (Int, (387, 388, 389, 390)))
 
     # check correct endian-ness
     if header[genpars[:FDFLTORDER]] ≉ 2.345
@@ -142,7 +135,7 @@ function parsenmrpipeheader(header::Vector{Float32})
 
     # populate metadata for each dimension
     axesmd = []
-    for i=1:ndim
+    for i in 1:ndim
         dic = Dict{Symbol,Any}()
         pipedic = Dict{Symbol,Any}()
         for k in keys(dimpars)
@@ -172,13 +165,13 @@ function parsenmrpipeheader(header::Vector{Float32})
             dic[:swppm] = dic[:swhz] / dic[:bf]
             swregion = dic[:swppm]
             dic[:offsetppm] = pipedic[:FDCAR]
-            dic[:offsethz] = (dic[:offsetppm]*1e-6 + 1) * dic[:bf]
-            dic[:sf] = dic[:offsethz]*1e-6 + dic[:bf]
+            dic[:offsethz] = (dic[:offsetppm] * 1e-6 + 1) * dic[:bf]
+            dic[:sf] = dic[:offsethz] * 1e-6 + dic[:bf]
             if pipedic[:FDX1] == 0 && pipedic[:FDXN] == 0
                 dic[:region] = missing
                 dic[:npoints] = dic[:tdzf]
             else
-                dic[:region] = pipedic[:FDX1] : pipedic[:FDXN]
+                dic[:region] = pipedic[:FDX1]:pipedic[:FDXN]
                 dic[:npoints] = length(dic[:region])
 
                 dic[:swhz] *= dic[:tdzf] / dic[:npoints]
@@ -189,8 +182,8 @@ function parsenmrpipeheader(header::Vector{Float32})
             # calculate chemical shift values
             cs_at_edge = edge_frq / dic[:bf]
             cs_at_other_edge = cs_at_edge + swregion
-            x = range(cs_at_other_edge, cs_at_edge, length=dic[:npoints]+1);
-            dic[:val] = x[2:end];
+            x = range(cs_at_other_edge, cs_at_edge; length=dic[:npoints] + 1)
+            dic[:val] = x[2:end]
             # # alternative calculation (without extraction) - this agrees OK
             # x = range(dic[:offsetppm] + 0.5*dic[:swppm], dic[:offsetppm] - 0.5*dic[:swppm], length=dic[:npoints]+1)
             # dic[:val2] = x[1:end-1]
@@ -224,8 +217,6 @@ function parsenmrpipeheader(header::Vector{Float32})
     return md, axesmd
 end
 
-
-
 """
     loadnmrpipe1d(filename, md, mdax)
 
@@ -240,19 +231,16 @@ function loadnmrpipe1d(filename, md, mdax)
     # read the file
     open(filename) do f
         read!(f, header)
-        read!(f, y)
+        return read!(f, y)
     end
     y = Float64.(y)
 
     valx = mdax[1][:val]
-    delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
-    xaxis = F1Dim(valx, metadata=mdax[1])
+    delete!(mdax[1], :val) # remove values from metadata to prevent confusion when slicing up
+    xaxis = F1Dim(valx; metadata=mdax[1])
 
-    return NMRData(y, (xaxis, ), metadata=md)
+    return NMRData(y, (xaxis,); metadata=md)
 end
-
-
-
 
 """
     loadnmrpipe2d(filename, md, mdax)
@@ -275,7 +263,7 @@ function loadnmrpipe2d(filename::String, md, mdax)
     # read the file
     open(filename) do f
         read!(f, header)
-        read!(f, y)
+        return read!(f, y)
     end
     if transposeflag
         y = transpose(y)
@@ -283,17 +271,15 @@ function loadnmrpipe2d(filename::String, md, mdax)
     y = Float64.(y)
 
     valx = mdax[1][:val]
-    delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
+    delete!(mdax[1], :val) # remove values from metadata to prevent confusion when slicing up
     valy = mdax[2][:val]
-    delete!(mdax[2],:val) # remove values from metadata to prevent confusion when slicing up
+    delete!(mdax[2], :val) # remove values from metadata to prevent confusion when slicing up
     ax2 = mdax[2][:pseudodim] ? X2Dim : F2Dim
-    xaxis = F1Dim(valx, metadata=mdax[1])
-    yaxis = ax2(valy, metadata=mdax[2])
+    xaxis = F1Dim(valx; metadata=mdax[1])
+    yaxis = ax2(valy; metadata=mdax[2])
 
-    NMRData(y, (xaxis, yaxis), metadata=md)
+    return NMRData(y, (xaxis, yaxis); metadata=md)
 end
-
-
 
 """
     loadnmrpipe3d(filename, md, mdax)
@@ -309,19 +295,19 @@ function loadnmrpipe3d(filename::String, md, mdax)
     if md[:pipe][:FDPIPEFLAG] == 0
         # series of 2D files
         y2d = zeros(Float32, datasize[1], datasize[2])
-        for i = 1:datasize[3]
+        for i in 1:datasize[3]
             filename1 = expandpipetemplate(filename, i)
             open(filename1) do f
                 read!(f, header)
-                read!(f, y2d)
+                return read!(f, y2d)
             end
-            y[:,:,i] = y2d
+            y[:, :, i] = y2d
         end
     else
         # single stream
         open(filename) do f
             read!(f, header)
-            read!(f, y)
+            return read!(f, y)
         end
     end
     y = Float64.(y)
@@ -330,9 +316,9 @@ function loadnmrpipe3d(filename::String, md, mdax)
     val1 = mdax[1][:val]
     val2 = mdax[2][:val]
     val3 = mdax[3][:val]
-    delete!(mdax[1],:val) # remove values from metadata to prevent confusion when slicing up
-    delete!(mdax[2],:val)
-    delete!(mdax[3],:val)
+    delete!(mdax[1], :val) # remove values from metadata to prevent confusion when slicing up
+    delete!(mdax[2], :val)
+    delete!(mdax[3], :val)
 
     # y is currently in order of FDSIZE - we need to rearrange
     dimorder = md[:pipe][:FDDIMORDER][1:3]
@@ -341,14 +327,14 @@ function loadnmrpipe3d(filename::String, md, mdax)
     # figure out current ordering of data matrix
     # e.g. order = [2 1 3] indicates the data matrix is axis2 x axis1 x axis3
     if tr == 0
-        order = [findfirst(x->x.==i, dimorder) for i=[2,1,3]]
+        order = [findfirst(x -> x .== i, dimorder) for i in [2, 1, 3]]
     else # transpose flag
         # swap first two entries of dimorder round
         dimorder2 = [dimorder[2], dimorder[1], dimorder[3]]
-        order = [findfirst(x->x.==i, dimorder2) for i=[1,2,3]]
+        order = [findfirst(x -> x .== i, dimorder2) for i in [1, 2, 3]]
     end
     # calculate the permutation required to bring the data matrix into the order axis1 x axis2 x axis3
-    unorder = [findfirst(x->x.==i, order) for i=[1,2,3]]
+    unorder = [findfirst(x -> x .== i, order) for i in [1, 2, 3]]
     y = permutedims(y, unorder)
 
     # finally rearrange data into a useful order - always place pseudo-dimension last - and generate axes
@@ -358,22 +344,22 @@ function loadnmrpipe3d(filename::String, md, mdax)
     pdim = [mdax[i][:pseudodim] for i in 1:3]
     if pdim[2]
         # dimensions are x p y => we want ordering 1 3 2
-        xaxis = F1Dim(val1, metadata=mdax[1])
-        yaxis = F2Dim(val3, metadata=mdax[3])
-        zaxis = X3Dim(val2, metadata=mdax[2])
+        xaxis = F1Dim(val1; metadata=mdax[1])
+        yaxis = F2Dim(val3; metadata=mdax[3])
+        zaxis = X3Dim(val2; metadata=mdax[2])
         y = permutedims(y, [1, 3, 2])
     elseif pdim[3]
         # dimensions are x y p => we want ordering 1 2 3
-        xaxis = F1Dim(val1, metadata=mdax[1])
-        yaxis = F2Dim(val2, metadata=mdax[2])
-        zaxis = X3Dim(val3, metadata=mdax[3])
+        xaxis = F1Dim(val1; metadata=mdax[1])
+        yaxis = F2Dim(val2; metadata=mdax[2])
+        zaxis = X3Dim(val3; metadata=mdax[3])
     else
         # no pseudodimension, use Z axis not Ti
         # dimensions are x y z => we want ordering 1 2 3
-        xaxis = F1Dim(val1, metadata=mdax[1])
-        yaxis = F2Dim(val2, metadata=mdax[2])
-        zaxis = F3Dim(val3, metadata=mdax[3])
+        xaxis = F1Dim(val1; metadata=mdax[1])
+        yaxis = F2Dim(val2; metadata=mdax[2])
+        zaxis = F3Dim(val3; metadata=mdax[3])
     end
 
-    NMRData(y, (xaxis, yaxis, zaxis), metadata=md)
+    return NMRData(y, (xaxis, yaxis, zaxis); metadata=md)
 end

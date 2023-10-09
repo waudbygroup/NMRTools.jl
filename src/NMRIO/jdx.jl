@@ -1,11 +1,12 @@
 function loadjdx(filename::String)
-    isfile(filename) || throw(NMRToolsError("loading JCAMP-DX data: $(filename) is not a valid file"))
+    isfile(filename) ||
+        throw(NMRToolsError("loading JCAMP-DX data: $(filename) is not a valid file"))
 
     dat = open(filename) do f
-        read(f, String)
+        return read(f, String)
     end
 
-    fields = [strip(strip(x),'$') for x in split(dat, "##")]
+    fields = [strip(strip(x), '$') for x in split(dat, "##")]
     dic = Dict{Symbol,Any}()
     for field in fields
         field == "" && continue # skip empty lines
@@ -20,8 +21,6 @@ function loadjdx(filename::String)
     return dic
 end
 
-
-
 function parsejdxentry(dat)
     if dat[1] == '('
         # array data - split into fields
@@ -31,18 +30,16 @@ function parsejdxentry(dat)
             parsed = float.(parsed)
         end
         # create a dictionary, 0 => p0, 1 => p1, etc.
-        parsed = Dict(zip(0:length(parsed)-1, parsed))
+        parsed = Dict(zip(0:(length(parsed) - 1), parsed))
     else
         parsed = parsejdxfield(dat)
     end
     return parsed
 end
 
-
-
 function parsejdxfield(dat)
     if dat[1] == '<' # <string>
-        dat = dat[2:end-1]
+        dat = dat[2:(end - 1)]
     else
         x = tryparse(Int64, dat)
         if isnothing(x)

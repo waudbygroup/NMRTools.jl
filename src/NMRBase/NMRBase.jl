@@ -34,8 +34,9 @@ const DD = DimensionalData
 
 import DimensionalData.refdims_title
 import .LookupArrays: metadata, set, _set, rebuild, basetypeof, Metadata,
-    order, span, sampling, locus, val, index, bounds, hasselection, units, SelectorOrInterval,
-    ForwardOrdered
+                      order, span, sampling, locus, val, index, bounds, hasselection, units,
+                      SelectorOrInterval,
+                      ForwardOrdered
 import .Dimensions: dims, refdims, lookup, dimstride, kwdims, hasdim, label, _astuple
 
 include("exceptions.jl")

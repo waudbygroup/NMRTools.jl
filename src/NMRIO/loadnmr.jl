@@ -35,9 +35,9 @@ function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
     aqdic = getacqusmetadata(format, filename, experimentfolder)
 
     # 3. load data
-    if format==:nmrpipe
+    if format == :nmrpipe
         spectrum = loadnmrpipe(filename)
-    elseif format==:pdata
+    elseif format == :pdata
         # TODO bruker pdata import
         spectrum = loadpdata(filename, allcomponents)
     else
@@ -53,7 +53,6 @@ function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
 
     return spectrum
 end
-
 
 """
     getformat(filename)
@@ -74,7 +73,7 @@ function getformat(filename)
     # No pdata directory specified? Test if filename/pdata/1 exists
     # If it does, return the updated path filename/pdata/1
     if isdir(filename)
-        testpath = joinpath(filename, "pdata","1")
+        testpath = joinpath(filename, "pdata", "1")
         isdir(testpath) && return :pdata, testpath
     end
 

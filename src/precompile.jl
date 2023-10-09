@@ -1,19 +1,19 @@
 @compile_workload begin
     # 1D data
-    axH = F1Dim(8:.1:9, metadata=Dict{Symbol,Any}(:test=>123))
-    dat = NMRData(0.:1:10, (axH,))
+    axH = F1Dim(8:0.1:9; metadata=Dict{Symbol,Any}(:test => 123))
+    dat = NMRData(0.0:1:10, (axH,))
 
     foo = dat[At(8.5)]
     foo = dat[Near(8.5)]
-    foo = dat[8.4..8.6]
-    foo = dat[8.41..8.6]
+    foo = dat[8.4 .. 8.6]
+    foo = dat[8.41 .. 8.6]
     foo = isnothing(metadata(dat, 1)[:window])
     foo = label(dims(dat, 1))
     foo = isnothing(units(dims(dat, 1)))
     foo = metadata(dat, 1)[:test]
 
     # 2D data
-    x = 8:.1:9
+    x = 8:0.1:9
     y = 100:120
     z = x .+ y'  # 11 x 21
 

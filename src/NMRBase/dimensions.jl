@@ -7,8 +7,6 @@ See also [`FrequencyDimension`](@ref) and [`NonFrequencyDimension`](@ref).
 """
 abstract type NMRDimension{T} <: DimensionalData.Dimension{T} end
 
-
-
 """
     FrequencyDimension <: NMRDimension
 
@@ -20,8 +18,6 @@ See also [`NonFrequencyDimension`](@ref).
 """
 abstract type FrequencyDimension{T} <: NMRDimension{T} end
 
-
-
 """
     NonFrequencyDimension <: NMRDimension
 
@@ -32,8 +28,6 @@ and [`UnknownDimension`](@ref).
 See also [`FrequencyDimension`](@ref).
 """
 abstract type NonFrequencyDimension{T} <: NMRDimension{T} end
-
-
 
 """
     TimeDimension <: NonFrequencyDimension <: NMRDimension
@@ -47,8 +41,6 @@ kinetics.
 abstract type TimeDimension{T} <: NonFrequencyDimension{T} end
 # abstract type QuadratureDimension{T} <: NMRDimension{T} end
 
-
-
 """
     UnknownDimension <: NonFrequencyDimension <: NMRDimension
 
@@ -57,8 +49,6 @@ Concrete types `X1Dim`, `X2Dim`, `X3Dim` and `X4Dim` are generated for
 use in creating objects.
 """
 abstract type UnknownDimension{T} <: NonFrequencyDimension{T} end
-
-
 
 """
     GradientDimension <: NonFrequencyDimension <: NMRDimension
@@ -69,56 +59,54 @@ use in creating objects.
 """
 abstract type GradientDimension{T} <: NonFrequencyDimension{T} end
 
-
-
 # override DimensionalData.Dimensions macro to generate default metadata
 macro NMRdim(typ::Symbol, supertyp::Symbol, args...)
-    NMRdimmacro(typ, supertyp, args...)
+    return NMRdimmacro(typ, supertyp, args...)
 end
 function NMRdimmacro(typ, supertype, name::String=string(typ))
-    quote
-        Base.@__doc__ struct $typ{T} <: $supertype{T}
-            val::T
-        end
-        function $typ(val::AbstractArray; kw...)
-            v = values(kw)
-            # e.g. values(kw) = (metadata = NoMetadata(),)
-            if :metadata ∉ keys(kw)
-                # if no metadata defined, define it
-                # alternatively, if there is valid metadata, merge in the defaults
-                @debug "Creating default dimension metadata"
-                v = merge((metadata=defaultmetadata($typ),), v)
-            elseif v[:metadata] isa Metadata{$typ}
-                @debug "Merging dimension metadata with defaults"
-                v2 = merge(v, (metadata=defaultmetadata($typ),))
-                merge!(v2[:metadata].val, v[:metadata].val)
-                v = v2
-            elseif v[:metadata] isa Dict
-                @debug "Merging metadata dictionary with defaults"
-                md = v[:metadata]
-                v = merge(v, (metadata=defaultmetadata($typ),))
-                merge!(v[:metadata].val, md)
-            else
-                # if NoMetadata (or an invalid type), define the correct default metadata
-                @debug "Dimension metadata is NoMetadata - replace with defaults"
-                v = merge(v, (metadata=defaultmetadata($typ),))
+    esc(quote
+            Base.@__doc__ struct $typ{T} <: $supertype{T}
+                val::T
             end
-            val = AutoLookup(val, v)
-            $typ{typeof(val)}(val)
-            # @show tmpdim = $typ{typeof(val)}(val)
-            # @show newlookup = DimensionalData.Dimensions._format(tmpdim, axes(tmpdim,1))
-            # return $typ{typeof(newlookup)}(newlookup)
-        end
-        function $typ(val::T) where {T<:DimensionalData.Dimensions.LookupArrays.LookupArray}
-            # HACK - this would better be replaced with a call to DD.format in the function above
-            # e.g.
-            # DimensionalData.Dimensions.format(DimensionalData.LookupArrays.val(axH), DimensionalData.LookupArrays.basetypeof(axH), Base.OneTo(11))
-            $typ{T}(val)
-        end
-        $typ() = $typ(:)
-        Dimensions.name(::Type{<:$typ}) = $(QuoteNode(Symbol(name)))
-        Dimensions.key2dim(::Val{$(QuoteNode(typ))}) = $typ()
-    end |> esc
+            function $typ(val::AbstractArray; kw...)
+                v = values(kw)
+                # e.g. values(kw) = (metadata = NoMetadata(),)
+                if :metadata ∉ keys(kw)
+                    # if no metadata defined, define it
+                    # alternatively, if there is valid metadata, merge in the defaults
+                    @debug "Creating default dimension metadata"
+                    v = merge((metadata=defaultmetadata($typ),), v)
+                elseif v[:metadata] isa Metadata{$typ}
+                    @debug "Merging dimension metadata with defaults"
+                    v2 = merge(v, (metadata=defaultmetadata($typ),))
+                    merge!(v2[:metadata].val, v[:metadata].val)
+                    v = v2
+                elseif v[:metadata] isa Dict
+                    @debug "Merging metadata dictionary with defaults"
+                    md = v[:metadata]
+                    v = merge(v, (metadata=defaultmetadata($typ),))
+                    merge!(v[:metadata].val, md)
+                else
+                    # if NoMetadata (or an invalid type), define the correct default metadata
+                    @debug "Dimension metadata is NoMetadata - replace with defaults"
+                    v = merge(v, (metadata=defaultmetadata($typ),))
+                end
+                val = AutoLookup(val, v)
+                return $typ{typeof(val)}(val)
+                # @show tmpdim = $typ{typeof(val)}(val)
+                # @show newlookup = DimensionalData.Dimensions._format(tmpdim, axes(tmpdim,1))
+                # return $typ{typeof(newlookup)}(newlookup)
+            end
+            function $typ(val::T) where {T<:DimensionalData.Dimensions.LookupArrays.LookupArray}
+                # HACK - this would better be replaced with a call to DD.format in the function above
+                # e.g.
+                # DimensionalData.Dimensions.format(DimensionalData.LookupArrays.val(axH), DimensionalData.LookupArrays.basetypeof(axH), Base.OneTo(11))
+                return $typ{T}(val)
+            end
+            $typ() = $typ(:)
+            Dimensions.name(::Type{<:$typ}) = $(QuoteNode(Symbol(name)))
+            Dimensions.key2dim(::Val{$(QuoteNode(typ))}) = $typ()
+        end)
 end
 
 @NMRdim F1Dim FrequencyDimension
@@ -145,7 +133,6 @@ end
 @NMRdim G4Dim GradientDimension
 # @NMRdim SpatialDim NMRDimension
 
-
 # Getters ########
 """
     data(nmrdimension)
@@ -154,7 +141,6 @@ Return the numerical data associated with an NMR dimension.
 """
 data(d::NMRDimension) = d.val.data
 
-
 """
     getω(axis)
 
@@ -162,12 +148,9 @@ Return the offsets (in rad/s) for points along a frequency axis.
 """
 getω(ax::FrequencyDimension) = 2π * ax[:bf] * (data(ax) .- ax[:offsetppm])
 
-
 """
     getω(axis, δ)
 
 Return the offset (in rad/s) for a chemical shift (or list of shifts) on a frequency axis.
 """
 getω(ax::FrequencyDimension, δ) = 2π * ax[:bf] * (δ .- ax[:offsetppm])
-
-

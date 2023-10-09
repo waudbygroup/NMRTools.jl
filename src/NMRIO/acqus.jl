@@ -1,7 +1,7 @@
 function getacqusmetadata(format, filename, experimentfolder=nothing)
     # TODO - this assumes we're dealing with Bruker data…
 
-    md = Dict{Symbol, Any}()
+    md = Dict{Symbol,Any}()
     md[:format] = format
 
     # try to locate the folder containing the acqus file
@@ -42,7 +42,7 @@ function getacqusmetadata(format, filename, experimentfolder=nothing)
     # add filenames to metadata
     md[:filename] = filename
     md[:experimentfolder] = experimentfolder
-    
+
     # parse the acqus file
     acqusfilename = joinpath(experimentfolder, "acqus")
     if isfile(acqusfilename)
@@ -57,7 +57,7 @@ function getacqusmetadata(format, filename, experimentfolder=nothing)
     end
 
     # parse the acquXs files, if they exist
-    for i=2:4
+    for i in 2:4
         acquXsfilename = joinpath(experimentfolder, "acqu$(i)s")
         if isfile(acquXsfilename)
             acquXsmetadata = parseacqus(acquXsfilename)
@@ -82,8 +82,6 @@ function getacqusmetadata(format, filename, experimentfolder=nothing)
     return md
 end
 
-
-
 function parseacqus(acqusfilename::String)
     dic = loadjdx(acqusfilename)
 
@@ -93,8 +91,6 @@ function parseacqus(acqusfilename::String)
     return dic
 end
 
-
-
 function parseacqusauxfiles!(dic, basedir)
     for k in (:vclist,) # integer lists
         get(dic, k, "") == "" && continue
@@ -102,8 +98,8 @@ function parseacqusauxfiles!(dic, basedir)
         filename = joinpath(basedir, string(k))
         ispath(filename) || continue
         x = readlines(filename)
-        xi = tryparse.(Int,x)
-        if any(xi.==nothing)
+        xi = tryparse.(Int, x)
+        if any(xi .== nothing)
             @warn "Unable to parse format of list $(k) when opening $(filename)"
             dic[k] = x
         else
@@ -111,16 +107,17 @@ function parseacqusauxfiles!(dic, basedir)
         end
     end
 
-    for k in (:fq1list, :fq2list, :fq3list, :fq4list, :fq5list, :fq6list, :fq7list, :fq8list,
-                :valist, :vdlist, :vplist, :vtlist) # float lists
+    for k in
+        (:fq1list, :fq2list, :fq3list, :fq4list, :fq5list, :fq6list, :fq7list, :fq8list,
+         :valist, :vdlist, :vplist, :vtlist) # float lists
         get(dic, k, "") == "" && continue
         # note that filenames aren't actually used - vclist is always stored as vclist
         filename = joinpath(basedir, string(k))
         ispath(filename) || continue
         x = readlines(filename)
-        xp = [replace(replace(xs, "u"=>"e-6"),"m"=>"e-3") for xs in x]
-        xf = tryparse.(Float64,xp)
-        if any(xf.==nothing)
+        xp = [replace(replace(xs, "u" => "e-6"), "m" => "e-3") for xs in x]
+        xf = tryparse.(Float64, xp)
+        if any(xf .== nothing)
             @warn "Unable to parse format of list $(k) when opening $(filename)"
             dic[k] = x
         else
