@@ -63,8 +63,7 @@ acqus(spec, :cnst, 4)
 If present, files such as `vclist` and `vdlist` are imported and can be accessed through the `acqus` function
 
 ```@repl 1
-pseudo3dspec = loadnmr("../../exampledata/pseudo3D_HN_R2/ft/test%03d.ft2"); # hide
-pseudo3dspec[:label] # hide
+pseudo3dspec = loadnmr("../../exampledata/pseudo3D_HN_R2/1"); # hide
 acqus(pseudo3dspec, :vclist)
 ```
 
