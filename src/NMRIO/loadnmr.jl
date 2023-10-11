@@ -32,6 +32,7 @@ function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
     format, filename = getformat(filename)
 
     # 2. get acqus metadata
+    # TODO - this assumes we're dealing with Bruker data…
     aqdic = getacqusmetadata(format, filename, experimentfolder)
 
     # 3. load data
