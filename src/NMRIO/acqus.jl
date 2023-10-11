@@ -336,7 +336,7 @@ function parsefqlist(filename)
         return x
     end
 
-    fqlist = [FQ(v, unit, relative) for v in xf]
+    fqlist = FQList(xf, unit, relative)
 
     return fqlist
 end

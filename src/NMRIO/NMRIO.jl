@@ -2,7 +2,7 @@ module NMRIO
 
 using ..NMRBase
 
-include("types.jl")
+include("lists.jl")
 include("loadnmr.jl")
 include("jdx.jl")
 include("acqus.jl")
