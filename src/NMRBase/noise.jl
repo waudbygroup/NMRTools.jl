@@ -10,9 +10,9 @@ Data are sorted into numerical order, and the highest and lowest 12.5% of data a
 (so that 75% of the data remain). These values are then fitted to a truncated gaussian
 distribution via maximum likelihood analysis.
 
-The likelihood function is:
+The log-likelihood function is:
 ```math
-\\log \\scrL(\\mu, \\sigma) = \\sum_i{\\log P(y_i, \\mu, \\sigma)}
+\\log L(\\mu, \\sigma) = \\sum_i{\\log P(y_i, \\mu, \\sigma)}
 ```
 
 where the likelihood of an individual data point is:
