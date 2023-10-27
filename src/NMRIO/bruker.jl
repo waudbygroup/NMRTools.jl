@@ -203,7 +203,7 @@ function loadpdata(filename, allcomponents=false)
         yaxis = ax2(val2; metadata=axesmd[2])
 
         NMRData(y, (xaxis, yaxis); metadata=md)
-    else
+    elseif ndim == 3
         # rearrange data into a useful order - always place pseudo-dimension last - and generate axes
         # 1 is always direct, and should be placed first (i.e. 1 x x)
         # if is there is a pseudodimension, put that last (i.e. 1 y p)
@@ -217,11 +217,18 @@ function loadpdata(filename, allcomponents=false)
         delete!(axesmd[3], :val)
 
         if pdim[2]
-            # dimensions are x p y => we want ordering 1 3 2
-            xaxis = F1Dim(val1; metadata=axesmd[1])
-            yaxis = F2Dim(val3; metadata=axesmd[3])
-            zaxis = X3Dim(val2; metadata=axesmd[2])
-            y = permutedims(y, [1, 3, 2])
+            if pdim[3]
+                # two pseudodimensions - keep default ordering
+                xaxis = F1Dim(val1; metadata=axesmd[1])
+                yaxis = X2Dim(val2; metadata=axesmd[2])
+                zaxis = X3Dim(val3; metadata=axesmd[3])
+            else
+                # dimensions are x p y => we want ordering 1 3 2
+                xaxis = F1Dim(val1; metadata=axesmd[1])
+                yaxis = F2Dim(val3; metadata=axesmd[3])
+                zaxis = X3Dim(val2; metadata=axesmd[2])
+                y = permutedims(y, [1, 3, 2])
+            end
         elseif pdim[3]
             # dimensions are x y p => we want ordering 1 2 3
             xaxis = F1Dim(val1; metadata=axesmd[1])
@@ -236,6 +243,8 @@ function loadpdata(filename, allcomponents=false)
         end
 
         NMRData(y, (xaxis, yaxis, zaxis); metadata=md)
+    else
+        throw(NMRToolsError("loadnmr cannot currently handle 4D+ experiments"))
     end
 end
 
