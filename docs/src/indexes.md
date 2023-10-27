@@ -1,13 +1,13 @@
-# API
+# Index
 
 ## NMRBase
 
-```@autodocs
+```@index
 Modules = [NMRTools.NMRBase]
 ```
 
 ## NMRIO
 
-```@autodocs
+```@index
 Modules = [NMRTools.NMRIO]
 ```

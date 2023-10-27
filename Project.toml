@@ -1,7 +1,7 @@
 name = "NMRTools"
 uuid = "c2839fe3-f1de-42fc-897f-c1b0e8db4db6"
 authors = ["Chris Waudby"]
-version = "0.1.4"
+version = "0.1.5"
 
 [deps]
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
