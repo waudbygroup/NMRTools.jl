@@ -32,7 +32,7 @@ Next, we extract or set other acquisition parameters required for analysis. In p
 coherence = SQ(H1)             # coherence for diffusion encoding
 γ = γeff(coherence)            # calculate effective gyromagnetic ratio
 
-g = data(spec, G1Dim)          # list of gradient strengths
+g = data(spec, G2Dim)          # list of gradient strengths
 
 # select chemical shift ranges for plotting and fitting
 plotrange = 6 .. 10 # ppm
