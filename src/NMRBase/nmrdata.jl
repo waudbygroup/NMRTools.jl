@@ -172,12 +172,17 @@ end
 # Set pseudo-dimension data
 
 """
-    setkinetictimes(A::NMRData, tvals, units=nothing)
+    setkinetictimes(A::NMRData, [dimnumber], tvals, units="")
 
-Return a new NMRData with the unknown dimension or time dimension replaced
-with a kinetic time axis containing the passed values (and optionally, units).
+Return a new NMRData with a kinetic time axis containing the passed values (and optionally, units).
+If a dimension number is specified, that dimension will be replaced with a `TkinDim`. If not, the
+function will search for a unique non-frequency dimension, and replace that. If there are multiple
+non-frequency dimensions, the dimension number must be specified explicitly, and the function will throw
+an error.
 """
-function setkinetictimes(A::NMRData, tvals, units=nothing)
+function setkinetictimes() end
+
+function setkinetictimes(A::NMRData, tvals::AbstractVector, units="")
     hasnonfrequencydimension(A) ||
         throw(NMRToolsError("cannot set time values: data does not have a non-frequency dimension"))
 
@@ -185,9 +190,14 @@ function setkinetictimes(A::NMRData, tvals, units=nothing)
     sum(nonfreqdims) == 1 ||
         throw(NMRToolsError("multiple non-frequency dimensions are present - ambiguous command"))
 
-    olddim = findfirst(nonfreqdims)
+    olddimnumber = findfirst(nonfreqdims)
+
+    setkinetictimes(A::NMRData, olddimnumber, tvals, units)
+end
+
+function setkinetictimes(A::NMRData, dimnumber::Integer, tvals::AbstractVector, units="")
     newdim = TkinDim(tvals)
-    newA = replacedimension(A::NMRData, olddim, newdim)
+    newA = replacedimension(A::NMRData, dimnumber, newdim)
 
     label!(newA, newdim, "Time elapsed")
     newA[newdim, :units] = units
@@ -195,13 +205,20 @@ function setkinetictimes(A::NMRData, tvals, units=nothing)
     return newA
 end
 
-"""
-    setrelaxtimes(A::NMRData, tvals, units="")
 
-Return a new NMRData with the unknown dimension or time dimension replaced
-with a relaxation time axis containing the passed values (and optionally, units).
+
 """
-function setrelaxtimes(A::NMRData, tvals, units="")
+    setrelaxtimes(A::NMRData, [dimnumber], tvals, units="")
+
+Return a new NMRData with a relaxation time axis containing the passed values (and optionally, units).
+If a dimension number is specified, that dimension will be replaced with a `TrelaxDim`. If not, the
+function will search for a unique non-frequency dimension, and replace that. If there are multiple
+non-frequency dimensions, the dimension number must be specified explicitly, and the function will throw
+an error.
+"""
+function setrelaxtimes() end
+
+function setrelaxtimes(A::NMRData, tvals::AbstractVector, units="")
     hasnonfrequencydimension(A) ||
         throw(NMRToolsError("cannot set time values: data does not have a non-frequency dimension"))
 
@@ -209,9 +226,14 @@ function setrelaxtimes(A::NMRData, tvals, units="")
     sum(nonfreqdims) == 1 ||
         throw(NMRToolsError("multiple non-frequency dimensions are present - ambiguous command"))
 
-    olddim = findfirst(nonfreqdims)
+    olddimnumber = findfirst(nonfreqdims)
+
+    setrelaxtimes(A::NMRData, olddimnumber, tvals, units)
+end
+
+function setrelaxtimes(A::NMRData, dimnumber::Integer, tvals::AbstractVector, units="")
     newdim = TrelaxDim(tvals)
-    newA = replacedimension(A::NMRData, olddim, newdim)
+    newA = replacedimension(A::NMRData, dimnumber, newdim)
 
     label!(newA, newdim, "Relaxation time")
     newA[newdim, :units] = units
@@ -219,21 +241,21 @@ function setrelaxtimes(A::NMRData, tvals, units="")
     return newA
 end
 
+
+
 """
-    setgradientlist(A::NMRData, relativegradientlist, Gmax=nothing)
+    setgradientlist(A::NMRData, [dimnumber], relativegradientlist, Gmax=nothing)
 
-Return a new NMRData with an unknown dimension replaced with a gradient axis
-containing the passed values. A default gradient strength of 0.55 T m⁻¹ will
-be set, but a warning raised for the user.
+Return a new NMRData with a gradient axis containing the passed values. If no maximum strength is specified,
+a default gradient strength of 0.55 T m⁻¹ will be set, but a warning raised for the user.
+
+If a dimension number is specified, that dimension will be replaced. If not, the function will search for
+a unique non-frequency dimension, and replace that. If there are multiple non-frequency dimensions, the
+dimension number must be specified explicitly, and the function will throw an error.
 """
-function setgradientlist(A::NMRData, relativegradientlist, Gmax=nothing)
-    hasnonfrequencydimension(A) ||
-        throw(NMRToolsError("cannot set gradient values: data does not have a non-frequency dimension"))
+function setgradientlist() end
 
-    unknowndims = isa.(dims(A), UnknownDimension)
-    sum(unknowndims) == 1 ||
-        throw(NMRToolsError("multiple unknown dimensions are present - ambiguous command"))
-
+function setgradientlist(A::NMRData, dimnumber::Integer, relativegradientlist::AbstractVector, Gmax=nothing)
     if isnothing(Gmax)
         @warn("a maximum gradient strength of 0.55 T m⁻¹ is being assumed - this is roughly correct for modern Bruker systems but calibration is recommended")
         gvals = 0.55 * relativegradientlist
@@ -241,15 +263,35 @@ function setgradientlist(A::NMRData, relativegradientlist, Gmax=nothing)
         gvals = Gmax * relativegradientlist
     end
 
-    olddim = findfirst(unknowndims)
-    newdim = G1Dim(gvals)
-    newA = replacedimension(A::NMRData, olddim, newdim)
+    if dimnumber == 1
+        newdim = G1Dim(gvals)
+    elseif dimnumber == 2
+        newdim = G2Dim(gvals)
+    elseif dimnumber == 3
+        newdim = G3Dim(gvals)
+    end
+    newA = replacedimension(A::NMRData, dimnumber, newdim)
 
     label!(newA, newdim, "Gradient strength")
     newA[newdim, :units] = "T m⁻¹"
 
     return newA
 end
+
+function setgradientlist(A::NMRData, relativegradientlist::AbstractVector, Gmax=nothing)
+    hasnonfrequencydimension(A) ||
+        throw(NMRToolsError("cannot set gradient values: data does not have a non-frequency dimension"))
+
+    unknowndims = isa.(dims(A), UnknownDimension)
+    sum(unknowndims) == 1 ||
+        throw(NMRToolsError("multiple unknown dimensions are present - ambiguous command"))
+
+    olddimnumber = findfirst(unknowndims)
+
+    setgradientlist(A, olddimnumber, relativegradientlist, Gmax)
+end
+
+
 
 """
     replacedimension(nmrdata, olddimnumber, newdim)
