@@ -71,7 +71,7 @@ spectra = map(loadnmr, filenames)
 nothing # hide
 ```
 
-This creates a list (`Vector`) of `NMRData` containing the individual spectra. When experiments are loaded in, the number of scans and receiver gain are automatically parsed, and by default this is used to normalise spectra for plotting; if required, this can be disabled with the `normalize=false` option. Therefore, to plot the series of 1D spectra, we can simply pass the list of spectra to the plot function:
+This creates a list (`Vector`) of `NMRData` containing the individual spectra. To plot this series of spectra, we can simply pass the list of spectra to the plot function:
 
 ```@example 1
 plot(spectra, xlims=(-125, -122))
@@ -80,7 +80,11 @@ savefig("plot-19F-titration.svg"); nothing # hide
 
 ![](plot-19F-titration.svg)
 
-A legend has been created automatically from the spectrum labels, which are generated in turn from the first line of the experiment title. The legend can be disabled using the `legend=nothing` option, or repositioned using standard Plots syntax. Spectra can be relabelled with `label!(spectrum, "new label")` (or for a list of experiments, the i-th spectrum can be relabelled with `label!(spectra[i], "new label")`).
+!!! note
+    By default, spectra are normalized according to the number of scans and receiver gain determined automatically from the spectrum metadata; this can be disabled with the `normalize=false` option
+
+!!! tip
+    Legends are produced from the first line of the spectrum title file. The legend can be disabled using the `legend=nothing` option. To re-label a spectrum, use `label!(spectrum, "new label")` (or for a list of experiments, the i-th spectrum can be relabelled with `label!(spectra[i], "new label")`).
 
 **Stacked views** can also be produced using the `vstack=true` option. By default, spectra are normalized according to the number of scans and receiver gain determined automatically from the spectrum metadata
 
