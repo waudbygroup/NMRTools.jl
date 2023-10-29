@@ -41,7 +41,10 @@ end
 
     # set default title
     title --> ifelse(isempty(refdims(Afwd)), label(Afwd), refdims_title(Afwd))
+
+    # turn off legend, but provide a label in case the user wishes
     legend --> false
+    label --> label(A)
 
     xguide --> axislabel(A)
     xflip --> true
@@ -68,7 +71,10 @@ end
 
     # set default title
     title --> ifelse(isempty(refdims(Afwd)), label(Afwd), refdims_title(Afwd))
+    
+    # turn off legend, but provide a label in case the user wishes
     legend --> false
+    label --> label(A)
 
     xguide --> axislabel(A)
     xflip --> false
