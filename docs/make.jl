@@ -13,8 +13,8 @@ makedocs(;
         "Tutorials" => [
             "Working with NMR data" => "tutorial-data.md",
             # "Non-frequency dimensions" => "tutorial-nonfreqdims.md",
-            # "Plot recipes" => "tutorial-plotrecipes.md",
-            # "Animating spectra" => "tutorial-animation.md",
+            "Plot recipes" => "tutorial-plotrecipes.md",
+            "Animating spectra" => "tutorial-animation.md",
             # "1D relaxation analysis" => "tutorial-relaxation.md",
             "1D diffusion analysis" => "tutorial-diffusion.md",
             # "2D phosphorylation kinetics" => "tutorial-phosphorylation.md",

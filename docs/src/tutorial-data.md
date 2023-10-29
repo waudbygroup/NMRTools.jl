@@ -8,10 +8,16 @@ NMR measurements are arrays of data, with additional numerical data associated w
 NMR data are loaded using the [`loadnmr`](@ref) function. This can handle processed Bruker experiments, or NMRPipe-format data.
 
 ```@example 1
-using NMRTools # hide
-spec2d = loadnmr("../../exampledata/2D_HN/1") # by default, will load spectrum from proc 1
-spec1d = loadnmr("../../exampledata/2D_HN/1/pdata/101") # load a different processed spectrum
-spec3d = loadnmr("../../exampledata/pseudo3D_HN_R2/1/ft/test%03d.ft2") # NMRPipe format, using template
+using NMRTools
+
+# by default, NMRTools will load bruker processed data from proc 1
+spec2d = loadnmr("../../exampledata/2D_HN/1")
+
+# load a different processed spectrum
+spec1d = loadnmr("../../exampledata/2D_HN/1/pdata/101")
+
+# load data from NMRPipe format, using a template
+spec3d = loadnmr("../../exampledata/pseudo3D_HN_R2/1/ft/test%03d.ft2")
 nothing # hide
 ```
 
@@ -75,7 +81,7 @@ A heirarchy of types are defined for NMR dimensions, reflecting the variety of d
 
 Metadata entries are labelled by symbols such as `:ns` or `:pulseprogram`. Entries can be accessed using the `metadata` function, or directly as a dictionary-style lookup:
 ```@repl 1
-spec2d = loadnmr("../../exampledata/2D_HN/1") # hide
+spec2d = loadnmr("../../exampledata/2D_HN/1"); # hide
 metadata(spec2d, :ns)
 spec2d[:title]
 ```
@@ -88,12 +94,10 @@ acqus(spec2d, :p, 1)
 
 Axis metadata can be accessed by providing an additional label, which can either be numerical or the appropriate `NMRDimension` type, such as `F1Dim` etc:
 ```@repl 1
-metadata(spec, F2Dim, :label)
-spec[2 :bf]
-spec[F2Dim, :window]
+metadata(spec2d, F2Dim, :label)
+spec2d[2, :bf]
+spec2d[F2Dim, :window]
 ```
 
-
-<!-- ## Creating new NMRData structures -->
 
 

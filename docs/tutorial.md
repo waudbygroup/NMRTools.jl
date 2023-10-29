@@ -42,7 +42,7 @@ savefig("plot-y2.svg"); nothing # hide
 
 All plots can be saved as high quality vector graphics or png files, using the `savefig` command:
 
-```@example 1
+```julia
 savefig("myspectrum.pdf")
 ```
 

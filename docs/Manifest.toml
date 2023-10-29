@@ -720,7 +720,7 @@ version = "7.8.3"
 deps = ["ColorSchemes", "Colors", "DimensionalData", "LinearAlgebra", "Optim", "PrecompileTools", "Reexport", "SimpleTraits", "SpecialFunctions", "Statistics"]
 path = "/Users/chris/.julia/dev/NMRTools"
 uuid = "c2839fe3-f1de-42fc-897f-c1b0e8db4db6"
-version = "0.1.4"
+version = "0.1.5"
 weakdeps = ["Plots"]
 
     [deps.NMRTools.extensions]
