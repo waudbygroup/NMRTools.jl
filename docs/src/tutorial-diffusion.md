@@ -77,6 +77,8 @@ integrals /= maximum(integrals)
 nothing # hide
 ```
 
+## Fitting
+
 Now, we can fit the data to the Stejskal-Tanner equation using the `LsqFit` package.
 ```@example diff
 # model parameters are (I0, D) - scale D by 1e-10 for a nicer numerical value
@@ -91,6 +93,8 @@ pfit = coef(fit)
 err = stderror(fit)
 D = (pfit[2] ± err[2]) * 1e-10
 ```
+
+## Plot the results
 
 Finally, plot the results:
 ```@example diff

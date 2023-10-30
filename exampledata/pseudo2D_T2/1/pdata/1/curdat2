@@ -1,0 +1,17 @@
+##TITLE= Parameter file, TopSpin 4.2.0
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 1	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= nmrsu
+$$ 2023-07-31 10:05:54.797 +0100  nmrsu@CZC1459CVK
+$$ /home/nmrsu/nmr/kitty_230524_aa_GroupQ/4/pdata/1/curdat2
+$$ process /opt/topspin4.2.0/prog/mod/dataserver
+##$DATPATH2= </home/nmrsu/nmr>
+##$DU2= <>
+##$EXPNO2= 4
+##$NAME2= <kitty_230524_aa_GroupQ>
+##$PROCNO2= 999
+##$TYPE= <>
+##$USER2= <>
+##END=

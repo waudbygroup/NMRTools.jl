@@ -1,0 +1,24 @@
+##TITLE= Parameter file, TopSpin 4.1.4
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 1	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= nmrsu
+$$ 2023-05-24 15:32:19.104 +0100  nmrsu@CZC1459CVK
+$$ /home/nmrsu/nmr/kitty_230524_aa_GroupQ/4/scon2
+$$ process /opt/topspin4.1.4/prog/mod/acqdataserver
+##$BLKTR= (0..32)
+3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+##$DE1= 4.5
+##$DEADC= 0.5
+##$DEPA= 4.5
+##$DERX= 1.5
+##$GRADPRE= (0..1)
+10 10
+##$HD_BLKTR= (0..32)
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##$HD_DE1= 5
+##$HD_DEADC= 0
+##$HD_DEPA= 2.5
+##$HD_DERX= 0
+##END=
