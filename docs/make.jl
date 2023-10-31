@@ -14,6 +14,7 @@ makedocs(;
             "Working with NMR data" => "tutorial-data.md",
             # "Non-frequency dimensions" => "tutorial-nonfreqdims.md",
             "Plotting" => "tutorial-plotrecipes.md",
+            "Metadata" => "tutorial-metadata.md",
             "Animating spectra" => "tutorial-animation.md",
             "1D relaxation analysis" => "tutorial-relaxation.md",
             "Diffusion analysis" => "tutorial-diffusion.md",
