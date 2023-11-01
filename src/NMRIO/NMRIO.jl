@@ -11,6 +11,6 @@ include("bruker.jl")
 
 export loadnmr
 export loadjdx
-export FQ
+export FQList, getppm, getoffset
 
 end
