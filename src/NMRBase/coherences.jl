@@ -73,35 +73,3 @@ coherenceorder(c::SQ) = 1
 function coherenceorder(c::MQ)
     return sum([t[2] for t in c.coherences])
 end
-
-"""
-    γeff(coherence)
-
-Calculate the effective gyromagnetic ratio of the coherence. This is equal to
-the product of the individual gyromagnetic ratios with their coherence orders.
-
-```jldoctest
-julia> γeff(SQ(H1))
-2.6752218744e8
-
-julia> γeff(MQ(((H1,1),(C13,1))))
-3.3480498744e8
-
-julia> γeff(MQ(((H1,1),(C13,-1))))
-2.0023938744e8
-
-julia> γeff(MQ(((H1,3),(C13,1))))
-8.698493623199999e8
-
-julia> γeff(MQ(((H1,0),)))
-0.0
-```
-
-See also [`Nucleus`](@ref), [`SQ`](@ref), [`MQ`](@ref).
-"""
-function γeff end
-
-γeff(c::SQ) = gyromagneticratio(c.nucleus)
-function γeff(c::MQ)
-    return sum([gyromagneticratio(t[1]) * t[2] for t in c.coherences])
-end

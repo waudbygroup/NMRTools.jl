@@ -42,6 +42,7 @@ import .Dimensions: dims, refdims, lookup, dimstride, kwdims, hasdim, label, _as
 include("exceptions.jl")
 include("nuclei.jl")
 include("coherences.jl")
+include("isotopedata.jl")
 include("dimensions.jl")
 include("nmrdata.jl")
 include("windows.jl")
@@ -67,7 +68,6 @@ export gyromagneticratio
 export Coherence
 export SQ, MQ
 export coherenceorder
-export γeff
 
 # NMRData
 export AbstractNMRData

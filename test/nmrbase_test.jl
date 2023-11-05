@@ -140,11 +140,11 @@ end
     @test coherenceorder(MQ(((H1, 3), (C13, 1)))) == 4
     @test coherenceorder(MQ(((H1, 0),))) == 0
 
-    @test γeff(SQ(H1)) == 2.6752218744e8
-    @test γeff(MQ(((H1, 1), (C13, 1)))) == 3.3480498744e8
-    @test γeff(MQ(((H1, 1), (C13, -1)))) == 2.0023938744e8
-    @test γeff(MQ(((H1, 3), (C13, 1)))) == 8.698493623199999e8
-    @test γeff(MQ(((H1, 0),))) == 0
+    @test gyromagneticratio(SQ(H1)) == 2.6752218744e8
+    @test gyromagneticratio(MQ(((H1, 1), (C13, 1)))) == 3.3480498744e8
+    @test gyromagneticratio(MQ(((H1, 1), (C13, -1)))) == 2.0023938744e8
+    @test gyromagneticratio(MQ(((H1, 3), (C13, 1)))) == 8.698493623199999e8
+    @test gyromagneticratio(MQ(((H1, 0),))) == 0
 end
 
 @testset "NMRBase: window functions" begin
