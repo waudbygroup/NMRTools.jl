@@ -192,7 +192,7 @@ function setkinetictimes(A::NMRData, tvals::AbstractVector, units="")
 
     olddimnumber = findfirst(nonfreqdims)
 
-    setkinetictimes(A::NMRData, olddimnumber, tvals, units)
+    return setkinetictimes(A::NMRData, olddimnumber, tvals, units)
 end
 
 function setkinetictimes(A::NMRData, dimnumber::Integer, tvals::AbstractVector, units="")
@@ -204,8 +204,6 @@ function setkinetictimes(A::NMRData, dimnumber::Integer, tvals::AbstractVector, 
 
     return newA
 end
-
-
 
 """
     setrelaxtimes(A::NMRData, [dimnumber], tvals, units="")
@@ -228,7 +226,7 @@ function setrelaxtimes(A::NMRData, tvals::AbstractVector, units="")
 
     olddimnumber = findfirst(nonfreqdims)
 
-    setrelaxtimes(A::NMRData, olddimnumber, tvals, units)
+    return setrelaxtimes(A::NMRData, olddimnumber, tvals, units)
 end
 
 function setrelaxtimes(A::NMRData, dimnumber::Integer, tvals::AbstractVector, units="")
@@ -240,8 +238,6 @@ function setrelaxtimes(A::NMRData, dimnumber::Integer, tvals::AbstractVector, un
 
     return newA
 end
-
-
 
 """
     setgradientlist(A::NMRData, [dimnumber], relativegradientlist, Gmax=nothing)
@@ -255,7 +251,8 @@ dimension number must be specified explicitly, and the function will throw an er
 """
 function setgradientlist() end
 
-function setgradientlist(A::NMRData, dimnumber::Integer, relativegradientlist::AbstractVector, Gmax=nothing)
+function setgradientlist(A::NMRData, dimnumber::Integer,
+                         relativegradientlist::AbstractVector, Gmax=nothing)
     if isnothing(Gmax)
         @warn("a maximum gradient strength of 0.55 T m⁻¹ is being assumed - this is roughly correct for modern Bruker systems but calibration is recommended")
         gvals = 0.55 * relativegradientlist
@@ -288,10 +285,8 @@ function setgradientlist(A::NMRData, relativegradientlist::AbstractVector, Gmax=
 
     olddimnumber = findfirst(unknowndims)
 
-    setgradientlist(A, olddimnumber, relativegradientlist, Gmax)
+    return setgradientlist(A, olddimnumber, relativegradientlist, Gmax)
 end
-
-
 
 """
     replacedimension(nmrdata, olddimnumber, newdim)

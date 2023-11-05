@@ -95,7 +95,6 @@ function parseacqus(acqusfilename::String, auxfiles=true)
     return dic
 end
 
-
 """
     parsetopspinversion(acqusfilename)
 
@@ -128,7 +127,6 @@ function parseacqusauxfiles!(dic, basedir)
     end
 end
 
-
 function _parseacqusauxfiles_TS3!(dic, basedir)
     # filenames aren't actually used before TS4 - e.g. vclist is always stored as vclist
     if get(dic, :vclist, "") != ""
@@ -137,7 +135,6 @@ function _parseacqusauxfiles_TS3!(dic, basedir)
             dic[:vclist] = parsevclist(filename)
         end
     end
-    
 
     if get(dic, :vdlist, "") != ""
         filename = joinpath(basedir, "vdlist")
@@ -160,9 +157,10 @@ function _parseacqusauxfiles_TS3!(dic, basedir)
         end
     end
 
-    for k in (:fq1list, :fq2list, :fq3list, :fq4list, :fq5list, :fq6list, :fq7list, :fq8list)
+    for k in
+        (:fq1list, :fq2list, :fq3list, :fq4list, :fq5list, :fq6list, :fq7list, :fq8list)
         get(dic, k, "") == "" && continue
-        
+
         filename = joinpath(basedir, string(k))
         isfile(filename) || continue
 
@@ -191,7 +189,8 @@ function _parseacqusauxfiles_TS4!(dic, basedir)
         dic[:valist] = parsevalist(valistfile)
     end
 
-    for k in (:fq1list, :fq2list, :fq3list, :fq4list, :fq5list, :fq6list, :fq7list, :fq8list)
+    for k in
+        (:fq1list, :fq2list, :fq3list, :fq4list, :fq5list, :fq6list, :fq7list, :fq8list)
         fqlistfile = joinpath(basedir, "lists", "f1", get(dic, k, ""))
         isfile(fqlistfile) || continue
         dic[k] = parsefqlist(fqlistfile)
@@ -230,7 +229,7 @@ function parsevdlist(filename)
         @warn "Unable to parse format of vdlist $filename"
         return x
     end
-    
+
     return xf
 end
 
@@ -241,16 +240,16 @@ function parsevplist(filename)
     x = map(x) do line
         line = replace(line, "u" => "")
         line = replace(line, "m" => "e3")
-        line = replace(line, "s" => "e6")
+        return line = replace(line, "s" => "e6")
     end
-    
+
     xf = tryparse.(Float64, x)
 
     if any(xf .== nothing)
         @warn "Unable to parse format of vplist $filename"
         return x
     end
-    
+
     return xf * 1e-6  # return vplist in seconds
 end
 
@@ -260,7 +259,7 @@ function parsevalist(filename)
 
     # power unit must be specified on first lien
     powertoken = popfirst!(x)
-    
+
     # parse the rest of the list
     xf = tryparse.(Float64, x)
 
@@ -340,5 +339,3 @@ function parsefqlist(filename)
 
     return fqlist
 end
-
-

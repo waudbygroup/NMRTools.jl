@@ -428,4 +428,5 @@ end
     dat = loadnmr("../exampledata/pseudo3D_HN_R2/1/pdata/1");
     @test size(dat) == (512, 512, 11)
     @test dat[5,6,7] == 2370.09375
+    @test acqus(spec,:vclist) == [0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16]
 end
