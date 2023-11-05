@@ -26,7 +26,7 @@ makedocs(;
         #     "File I/O" => "ref-io.md",
             "Metadata" => "ref-metadata.md",
         #     "Window functions" => "ref-windows.md",
-        #     "Coherences and reference data" => "ref-coherences.md",
+            "Coherences and isotope data" => "ref-coherences.md",
         #     "Exceptions" => "ref-exceptions.md",
         #     "Plotting with JuliaPlots" => "ref-plots.md",
         ],

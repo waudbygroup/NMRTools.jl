@@ -82,7 +82,7 @@ end
 begin
 	spec = setgradientlist(dat, gradients, Gmax)
 	
-	γ = γeff(coherence)
+	γ = gyromagneticratio(coherence)
 	g = data(dims(spec, G1Dim))
 	
 	integrals = vec(data(sum(spec[selector,:],dims=F1Dim)))

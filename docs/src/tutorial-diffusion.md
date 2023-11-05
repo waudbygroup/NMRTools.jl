@@ -30,7 +30,7 @@ Next, we extract or set other acquisition parameters required for analysis. In p
 σ = 0.9                        # gradient pulse shape factor (for SMSQ10)
 
 coherence = SQ(H1)             # coherence for diffusion encoding
-γ = γeff(coherence)            # calculate effective gyromagnetic ratio
+γ = gyromagneticratio(coherence)            # calculate effective gyromagnetic ratio
 
 g = data(spec, G2Dim)          # list of gradient strengths
 
