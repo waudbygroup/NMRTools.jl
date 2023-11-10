@@ -94,6 +94,6 @@ getoffset
 | `:sf`                | carrier frequency, in MHz                                                  |
 | `:swhz`              | spectrum width, in Hz                                                      |
 | `:swppm`             | spectrum width, in ppm                                                     |
-| `:td`                | number of **complex** points acquired                                      |
+| `:td`                | number of **complex** points acquired, including LP                        |
 | `:tdzf`              | number of **complex** points when FT executed, including LP and ZF         |
 | `:window`            | [`WindowFunction`](@ref) encoding applied apodization                      |
