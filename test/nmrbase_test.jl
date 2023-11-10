@@ -151,7 +151,7 @@ end
     dat = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1")
     @test dat[1, :window] isa Cos²Window
     @test dat[1, :window].tmax == 0.0512
-    @test length(apod(dat, 1)) == 1024
+    @test length(apod(dat, 1)) == 2048
     @test apod(dat, 1)[10] == 0.9992377902866475
 
     @test lineshape(dims(dat, 1), 8.0, 5)[1] == 1.1210822807171034e-8
