@@ -86,11 +86,11 @@ function loadpdata(filename, allcomponents=false)
             dic[:sf] = dic[:offsethz] * 1e-6 + dic[:bf]
 
             # if procdic[:lpbin] == 0
-            dic[:td] = procdic[:tdeff] ÷ 2  # number of COMPLEX points
+            dic[:td] = procdic[:tdeff] ÷ 2  # number of COMPLEX points, after LP, before ZF
             # else
             #     dic[:td] = procdic[:lpbin] ÷ 2
             # end
-            dic[:tdzf] = procdic[:ftsize] ÷ 2  # number of COMPLEX points
+            dic[:tdzf] = procdic[:ftsize] #÷ 2  # number of COMPLEX points
             dic[:aq] = dic[:td] / dic[:swhz]
 
             # get any extracted regions and number of points

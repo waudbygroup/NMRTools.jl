@@ -255,7 +255,7 @@ end
     @test dat[1, :bf] == 470.582968
     @test label(dat, 1) == "19F"
     @test dat[1, :td] == 14097
-    @test dat[1, :tdzf] == 16384
+    @test dat[1, :tdzf] == 32768
     @test dat[1, :region] == 5000:9999
     @test dat[1, :offsetppm] == -129.99998659428783
     @test dat[1, :window] == ExponentialWindow(10.0, 0.9999471999999971)
@@ -353,7 +353,7 @@ end
     @test dat[1, :bf] == 600.2
     @test label(dat, 1) == "1H"
     @test dat[1, :td] == 1024
-    @test dat[1, :tdzf] == 2048
+    @test dat[1, :tdzf] == 4096
     @test dat[1, :region] == 600:1815
     @test dat[1, :offsetppm] == 4.696770344069996
     @test dat[1, :window] == Cos²Window(0.09461759999999972)
@@ -365,7 +365,7 @@ end
     @test dat[2, :bf] == 60.817738
     @test label(dat, 2) == "15N"
     @test dat[2, :td] == 64
-    @test dat[2, :tdzf] == 256
+    @test dat[2, :tdzf] == 512
     @test ismissing(dat[2, :region])
     @test dat[2, :offsetppm] == 117.99995292412437
     @test dat[2, :window] == CosWindow(0.04783359999999993)
