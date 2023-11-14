@@ -11,6 +11,9 @@ function getacqusmetadata(format, filename, experimentfolder=nothing)
                 # move up a directory
                 experimentfolder = dirname(experimentfolder)
             end
+        elseif format == :ucsf
+            # assume that acqus is in same directory as ucsf file
+            experimentfolder = dirname(filename)
         elseif format == :pdata
             # move up two directories from X/pdata/Y to X
             if isdir(filename)

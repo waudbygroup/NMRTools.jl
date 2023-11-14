@@ -403,3 +403,37 @@ end
     @test dat[5, 6, 7] == 2370.09375
     @test acqus(dat, :vclist) == [0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16]
 end
+
+# @testset "3D data (Bruker pdata)" begin
+#     spec = loadnmr("../exampledata/3D_HNCA/1")
+#     @test size(spec) == (512, 128, 256)
+#     @test spec[5, 6, 7] == -3588.4375
+#     @test label(spec, 1) == "1H"
+#     @test label(spec, 2) == "15N"
+#     @test label(spec, 3) == "13C"
+#     @test dims(spec, 1)[2] == 9.994244210893847
+#     @test dims(spec, 2)[end] == 107.66998310451476
+#     @test dims(spec, 3)[Near(45)] == 44.99702749174231
+
+#     spec13 = loadnmr("exampledata/3D_HNCA/1/pdata/131")
+#     spec23 = loadnmr("exampledata/3D_HNCA/1/pdata/231")
+#     @test size(spec13) == (512, 256)
+#     @test size(spec23) == (512, 128)
+#     @test spec23[Near(7.2), Near(122)] == 19735.930053710938
+#     @test spec13[Near(8.3), Near(63)] == -321.002197265625
+#     @test maximum(spec) / spec[:noise] == 703.8872844716632
+# end
+
+# @testset "3D data (nmrPipe)" begin
+#     spec = loadnmr("../exampledata/3D_HNCA/1/smile/test%03d.ft3")
+#     @test size(spec) == (384, 512, 128)
+#     @test label(spec) == "500 uM 13C,15N ubiquitin, 298 K, BEST-HNCA"
+#     @test dims(spec, 1)[1] == 9.703234081887576
+#     @test dims(spec, 2)[1] == 68.7403353437212
+#     @test dims(spec, 3)[end] == 107.75223308061521
+#     @test spec[10, 11, 12] == 99473.6875
+#     @test spec[1, :window] == Cos²Window(0.09261055758378933)
+#     @test spec[2, :window] == CosWindow(0.057541115456864404)
+#     @test spec[3, :window] == CosWindow(0.03894846805778692)
+#     @test maximum(spec) / spec[:noise] == 492.0035185914213
+# end

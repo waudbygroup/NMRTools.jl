@@ -18,10 +18,19 @@ loadnmr("exampledata/pseudo2D_XSTE/1/test.ft1");
 loadnmr("exampledata/pseudo3D_HN_R2/1/ft/test%03d.ft2");
 ```
 
-bruker pdata import:
+Bruker pdata import:
 
 ```julia
 loadnmr("exampledata/1D_19F/1");
+loadnmr("exampledata/1D_19F/1/");
+loadnmr("exampledata/1D_19F/1/pdata/1");
+loadnmr("exampledata/1D_19F/1/pdata/1/");
+```
+
+ucsf (Sparky) import:
+
+```julia
+loadnmr("exampledata/2D_HN/1/hmqc.ucsf");
 loadnmr("exampledata/1D_19F/1/");
 loadnmr("exampledata/1D_19F/1/pdata/1");
 loadnmr("exampledata/1D_19F/1/pdata/1/");
@@ -38,6 +47,8 @@ function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
     # 3. load data
     if format == :nmrpipe
         spectrum = loadnmrpipe(filename)
+    elseif format == :ucsf
+        spectrum = loaducsf(filename)
     elseif format == :pdata
         # TODO bruker pdata import
         spectrum = loadpdata(filename, allcomponents)
@@ -58,10 +69,14 @@ end
 """
     getformat(filename)
 
-Take an input filename and return either :nmrpipe, :pdata (bruker processed), or :unknown after checking
+Take an input filename and return either :ucsf, :nmrpipe, :pdata (bruker processed), or :unknown after checking
 whether the filename matches any known format.
 """
 function getformat(filename)
+    # ucsf: match XXX.ucsf
+    isucsf = occursin(r"\.ucsf$", filename)
+    isucsf && return :ucsf, filename
+
     # NMRPipe: match XXX.ft, test.ft1, test.ft2, test.ft3, test.ft4, test001.ft1, test0001.ft3, ...
     ispipe = occursin(r"[a-zA-Z0-9]+(\%0[34]d)?\.ft[1234]?$", filename)
     ispipe && return :nmrpipe, filename
