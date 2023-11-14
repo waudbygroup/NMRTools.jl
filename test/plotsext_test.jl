@@ -67,4 +67,9 @@ end
         xlims!(7, 8)
         ylims!(115, 120)
     end "plot_2D_HN_overlay.png" false
+
+    # dat6 = loadnmr("../exampledata/3D_HNCA/1")
+    # @plottest begin
+    #     plot(maximum(spec; dims=2)[:, 1, :] / 3)
+    # end "plot_3D_HNCA_projection.png" false
 end
