@@ -1,0 +1,39 @@
+[1D_19F]
+git-tree-sha1 = "ee55cb87114933a784c3af8043fd02b2d14d1269"
+lazy = true
+
+    [[1D_19F.download]]
+    sha256 = "76af169447882516211ca03752656b0fd2092fff32e46acc4c09f268dfe0cf94"
+    url = "https://gist.github.com/chriswaudby/0467d1981a3f3e17810d1a7d6d17de2f/raw/ee55cb87114933a784c3af8043fd02b2d14d1269.tar.gz"
+
+[1D_19F_titration]
+git-tree-sha1 = "7bbab8fff505ff6fd1430a67c669f17c31abef31"
+lazy = true
+
+    [[1D_19F_titration.download]]
+    sha256 = "ba95298d693375a37eb0733b724ad77b2277908d4af84055a79f4ffba5bfef65"
+    url = "https://gist.github.com/chriswaudby/a7b5b0355320b40c681a76cbdb3a7645/raw/7bbab8fff505ff6fd1430a67c669f17c31abef31.tar.gz"
+
+[1D_1H]
+git-tree-sha1 = "e029f2ca7951a8dcea3ce0562d0550965c1130bd"
+lazy = true
+
+    [[1D_1H.download]]
+    sha256 = "2f0c95aaf8705f51af6c50628cb7f02c9a2aaa4c5f8ad30a3a46f32fd1d47f3a"
+    url = "https://gist.github.com/chriswaudby/442a7da0cf2feac315110752ef446661/raw/e029f2ca7951a8dcea3ce0562d0550965c1130bd.tar.gz"
+
+[2D_HN]
+git-tree-sha1 = "bb3a486dbb1edf52f2bbdf6a2e7af878709c0a5b"
+lazy = true
+
+    [[2D_HN.download]]
+    sha256 = "ff897d87001c8c06a935b566080c812189f8340d013f00a0d1b125dcce66e989"
+    url = "https://gist.github.com/chriswaudby/8214ef7877705203d90c386f91c38816/raw/bb3a486dbb1edf52f2bbdf6a2e7af878709c0a5b.tar.gz"
+
+[2D_HN_titration]
+git-tree-sha1 = "2e5b68e5332ac0217c577c022e7e6b74fbba8943"
+lazy = true
+
+    [[2D_HN_titration.download]]
+    sha256 = "07749f404f9cb127b5870a8b82b516076ac18a7804100d94b3bcc666eca09631"
+    url = "https://gist.github.com/chriswaudby/131bb62de38c70d5061e71196036b2a6/raw/2e5b68e5332ac0217c577c022e7e6b74fbba8943.tar.gz"
