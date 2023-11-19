@@ -3,6 +3,7 @@ module NMRIO
 using ..NMRBase
 using Artifacts
 using ArtifactUtils
+using LazyArtifacts
 
 include("lists.jl")
 include("loadnmr.jl")
