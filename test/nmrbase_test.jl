@@ -1,10 +1,11 @@
 using NMRTools
+using Artifacts
 using Test
 
 @testset "NMRBase: NMRData" begin
-    dat1a = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1")
-    dat1b = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1")
-    dat2 = loadnmr("../exampledata/1D_19F/1/pdata/1")
+    dat1a = exampledata("pseudo2D_XSTE")
+    dat1b = exampledata("pseudo2D_XSTE")
+    dat2 = exampledata("1D_19F")
     dat2b = NMRData(dat2) # create NMRData from another NMRData object
     @test dat1a == dat1b # test equality
     @test dat1a ≠ dat2
@@ -166,7 +167,7 @@ end
     @test decimate(1:10, 2) == [1.5, 3.5, 5.5, 7.5, 9.5]
 
     # NMR data
-    dat = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1")
+    dat = exampledata("pseudo2D_XSTE")
     @test size(decimate(dat, 10, 1)) == (204, 10)
     @test decimate(dat, 10, 1)[2, 2] == 43.59735595703125
     @test size(decimate(dat, 3, 2)) == (2048, 3)
@@ -174,20 +175,20 @@ end
 end
 
 @testset "NMRBase: stack" begin
-    specs = [loadnmr("../exampledata/1D_19F_titration/1"),
-             loadnmr("../exampledata/1D_19F_titration/2"),
-             loadnmr("../exampledata/1D_19F_titration/3")]
+    specs = [loadnmr(joinpath(artifact"1D_19F_titration","1")),
+            loadnmr(joinpath(artifact"1D_19F_titration","2")),
+            loadnmr(joinpath(artifact"1D_19F_titration","3"))]
     stacked = stack(specs)
     @test size(stacked) == (32768, 3)
 
-    specs2 = [loadnmr("../exampledata/1D_19F_titration/1"),
-              loadnmr("../exampledata/2D_HN/1")]
+    specs2 = [loadnmr(joinpath(artifact"1D_19F_titration","1")),
+              exampledata("2D_HN")]
     @test_throws DimensionMismatch stack(specs2)
 
-    specs3 = [loadnmr("../exampledata/2D_HN_titration/1/test.ft2"),
-              loadnmr("../exampledata/2D_HN_titration/2/test.ft2"),
-              loadnmr("../exampledata/2D_HN_titration/3/test.ft2"),
-              loadnmr("../exampledata/2D_HN_titration/4/test.ft2")]
+    specs3 = [loadnmr(joinpath(artifact"2D_HN_titration","1/test.ft2")),
+            loadnmr(joinpath(artifact"2D_HN_titration","2/test.ft2")),
+            loadnmr(joinpath(artifact"2D_HN_titration","3/test.ft2")),
+            loadnmr(joinpath(artifact"2D_HN_titration","4/test.ft2"))]
     # expect warning that experiments do not have same rg
     @test (@test_logs (:warn,) size(stack(specs3))) == (768, 512, 4)
 end

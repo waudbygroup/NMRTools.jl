@@ -2,7 +2,7 @@ using NMRTools
 using Test
 
 @testset "NMRIO: 1D 19F (nmrPipe)" begin
-    dat = loadnmr("../exampledata/1D_19F/1/test.ft1")
+    dat = loadnmr(joinpath(artifact"1D_19F","test.ft1"))
 
     @test size(dat) == (8751,)
     @test length(dat) == 8751
@@ -50,7 +50,7 @@ using Test
 end
 
 @testset "NMRIO: 2D HN (nmrPipe)" begin
-    dat = loadnmr("../exampledata/2D_HN/1/test.ft2")
+    dat = loadnmr(joinpath(artifact"2D_HN","test.ft2"))
 
     @test size(dat) == (568, 256)
     @test length(dat) == 145408
@@ -139,7 +139,7 @@ end
 end
 
 @testset "NMRIO: pseudo-2D XSTE (nmrPipe)" begin
-    dat = loadnmr("../exampledata/pseudo2D_XSTE/1/test.ft1")
+    dat = loadnmr(joinpath(artifact"pseudo2D_XSTE","test.ft1"))
 
     @test size(dat) == (206, 10)
     @test length(dat) == 2060
@@ -214,11 +214,8 @@ end
 end
 
 @testset "NMRIO: 1D 19F (Bruker pdata)" begin
-    dat = loadnmr("../exampledata/1D_19F/1")
-    dat = loadnmr("../exampledata/1D_19F/1/")
-    dat = loadnmr("../exampledata/1D_19F/1/pdata/1")
-    dat = loadnmr("../exampledata/1D_19F/1/pdata/1/")
-
+    dat = exampledata("1D_19F")
+    
     @test size(dat) == (5000,)
     @test length(dat) == 5000
 
@@ -264,12 +261,12 @@ end
     @test dat[1, :pseudodim] == false
 
     # load complex spectrum
-    dat2 = loadnmr("../exampledata/1D_19F/1/pdata/1"; allcomponents=true)
+    dat2 = loadnmr(artifact"1D_19F"; allcomponents=true)
     @test dat2[100] == 4920.725646972656 - 17351.53515625im
 end
 
 @testset "NMRIO: 2D HN (Bruker pdata)" begin
-    dat = loadnmr("../exampledata/2D_HN/1/pdata/1")
+    dat = exampledata("2D_HN")
 
     @test size(dat) == (1216, 512)
     @test length(dat) == 622592
@@ -375,8 +372,8 @@ end
 end
 
 @testset "NMRIO: pseudo-2D (Bruker pdata)" begin
-    dat = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1")
-    datC = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1"; allcomponents=true)
+    dat = exampledata("pseudo2D_XSTE")
+    datC = loadnmr(artifact"pseudo2D_XSTE"; allcomponents=true)
 
     @test size(dat) == (2048, 10)
 
@@ -398,42 +395,75 @@ end
 end
 
 @testset "pseudo3D data (Bruker pdata)" begin
-    dat = loadnmr("../exampledata/pseudo3D_HN_R2/1/pdata/1")
+    dat = exampledata("pseudo3D_HN_R2")
     @test size(dat) == (512, 512, 11)
     @test dat[5, 6, 7] == 2370.09375
     @test acqus(dat, :vclist) == [0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16]
 end
 
-# @testset "3D data (Bruker pdata)" begin
-#     spec = loadnmr("../exampledata/3D_HNCA/1")
-#     @test size(spec) == (512, 128, 256)
-#     @test spec[5, 6, 7] == -3588.4375
-#     @test label(spec, 1) == "1H"
-#     @test label(spec, 2) == "15N"
-#     @test label(spec, 3) == "13C"
-#     @test dims(spec, 1)[2] == 9.994244210893847
-#     @test dims(spec, 2)[end] == 107.66998310451476
-#     @test dims(spec, 3)[Near(45)] == 44.99702749174231
+@testset "3D data (Bruker pdata)" begin
+    spec = exampledata("3D_HNCA")
+    @test size(spec) == (512, 128, 256)
+    @test spec[5, 6, 7] == -3588.4375
+    @test label(spec, 1) == "1H"
+    @test label(spec, 2) == "15N"
+    @test label(spec, 3) == "13C"
+    @test dims(spec, 1)[2] == 9.994244210893847
+    @test dims(spec, 2)[end] == 107.66998310451476
+    @test dims(spec, 3)[Near(45)] == 44.99702749174231
 
-#     spec13 = loadnmr("exampledata/3D_HNCA/1/pdata/131")
-#     spec23 = loadnmr("exampledata/3D_HNCA/1/pdata/231")
-#     @test size(spec13) == (512, 256)
-#     @test size(spec23) == (512, 128)
-#     @test spec23[Near(7.2), Near(122)] == 19735.930053710938
-#     @test spec13[Near(8.3), Near(63)] == -321.002197265625
-#     @test maximum(spec) / spec[:noise] == 703.8872844716632
-# end
+    spec13 = loadnmr(joinpath(artifact"3D_HNCA","pdata","131"))
+    spec23 = loadnmr(joinpath(artifact"3D_HNCA","pdata","231"))
+    @test size(spec13) == (512, 256)
+    @test size(spec23) == (512, 128)
+    @test spec23[Near(7.2), Near(122)] == 19735.930053710938
+    @test spec13[Near(8.3), Near(63)] == -321.002197265625
+    @test maximum(spec) / spec[:noise] == 703.8872844716632
+end
 
-# @testset "3D data (nmrPipe)" begin
-#     spec = loadnmr("../exampledata/3D_HNCA/1/smile/test%03d.ft3")
-#     @test size(spec) == (384, 512, 128)
-#     @test label(spec) == "500 uM 13C,15N ubiquitin, 298 K, BEST-HNCA"
-#     @test dims(spec, 1)[1] == 9.703234081887576
-#     @test dims(spec, 2)[1] == 68.7403353437212
-#     @test dims(spec, 3)[end] == 107.75223308061521
-#     @test spec[10, 11, 12] == 99473.6875
-#     @test spec[1, :window] == Cos²Window(0.09261055758378933)
-#     @test spec[2, :window] == CosWindow(0.057541115456864404)
-#     @test spec[3, :window] == CosWindow(0.03894846805778692)
-#     @test maximum(spec) / spec[:noise] == 492.0035185914213
-# end
+@testset "3D data (nmrPipe)" begin
+    spec = loadnmr(joinpath(artifact"3D_HNCA_pipe","smile","test%03d.ft3"))
+    @test size(spec) == (384, 512, 128)
+    @test label(spec) == "500 uM 13C,15N ubiquitin, 298 K, BEST-HNCA"
+    @test dims(spec, 1)[1] == 9.703234081887576
+    @test dims(spec, 2)[1] == 68.7403353437212
+    @test dims(spec, 3)[end] == 107.75223308061521
+    @test spec[10, 11, 12] == 99473.6875
+    @test spec[1, :window] == Cos²Window(0.09261055758378933)
+    @test spec[2, :window] == CosWindow(0.057541115456864404)
+    @test spec[3, :window] == CosWindow(0.03894846805778692)
+    @test maximum(spec) / spec[:noise] == 492.0035185914213
+end
+
+@testset "NMRIO: 2D HN (ucsf)" begin
+    dat = loadnmr(joinpath(artifact"2D_HN","hmqc.ucsf"))
+
+    @test size(dat) == (568, 256)
+    @test length(dat) == 145408
+
+    @test parent(dat) isa Matrix{Float64}
+
+    @test dat[1, 100] == 59228.95703125
+    @test dat[20, 100] == 27169.9140625
+    @test dat[1] == -48482.26171875
+    @test dat[1, end] == 36429.125
+    @test dat[end, end] == -23958.6171875
+    @test dat[end] == -23958.6171875
+    @test maximum(dat) == 7.984743e6
+
+    @test label(dat,1) == "1H"
+    @test label(dat,2) == "15N"
+end
+
+
+@testset "3D data (ucsf)" begin
+    spec = loadnmr(joinpath(artifact"3D_HNCA_ucsf","hnca.ucsf"))
+    @test size(spec) == (384, 512, 128)
+    @test label(spec) == "500 uM 13C,15N ubiquitin, 298 K, BEST-HNCA"
+    @test dims(spec, 1)[1] == 9.703234081887576
+    @test dims(spec, 2)[1] == 68.7403353437212
+    @test dims(spec, 3)[end] == 107.75223308061521
+    @test spec[10, 11, 12] == 99473.6875
+    @test spec[1, :window] isa UnknownWindow
+    @test maximum(spec) / spec[:noise] == 492.0035185914213
+end

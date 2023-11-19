@@ -37,5 +37,7 @@ function exampledata(name)
         loadnmr(artifact"pseudo3D_kinetics")
     elseif name == "3D_HNCA"
         loadnmr(artifact"3D_HNCA")
+    else
+        throw(NMRToolsError("example data $name not found. Call exampledata() to list available data"))
     end
 end

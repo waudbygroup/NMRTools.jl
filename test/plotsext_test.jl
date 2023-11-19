@@ -4,7 +4,7 @@ using Test
 using VisualRegressionTests
 
 @testset "PlotsExt: 1D 19F" begin
-    dat = loadnmr("../exampledata/1D_19F/1/pdata/1")
+    dat = exampledata("1D_19F")
 
     pr = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(), dat)
 
@@ -19,7 +19,7 @@ using VisualRegressionTests
 end
 
 @testset "PlotsExt: 2D HN" begin
-    dat = loadnmr("../exampledata/2D_HN/1/pdata/1")
+    dat = exampledata("2D_HN")
 
     pr = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(), dat)
 
@@ -30,17 +30,17 @@ end
 end
 
 @testset "PlotsExt: visual regression testing" begin
-    dat1 = loadnmr("../exampledata/1D_19F/1/")
+    dat1 = exampledata("1D_19F")
     @plottest begin
         plot(dat1)
     end "plot_1D_19F.png" false
 
-    dat2 = loadnmr("../exampledata/2D_HN/1")
+    dat2 = exampledata("2D_HN")
     @plottest begin
         plot(dat2)
     end "plot_2D_HN.png" false
 
-    dat3 = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1")
+    dat3 = exampledata("pseudo2D_XSTE")
     dat3 = setgradientlist(dat3, LinRange(0.05, 0.95, 10), 0.55)
     @plottest begin
         plot(dat3[7 .. 9, :])
@@ -49,7 +49,7 @@ end
         heatmap(dat3[7 .. 9, :])
     end "plot_pseudo2D_XSTE_heatmap.png" false
 
-    dat4 = [loadnmr("../exampledata/1D_19F_titration/$i") for i in 1:11]
+    dat4 = exampledata("1D_19F_titration")
     @plottest begin
         plot(dat4; xlims=(-125, -122))
     end "plot_1D_19F_titration.png" false
@@ -57,7 +57,7 @@ end
         plot(dat4; xlims=(-125, -121), vstack=true)
     end "plot_1D_19F_titration_vstack.png" false
 
-    dat5 = [loadnmr("../exampledata/2D_HN_titration/$i/test.ft2") for i in 1:11]
+    dat5 = exampledata("2D_HN_titration")
     @plottest begin
         plot(dat5)
     end "plot_2D_HN_titration.png" false
@@ -68,8 +68,8 @@ end
         ylims!(115, 120)
     end "plot_2D_HN_overlay.png" false
 
-    # dat6 = loadnmr("../exampledata/3D_HNCA/1")
-    # @plottest begin
-    #     plot(maximum(spec; dims=2)[:, 1, :] / 3)
-    # end "plot_3D_HNCA_projection.png" false
+    dat6 = exampledata("3D_HNCA")
+    @plottest begin
+        plot(maximum(spec; dims=2)[:, 1, :] / 3)
+    end "plot_3D_HNCA_projection.png" false
 end
