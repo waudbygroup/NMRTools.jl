@@ -14,7 +14,7 @@ Metadata are stored in a dictionary labelled by symbols such as `:ns` or `:pulse
 ```@example 1
 using NMRTools
 # load an example 2D 1H,15N HMQC spectrum
-spec = loadnmr("../../exampledata/2D_HN/1")
+spec = exampledata("2D_HN")
 
 metadata(spec)
 ```
@@ -87,7 +87,7 @@ acqus(spec, :cnst, 4)
 If present, files such as `vclist` and `vdlist` are imported and can be accessed through the `acqus` function:
 
 ```@example 1
-relaxation_experiment = loadnmr("../../exampledata/pseudo3D_HN_R2/1")
+relaxation_experiment = exampledata("pseudo3D_HN_R2")
 acqus(relaxation_experiment, :vclist)
 ```
 

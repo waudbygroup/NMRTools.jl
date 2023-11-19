@@ -9,7 +9,7 @@ Let's load and plot an example 1D 19F spectrum, using the `loadnmr` and `plot` c
 
 ```@example 1
 using NMRTools, Plots
-spec = loadnmr("../../exampledata/1D_19F/1")
+spec = exampledata("1D_19F")
 plot(spec)
 savefig("plot-1D.svg"); nothing # hide
 ```
@@ -54,7 +54,7 @@ If the data are selected before plotting, the y axis will be scaled according on
 
 Multiple experiments can conveniently be loaded from a list of filenames using the `map` function.
 
-```@example 1
+```julia
 # create a list of bruker experiment directories
 filenames = ["../../exampledata/1D_19F_titration/1",
              "../../exampledata/1D_19F_titration/2",
@@ -74,6 +74,7 @@ nothing # hide
 This creates a list (`Vector`) of `NMRData` containing the individual spectra. To plot this series of spectra, we can simply pass the list of spectra to the plot function:
 
 ```@example 1
+spectra = exampledata("1D_19F_titration"); # hide
 plot(spectra, xlims=(-125, -122))
 savefig("plot-19F-titration.svg"); nothing # hide
 ```
@@ -102,7 +103,8 @@ savefig("plot-19F-stack.svg"); nothing # hide
 
 ```@example 1
 # load a bruker experiment
-spec2d = loadnmr("../../exampledata/2D_HN/1")
+# spec2d = loadnmr("exampledata/2D_HN/1")
+spec2d = exampledata("2D_HN")
 plot(spec2d)
 savefig("plot-2D.svg"); nothing # hide
 ```
@@ -137,7 +139,7 @@ savefig("plot-2D-heatmap.svg"); nothing # hide
 
 Multiple 2D experiments can conveniently be loaded from a list of filenames using the `map` function.
 
-```@example 1
+```julia
 # create a list of nmrPipe-processed experiments
 filenames = ["../../exampledata/2D_HN_titration/1/test.ft2",
              "../../exampledata/2D_HN_titration/2/test.ft2",
@@ -151,12 +153,12 @@ filenames = ["../../exampledata/2D_HN_titration/1/test.ft2",
              "../../exampledata/2D_HN_titration/10/test.ft2",
              "../../exampledata/2D_HN_titration/11/test.ft2"]
 spectra2d = map(loadnmr, filenames)
-nothing # hide
 ```
 
 As for 1D experiments, these can be plotted, with automatic normalisation for varying numbers of scans and receiver gain, simply by passing the list of spectra to the plot function:
 
 ```@example 1
+spectra2d = exampledata("2D_HN_titration"); # hide
 plot(spectra2d, legend=:topleft)
 savefig("plot-2D-titration.svg"); nothing # hide
 ```
@@ -184,7 +186,7 @@ Plot recipes are available for pseudo-2D data like diffusion, relaxation or kine
 
 ```@example 1
 # load a diffusion measurement, processed in topspin using xf2
-diffusiondata = loadnmr("../../exampledata/pseudo2D_XSTE/1/")
+diffusiondata = exampledata("pseudo2D_XSTE")
 
 # set the gradient strengths - which varied from 2% to 98% of the max, over 10 points
 diffusiondata = setgradientlist(diffusiondata, LinRange(0.02, 0.98, 10))

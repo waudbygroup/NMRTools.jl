@@ -9,7 +9,7 @@ Metadata entries are labelled by symbols such as `:ns` or `:pulseprogram`. See b
 
 ```@repl 1
 using NMRTools; # hide
-spec = loadnmr("../../exampledata/2D_HN/1/test.ft2"); # hide
+spec = exampledata("2D_HN"); # hide
 metadata(spec, :ns)
 spec[:ns]
 metadata(spec, :title)
@@ -63,7 +63,7 @@ acqus(spec, :cnst, 4)
 If present, files such as `vclist` and `vdlist` are imported and can be accessed through the `acqus` function
 
 ```@repl 1
-pseudo3dspec = loadnmr("../../exampledata/pseudo3D_HN_R2/1"); # hide
+pseudo3dspec = exampledata("pseudo3D_HN_R2"); # hide
 acqus(pseudo3dspec, :vclist)
 ```
 

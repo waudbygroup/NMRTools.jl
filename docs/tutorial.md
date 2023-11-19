@@ -17,7 +17,8 @@ Let's load some example data. This can be a Bruker experiment directory, a speci
 
 ```@example 1
 using NMRTools
-spec = loadnmr("../../exampledata/1D_19F/1")
+# spec = loadnmr("exampledata/1D_19F/1/pdata/1")
+spec = exampledata("1D_19F") # the exampledata function automatically downloads example spectra
 ```
 
 NMRTools contains Plots recipes for common types of spectrum. To plot our 1D spectrum, we just use
@@ -53,18 +54,19 @@ Load and plot multiple 1D spectra from a list of filenames
 
 ```@example 1Ds
 using NMRTools, Plots
-filenames = ["../../exampledata/1D_19F_titration/1/",
-            "../../exampledata/1D_19F_titration/2/",
-            "../../exampledata/1D_19F_titration/3/",
-            "../../exampledata/1D_19F_titration/4/",
-            "../../exampledata/1D_19F_titration/5/",
-            "../../exampledata/1D_19F_titration/6/",
-            "../../exampledata/1D_19F_titration/7/",
-            "../../exampledata/1D_19F_titration/8/",
-            "../../exampledata/1D_19F_titration/9/",
-            "../../exampledata/1D_19F_titration/10/",
-            "../../exampledata/1D_19F_titration/11/"]
-spectra = [loadnmr(filename) for filename in filenames]
+# filenames = ["exampledata/1D_19F_titration/1/",
+#             "exampledata/1D_19F_titration/2/",
+#             "exampledata/1D_19F_titration/3/",
+#             "exampledata/1D_19F_titration/4/",
+#             "exampledata/1D_19F_titration/5/",
+#             "exampledata/1D_19F_titration/6/",
+#             "exampledata/1D_19F_titration/7/",
+#             "exampledata/1D_19F_titration/8/",
+#             "exampledata/1D_19F_titration/9/",
+#             "exampledata/1D_19F_titration/10/",
+#             "exampledata/1D_19F_titration/11/"]
+# spectra = [loadnmr(filename) for filename in filenames]
+spectra = exampledata("1D_19F_titration")
 plot(spectra)
 savefig("plot-1Ds.svg"); nothing # hide
 ```
@@ -94,7 +96,7 @@ Two-dimensional spectra can be plotted in exactly the same way as for 1Ds.
 
 ```@example 2d
 using NMRTools, Plots
-spec = loadnmr("../../exampledata/2D_HN/1")
+spec = exampledata("2D_HN")
 plot(spec)
 savefig("plot-2d.svg"); nothing # hide
 ```
@@ -117,18 +119,19 @@ Multiple 2D spectra can be loaded and overlaid in a similar manner to 1Ds
 
 ```@repl 2Ds
 using NMRTools, Plots;
-filenames  = ["../../exampledata/2D_HN_titration/1/test.ft2",
-              "../../exampledata/2D_HN_titration/2/test.ft2",
-              "../../exampledata/2D_HN_titration/3/test.ft2",
-              "../../exampledata/2D_HN_titration/4/test.ft2",
-              "../../exampledata/2D_HN_titration/5/test.ft2",
-              "../../exampledata/2D_HN_titration/6/test.ft2",
-              "../../exampledata/2D_HN_titration/7/test.ft2",
-              "../../exampledata/2D_HN_titration/8/test.ft2",
-              "../../exampledata/2D_HN_titration/9/test.ft2",
-              "../../exampledata/2D_HN_titration/10/test.ft2",
-              "../../exampledata/2D_HN_titration/11/test.ft2"];
-spectra = [loadnmr(filename) for filename in filenames];
+#filenames  = ["exampledata/2D_HN_titration/1/test.ft2",
+#              "exampledata/2D_HN_titration/2/test.ft2",
+#              "exampledata/2D_HN_titration/3/test.ft2",
+#              "exampledata/2D_HN_titration/4/test.ft2",
+#              "exampledata/2D_HN_titration/5/test.ft2",
+#              "exampledata/2D_HN_titration/6/test.ft2",
+#              "exampledata/2D_HN_titration/7/test.ft2",
+#              "exampledata/2D_HN_titration/8/test.ft2",
+#              "exampledata/2D_HN_titration/9/test.ft2",
+#              "exampledata/2D_HN_titration/11/test.ft2"];
+#              "exampledata/2D_HN_titration/10/test.ft2",
+#spectra = [loadnmr(filename) for filename in filenames];
+spectra = exampledata("2D_HN_titration")
 plot(spectra);
 savefig("plot-2Ds.svg"); nothing # hide
 ```

@@ -13,7 +13,7 @@ Let's load some example data. This can be a Bruker experiment directory, a speci
 
 ```@example 1
 using NMRTools, Plots
-spec = loadnmr("../../exampledata/1D_19F/1")
+spec = exampledata("1D_19F")
 ```
 
 NMRTools contains Plots recipes for common types of spectrum. To plot our 1D spectrum, we just use
@@ -49,7 +49,7 @@ Two-dimensional spectra can be plotted in exactly the same way as for 1Ds.
 
 ```@example 2d
 using NMRTools, Plots # hide
-spec = loadnmr("../../exampledata/2D_HN/1")
+spec = exampledata("2D_HN")
 plot(spec)
 savefig("plot-2d.svg"); nothing # hide
 ```
@@ -71,7 +71,7 @@ savefig("plot-2d-scaled.svg"); nothing # hide
 Spectrum data and associated axis information, metadata, etc, is encapsulated in an [`NMRData`](@ref) structure.
 ```@repl data
 using NMRTools # hide
-spec = loadnmr("../../exampledata/1D_19F/1")
+spec = exampledata("1D_19F")
 ```
 
 Data can be accessed with conventional array indexing, but also using the value-based selectors, `Near` and `..`:
@@ -83,7 +83,7 @@ spec[-124 .. -123.5]
 
 This also works for multidimensional data. For example:
 ```@repl data
-spec2d = loadnmr("../../exampledata/2D_HN/1")
+spec2d = exampledata("2D_HN")
 spec2d[8.1 .. 8.3, Near(124)]
 ```
 

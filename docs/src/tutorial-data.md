@@ -8,16 +8,16 @@ NMR measurements are arrays of data, with additional numerical data associated w
 NMR data are loaded using the [`loadnmr`](@ref) function. This can handle processed Bruker experiments, or NMRPipe-format data.
 
 ```@example 1
-using NMRTools
+using NMRTools, Artifacts
 
 # by default, NMRTools will load bruker processed data from proc 1
-spec2d = loadnmr("../../exampledata/2D_HN/1")
+spec2d = exampledata("2D_HN")
 
 # load a different processed spectrum
-spec1d = loadnmr("../../exampledata/2D_HN/1/pdata/101")
+spec1d = loadnmr(joinpath(artifact"2D_HN","pdata","101"))
 
 # load data from NMRPipe format, using a template
-spec3d = loadnmr("../../exampledata/pseudo3D_HN_R2/1/ft/test%03d.ft2")
+spec3d = loadnmr(joinpath(artifact"pseudo3D_HN_R2","ft","test%03d.ft2"))
 nothing # hide
 ```
 
@@ -81,7 +81,7 @@ A heirarchy of types are defined for NMR dimensions, reflecting the variety of d
 
 Metadata entries are labelled by symbols such as `:ns` or `:pulseprogram`. Entries can be accessed using the `metadata` function, or directly as a dictionary-style lookup:
 ```@repl 1
-spec2d = loadnmr("../../exampledata/2D_HN/1"); # hide
+spec2d = exampledata("2D_HN"); # hide
 metadata(spec2d, :ns)
 spec2d[:title]
 ```
