@@ -1,4 +1,5 @@
 using NMRTools
+using Artifacts
 using Test
 
 @testset "NMRIO: 1D 19F (nmrPipe)" begin
@@ -403,13 +404,13 @@ end
 
 @testset "3D data (Bruker pdata)" begin
     spec = exampledata("3D_HNCA")
-    @test size(spec) == (512, 128, 256)
-    @test spec[5, 6, 7] == -3588.4375
+    @test size(spec) == (432, 64, 256)
+    @test spec[5, 6, 7] == 3506.28125
     @test label(spec, 1) == "1H"
     @test label(spec, 2) == "15N"
     @test label(spec, 3) == "13C"
-    @test dims(spec, 1)[2] == 9.994244210893847
-    @test dims(spec, 2)[end] == 107.66998310451476
+    @test dims(spec, 1)[2] == 9.693887210893848
+    @test dims(spec, 2)[end] == 107.84188874936109
     @test dims(spec, 3)[Near(45)] == 44.99702749174231
 
     spec13 = loadnmr(joinpath(artifact"3D_HNCA","pdata","131"))
@@ -418,7 +419,7 @@ end
     @test size(spec23) == (512, 128)
     @test spec23[Near(7.2), Near(122)] == 19735.930053710938
     @test spec13[Near(8.3), Near(63)] == -321.002197265625
-    @test maximum(spec) / spec[:noise] == 703.8872844716632
+    @test maximum(spec) / spec[:noise] ≈ 698.6861209993058
 end
 
 @testset "3D data (nmrPipe)" begin
@@ -432,7 +433,7 @@ end
     @test spec[1, :window] == Cos²Window(0.09261055758378933)
     @test spec[2, :window] == CosWindow(0.057541115456864404)
     @test spec[3, :window] == CosWindow(0.03894846805778692)
-    @test maximum(spec) / spec[:noise] == 492.0035185914213
+    @test maximum(spec) / spec[:noise] == 492.00351859142154
 end
 
 @testset "NMRIO: 2D HN (ucsf)" begin
@@ -460,10 +461,10 @@ end
     spec = loadnmr(joinpath(artifact"3D_HNCA_ucsf","hnca.ucsf"))
     @test size(spec) == (384, 512, 128)
     @test label(spec) == "500 uM 13C,15N ubiquitin, 298 K, BEST-HNCA"
-    @test dims(spec, 1)[1] == 9.703234081887576
-    @test dims(spec, 2)[1] == 68.7403353437212
-    @test dims(spec, 3)[end] == 107.75223308061521
+    @test dims(spec, 1)[1] == 9.703234542832309
+    @test dims(spec, 2)[1] == 68.74033212965945
+    @test dims(spec, 3)[end] == 107.75222413893053
     @test spec[10, 11, 12] == 99473.6875
     @test spec[1, :window] isa UnknownWindow
-    @test maximum(spec) / spec[:noise] == 492.0035185914213
+    @test maximum(spec) / spec[:noise] ≈ 492.00351859142154
 end

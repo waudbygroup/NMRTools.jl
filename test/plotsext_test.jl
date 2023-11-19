@@ -1,7 +1,17 @@
 using NMRTools
+using Artifacts
 using Plots
 using Test
 using VisualRegressionTests
+
+"""
+notes on testing, to generate plots:
+
+]activate --temp
+]dev .
+]add Plots
+using NMRTools, Plots
+"""
 
 @testset "PlotsExt: 1D 19F" begin
     dat = exampledata("1D_19F")
@@ -68,8 +78,8 @@ end
         ylims!(115, 120)
     end "plot_2D_HN_overlay.png" false
 
-    dat6 = exampledata("3D_HNCA")
     @plottest begin
-        plot(maximum(spec; dims=2)[:, 1, :] / 3)
+        dat6 = exampledata("3D_HNCA")
+        plot(maximum(dat6; dims=2)[:, 1, :] / 3)
     end "plot_3D_HNCA_projection.png" false
 end

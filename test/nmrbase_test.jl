@@ -149,7 +149,7 @@ end
 end
 
 @testset "NMRBase: window functions" begin
-    dat = loadnmr("../exampledata/pseudo2D_XSTE/1/pdata/1")
+    dat = exampledata("pseudo2D_XSTE")
     @test dat[1, :window] isa Cos²Window
     @test dat[1, :window].tmax == 0.0512
     @test length(apod(dat, 1)) == 2048
