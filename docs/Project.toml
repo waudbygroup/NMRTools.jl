@@ -1,6 +1,8 @@
 [deps]
+Artifacts = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 DocumenterTools = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
+LazyArtifacts = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 LsqFit = "2fda8390-95c7-5789-9bda-21331edee243"
 Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
 NMRTools = "c2839fe3-f1de-42fc-897f-c1b0e8db4db6"

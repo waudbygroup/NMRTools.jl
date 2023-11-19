@@ -1,4 +1,4 @@
-using Documenter, NMRTools, Plots
+using Documenter, NMRTools, Plots, Artifacts, LazyArtifacts
 
 ENV["GKSwstype"] = "100"
 

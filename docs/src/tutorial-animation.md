@@ -9,7 +9,7 @@ First, load in some data. This pseudo-3D kinetic data - a series of 1H,15N SOFAS
 ```@example 1
 using NMRTools, Plots
 
-spec=loadnmr("../../exampledata/pseudo3D_kinetics/1")
+spec=exampledata("pseudo3D_kinetics")
 nothing # hide
 ```
 
@@ -47,18 +47,7 @@ nothing # hide
 First, load in some data - as described in the [tutorial on plotting](@ref "Overlaying multiple 2D spectra").
 
 ```@example 1
-filenames = ["../../exampledata/2D_HN_titration/1/test.ft2",
-             "../../exampledata/2D_HN_titration/2/test.ft2",
-             "../../exampledata/2D_HN_titration/3/test.ft2",
-             "../../exampledata/2D_HN_titration/4/test.ft2",
-             "../../exampledata/2D_HN_titration/5/test.ft2",
-             "../../exampledata/2D_HN_titration/6/test.ft2",
-             "../../exampledata/2D_HN_titration/7/test.ft2",
-             "../../exampledata/2D_HN_titration/8/test.ft2",
-             "../../exampledata/2D_HN_titration/9/test.ft2",
-             "../../exampledata/2D_HN_titration/10/test.ft2",
-             "../../exampledata/2D_HN_titration/11/test.ft2"]
-spectra2d = map(loadnmr, filenames)
+spectra2d = exampledata("2D_HN_titration")
 nothing # hide
 ```
 
