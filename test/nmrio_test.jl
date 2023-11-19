@@ -1,5 +1,6 @@
 using NMRTools
 using Artifacts
+using LazyArtifacts
 using Test
 
 @testset "NMRIO: 1D 19F (nmrPipe)" begin

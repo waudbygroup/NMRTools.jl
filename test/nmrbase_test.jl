@@ -1,5 +1,6 @@
 using NMRTools
 using Artifacts
+using LazyArtifacts
 using Test
 
 @testset "NMRBase: NMRData" begin

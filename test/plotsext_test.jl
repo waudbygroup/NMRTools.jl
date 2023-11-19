@@ -1,5 +1,6 @@
 using NMRTools
 using Artifacts
+using LazyArtifacts
 using Plots
 using Test
 using VisualRegressionTests
