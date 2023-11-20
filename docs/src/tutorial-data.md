@@ -8,8 +8,6 @@ NMR measurements are arrays of data, with additional numerical data associated w
 NMR data are loaded using the [`loadnmr`](@ref) function. This can handle processed Bruker experiments, or NMRPipe-format data.
 
 ```julia
-using NMRTools
-
 # load bruker experiment number 1 from a directory '2D_HN'
 # by default, NMRTools will load bruker processed data from proc 1
 spec2d = loadnmr("exampledata/2D_HN/1")
@@ -57,6 +55,7 @@ When data are sliced, new NMRData structures are created and their axes are upda
 Information on data dimensions is stored in `NMRDimension` structures. These can be accessed with the `dims` function:
 ```@example 1
 # get the first dimension of this two-dimensional experiment
+using NMRTools # hide
 spec2d = exampledata("2D_HN"); # hide
 dims(spec2d, 1)
 ```
