@@ -26,6 +26,7 @@ PlotsExt = "Plots"
 
 [compat]
 ArtifactUtils = "0.2"
+Artifacts = "1"
 ColorSchemes = "3.23"
 Colors = "0.12"
 DimensionalData = "0.24"
