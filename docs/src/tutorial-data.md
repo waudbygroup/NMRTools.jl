@@ -7,18 +7,18 @@ NMR measurements are arrays of data, with additional numerical data associated w
 
 NMR data are loaded using the [`loadnmr`](@ref) function. This can handle processed Bruker experiments, or NMRPipe-format data.
 
-```@example 1
-using NMRTools, Artifacts
+```julia
+using NMRTools
 
+# load bruker experiment number 1 from a directory '2D_HN'
 # by default, NMRTools will load bruker processed data from proc 1
-spec2d = exampledata("2D_HN")
+spec2d = loadnmr("exampledata/2D_HN/1")
 
 # load a different processed spectrum
-spec1d = loadnmr(joinpath(artifact"2D_HN","pdata","101"))
+spec1d = loadnmr("exampledata/2D_HN/1/pdata/101")
 
 # load data from NMRPipe format, using a template
-spec3d = loadnmr(joinpath(artifact"pseudo3D_HN_R2","ft","test%03d.ft2"))
-nothing # hide
+spec3d = loadnmr("exampledata/pseudo3D_HN_R2/1/ft/test%03d.ft2")
 ```
 
 !!! tip
@@ -29,10 +29,9 @@ When spectra are loaded, a simple algorithm runs to estimate the noise level, wh
 ## Manipulating spectrum data
 
 [`NMRData`](@ref) structures encapsulate a standard Julia array. This can be accessed using the [`data`](@ref) command. However, through the magic of multiple dispatch, most operations will work transparently on NMRData variables as if they are regular arrays, with the added benefit that axis information and metadata are preserved. Data can be sliced and accessed like a regular array using the usual square brackets:
-```@example 1
+```julia
 spec1d[100:105]
 spec2d[3:4, 10:14]
-nothing # hide
 ```
 
 However, more conveniently, value-based selectors can also be used to locate data using chemical shifts. Three selectors are defined:
@@ -41,11 +40,10 @@ However, more conveniently, value-based selectors can also be used to locate dat
 - `x .. y`: select the range of data between `x` and `y` (closed interval)
 
 For example:
-```@example 1
+```julia
 spec1d[8.2 .. 8.3] # select between 8.2 and 8.3 ppm
 spec2d[Near(8.25), 123 .. 124] # select near 8.25 ppm in the first dimension
                                # and between 123 and 124 ppm in the second dimension
-nothing # hide
 ```
 
 When data are sliced, new NMRData structures are created and their axes are updated to match the new data size.
@@ -59,6 +57,7 @@ When data are sliced, new NMRData structures are created and their axes are upda
 Information on data dimensions is stored in `NMRDimension` structures. These can be accessed with the `dims` function:
 ```@example 1
 # get the first dimension of this two-dimensional experiment
+spec2d = exampledata("2D_HN"); # hide
 dims(spec2d, 1)
 ```
 
