@@ -224,9 +224,9 @@ end
 function parsevdlist(filename)
     x = readlines(filename)
     # default unit for vdlist is seconds
-    replace!(x, "u" => "e-6")
-    replace!(x, "m" => "e-3")
-    replace!(x, "s" => "")
+    x = replace.(x, "u" => "e-6")
+    x = replace.(x, "m" => "e-3")
+    x = replace.(x, "s" => "")
     xf = tryparse.(Float64, x)
     if any(xf .== nothing)
         @warn "Unable to parse format of vdlist $filename"
