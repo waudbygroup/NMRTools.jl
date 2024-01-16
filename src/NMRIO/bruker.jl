@@ -113,7 +113,7 @@ function loadpdata(filename, allcomponents=false)
             elseif w == 1
                 window = ExponentialWindow(procdic[:lb], dic[:aq])
             elseif w == 2
-                warn("Gaussian window not yet implemented")
+                @warn("Gaussian window not yet implemented")
                 window = UnknownWindow(dic[:aq])
             elseif w == 3
                 ssb = procdic[:ssb]
