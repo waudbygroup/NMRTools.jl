@@ -19,16 +19,19 @@ SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [weakdeps]
+Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [extensions]
 PlotsExt = "Plots"
+MakieExt = "Makie"
 
 [compat]
 ArtifactUtils = "0.2"
 ColorSchemes = "3.23"
 Colors = "0.12"
 DimensionalData = "0.24"
+Makie = "0.21.15"
 Optim = "1.7"
 Plots = "1.39"
 PrecompileTools = "1.2"
@@ -40,6 +43,7 @@ Statistics = "1.9"
 julia = "1.9"
 
 [extras]
+Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

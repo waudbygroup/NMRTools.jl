@@ -11,4 +11,14 @@ Reexport.@reexport using .NMRIO
 
 include("precompile.jl")
 
+export nmrplot, nmrplot!, nmrcontour, nmrcontour!, nmrheatmap, nmrheatmap!, nmrsurface, nmrsurface!
+function nmrplot end
+function nmrplot! end
+function nmrcontour end
+function nmrcontour! end
+function nmrheatmap end
+function nmrheatmap! end
+function nmrsurface end
+function nmrsurface! end
+
 end
