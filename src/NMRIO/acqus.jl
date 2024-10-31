@@ -300,8 +300,8 @@ P            | bf          | ppm
 function parsefqlist(filename)
     x = readlines(filename)
 
-    if isnumeric(x[1][1])
-        # first character of first line is a number => no header line
+    if tryparse(Float64, x[1]) !== nothing
+        # first line is a number => no header line => sfo hz
         unit = :Hz
         relative = true
     else
