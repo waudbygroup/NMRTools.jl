@@ -3,7 +3,8 @@ function loadjdx(filename::String)
         throw(NMRToolsError("loading JCAMP-DX data: $(filename) is not a valid file"))
 
     dat = open(filename) do f
-        return read(f, String)
+        txt = read(f, String)
+        replace(txt, "\r\n" => "\n") # replace Windows line endings with Unix
     end
 
     fields = [strip(strip(x), '$') for x in split(dat, "##")]
@@ -24,7 +25,8 @@ end
 function parsejdxentry(dat)
     if dat[1] == '('
         # array data - split into fields
-        fields = split(split(dat, ")\n")[2])
+        # handle potential Windows line endings in array data
+        fields = split(split(replace(dat, "\r\n" => "\n"), ")\n")[2])
         parsed = map(parsejdxfield, fields)
         if parsed isa Vector{Real}
             parsed = float.(parsed)

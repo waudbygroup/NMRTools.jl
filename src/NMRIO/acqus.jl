@@ -73,6 +73,7 @@ function getacqusmetadata(format, filename, experimentfolder=nothing)
     titlefilename = joinpath(experimentfolder, "pdata", "1", "title")
     if isfile(titlefilename)
         title = read(titlefilename, String)
+        title = replace(title, "\r\n" => "\n") # replace Windows line endings with Unix
         md[:title] = strip(title)
         # use first line of title for experiment label
         titleline1 = split(title, "\n")[1]
