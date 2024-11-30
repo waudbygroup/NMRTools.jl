@@ -303,7 +303,7 @@ function replacedimension(A::NMRData, olddimnumber, newdim)
     olddims[olddimnumber] = newdim
     newdims = tuple(olddims...)
 
-    return NMRData(A.data, newdims; name=A.name, refdims=A.refdims, metadata=A.metadata)
+    return NMRData(A.data, newdims; name=A.name, refdims=A.refdims, metadata=deepcopy(A.metadata))
 end
 
 """
