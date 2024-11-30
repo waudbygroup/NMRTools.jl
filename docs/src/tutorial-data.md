@@ -73,7 +73,7 @@ A heirarchy of types are defined for NMR dimensions, reflecting the variety of d
         - `GradientDimension`: for e.g. diffusion measurements, with specific types `G1Dim` to `G4Dim`
         - `UnknownDimension`: with specific types `X1Dim` to `X4Dim`
 
-## Adjusting spectrum referencing
+## Chemical shift referencing
 
 The `add_offset` function allows you to adjust the referencing of your NMR spectrum by adding a specified offset to the chemical shift values along a given dimension. This can be useful if you need to correct referencing errors or align spectra.
 
@@ -97,7 +97,7 @@ plot([spec2d_original, spec2d])
 savefig("plot-offset.svg"); nothing # hide
 ```
 
-![](plot-1D.svg)
+![](plot-offset.svg)
 
 In this example, the chemical shift values in the first dimension of `spec2d` are increased by 0.1 ppm, and the values in the second dimension are decreased by 0.5 ppm.
 
