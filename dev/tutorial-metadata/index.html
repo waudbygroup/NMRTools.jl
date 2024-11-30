@@ -17,43 +17,45 @@ metadata(spec)</code></pre><pre class="documenter-example-output"><code class="n
   :topspin          =&gt; v&quot;6.0.0&quot;
   :acqus            =&gt; Dict{Symbol, Any}(:fcuchan=&gt;Dict(0=&gt;0, 4=&gt;0, 5=&gt;0, 6=&gt;0,…
   :acqu2s           =&gt; Dict{Symbol, Any}(:origin=&gt;nothing, :sw=&gt;21.9971, :sw_h=…
-  :rg               =&gt; 203</code></pre><p>For convenience, entries can be accessed by passing a second argument to the <code>metadata</code> function:</p><pre><code class="language-julia hljs">metadata(spec, :title)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&quot;13C,15N ubiquitin\n500 uM in 10% D2O, 20 mM Pi pH 6.5, 277 K, SOFAST-HMQC&quot;</code></pre><p>or directly from the spectrum using a dictionary-style lookup:</p><pre><code class="language-julia hljs">spec[:ns]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2</code></pre><h2 id="Accessing-axis-metadata"><a class="docs-heading-anchor" href="#Accessing-axis-metadata">Accessing axis metadata</a><a id="Accessing-axis-metadata-1"></a><a class="docs-heading-anchor-permalink" href="#Accessing-axis-metadata" title="Permalink"></a></h2><p>Axis metadata can be accessed by providing an additional argument to the <a href="../api/#DimensionalData.Dimensions.LookupArrays.metadata"><code>metadata</code></a> function, specifying the axis numerically:</p><pre><code class="language-julia hljs">metadata(spec, 1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Metadata{FrequencyDimension}<span class="sgr90"> of </span>Dict{Symbol, Any} with 18 entries:
-  :aq        =&gt; 0.0946176
-  :label     =&gt; &quot;1H&quot;
-  :region    =&gt; 600:1815
-  :sf        =&gt; 600.203
-  :swppm     =&gt; 18.0315
-  :bf        =&gt; 600.2
-  :offsethz  =&gt; 2819.0
-  :window    =&gt; Cos²Window(0.0946176)
-  :offsetppm =&gt; 4.69677
-  :pseudodim =&gt; false
-  :npoints   =&gt; 1216
-  :swhz      =&gt; 10822.5
-  :td        =&gt; 1024
-  :units     =&gt; nothing
-  :coherence =&gt; nothing
-  :tdzf      =&gt; 4096
-  :mcindex   =&gt; nothing
-  :procs     =&gt; Dict{Symbol, Any}(:alpha=&gt;0, :ymin_p=&gt;-44320020, :pscal=&gt;4, :ax…</code></pre><p>Axes can also be accessed by their type, e.g. <code>F1Dim</code> or <code>F2Dim</code>:</p><pre><code class="language-julia hljs">metadata(spec, F2Dim)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Metadata{FrequencyDimension}<span class="sgr90"> of </span>Dict{Symbol, Any} with 18 entries:
-  :aq        =&gt; 0.0478336
-  :label     =&gt; &quot;15N&quot;
-  :region    =&gt; missing
-  :sf        =&gt; 60.8249
-  :swppm     =&gt; 21.9997
-  :bf        =&gt; 60.8177
-  :offsethz  =&gt; 7176.49
-  :window    =&gt; CosWindow(0.0478336)
-  :offsetppm =&gt; 118.0
-  :pseudodim =&gt; false
-  :npoints   =&gt; 512
-  :swhz      =&gt; 1337.97
-  :td        =&gt; 64
-  :units     =&gt; nothing
-  :coherence =&gt; nothing
-  :tdzf      =&gt; 512
-  :mcindex   =&gt; nothing
-  :procs     =&gt; Dict{Symbol, Any}(:alpha=&gt;0, :ymin_p=&gt;-44320020, :pscal=&gt;1, :ax…</code></pre><p>Again, for convenience entries can be accessed by passing an additional argument to the <code>metadata</code> function:</p><pre><code class="language-julia hljs">metadata(spec, F1Dim, :label)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&quot;1H&quot;</code></pre><p>or directly from the spectrum object using a dictionary-style lookup alongside an axis reference:</p><pre><code class="language-julia hljs">spec[2, :offsetppm]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">117.99995292412437</code></pre><h2 id="Accessing-acquisition-parameters"><a class="docs-heading-anchor" href="#Accessing-acquisition-parameters">Accessing acquisition parameters</a><a id="Accessing-acquisition-parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Accessing-acquisition-parameters" title="Permalink"></a></h2><p>Spectrometer acquisition parameters are automatically parsed from the <code>acqus</code> file when data are loaded. This is stored as a dictionary in the <code>:acqus</code> entry of the spectrum metadata, but can more conveniently be accessed through the function <code>acqus(spec, parametername)</code>. Parameter names can be provided either as strings (case insensitive, e.g. <code>&quot;TE&quot;</code> for the temperature) or as lowercase symbols (e.g. <code>:te</code>).</p><pre><code class="language-julia hljs">acqus(spec, :te)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">276.9988</code></pre><p>Arrayed parameters such as pulse lengths are returned as dictionaries:</p><pre><code class="language-julia hljs">acqus(spec, :p)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Dict{Int64, Float64} with 64 entries:
+  :rg               =&gt; 203</code></pre><p>For convenience, entries can be accessed by passing a second argument to the <code>metadata</code> function:</p><pre><code class="language-julia hljs">metadata(spec, :title)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&quot;13C,15N ubiquitin\n500 uM in 10% D2O, 20 mM Pi pH 6.5, 277 K, SOFAST-HMQC&quot;</code></pre><p>or directly from the spectrum using a dictionary-style lookup:</p><pre><code class="language-julia hljs">spec[:ns]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2</code></pre><h2 id="Accessing-axis-metadata"><a class="docs-heading-anchor" href="#Accessing-axis-metadata">Accessing axis metadata</a><a id="Accessing-axis-metadata-1"></a><a class="docs-heading-anchor-permalink" href="#Accessing-axis-metadata" title="Permalink"></a></h2><p>Axis metadata can be accessed by providing an additional argument to the <a href="../api/#DimensionalData.Dimensions.LookupArrays.metadata"><code>metadata</code></a> function, specifying the axis numerically:</p><pre><code class="language-julia hljs">metadata(spec, 1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Metadata{FrequencyDimension}<span class="sgr90"> of </span>Dict{Symbol, Any} with 19 entries:
+  :aq              =&gt; 0.0946176
+  :label           =&gt; &quot;1H&quot;
+  :region          =&gt; 600:1815
+  :sf              =&gt; 600.203
+  :swppm           =&gt; 18.0315
+  :bf              =&gt; 600.2
+  :offsethz        =&gt; 2819.0
+  :window          =&gt; Cos²Window(0.0946176)
+  :offsetppm       =&gt; 4.69677
+  :pseudodim       =&gt; false
+  :npoints         =&gt; 1216
+  :referenceoffset =&gt; 0.0
+  :swhz            =&gt; 10822.5
+  :td              =&gt; 1024
+  :units           =&gt; nothing
+  :coherence       =&gt; nothing
+  :tdzf            =&gt; 4096
+  :mcindex         =&gt; nothing
+  :procs           =&gt; Dict{Symbol, Any}(:alpha=&gt;0, :ymin_p=&gt;-44320020, :pscal=&gt;…</code></pre><p>Axes can also be accessed by their type, e.g. <code>F1Dim</code> or <code>F2Dim</code>:</p><pre><code class="language-julia hljs">metadata(spec, F2Dim)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Metadata{FrequencyDimension}<span class="sgr90"> of </span>Dict{Symbol, Any} with 19 entries:
+  :aq              =&gt; 0.0478336
+  :label           =&gt; &quot;15N&quot;
+  :region          =&gt; missing
+  :sf              =&gt; 60.8249
+  :swppm           =&gt; 21.9997
+  :bf              =&gt; 60.8177
+  :offsethz        =&gt; 7176.49
+  :window          =&gt; CosWindow(0.0478336)
+  :offsetppm       =&gt; 118.0
+  :pseudodim       =&gt; false
+  :npoints         =&gt; 512
+  :referenceoffset =&gt; 0.0
+  :swhz            =&gt; 1337.97
+  :td              =&gt; 64
+  :units           =&gt; nothing
+  :coherence       =&gt; nothing
+  :tdzf            =&gt; 512
+  :mcindex         =&gt; nothing
+  :procs           =&gt; Dict{Symbol, Any}(:alpha=&gt;0, :ymin_p=&gt;-44320020, :pscal=&gt;…</code></pre><p>Again, for convenience entries can be accessed by passing an additional argument to the <code>metadata</code> function:</p><pre><code class="language-julia hljs">metadata(spec, F1Dim, :label)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&quot;1H&quot;</code></pre><p>or directly from the spectrum object using a dictionary-style lookup alongside an axis reference:</p><pre><code class="language-julia hljs">spec[2, :offsetppm]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">117.99995292412437</code></pre><h2 id="Accessing-acquisition-parameters"><a class="docs-heading-anchor" href="#Accessing-acquisition-parameters">Accessing acquisition parameters</a><a id="Accessing-acquisition-parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Accessing-acquisition-parameters" title="Permalink"></a></h2><p>Spectrometer acquisition parameters are automatically parsed from the <code>acqus</code> file when data are loaded. This is stored as a dictionary in the <code>:acqus</code> entry of the spectrum metadata, but can more conveniently be accessed through the function <code>acqus(spec, parametername)</code>. Parameter names can be provided either as strings (case insensitive, e.g. <code>&quot;TE&quot;</code> for the temperature) or as lowercase symbols (e.g. <code>:te</code>).</p><pre><code class="language-julia hljs">acqus(spec, :te)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">276.9988</code></pre><p>Arrayed parameters such as pulse lengths are returned as dictionaries:</p><pre><code class="language-julia hljs">acqus(spec, :p)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Dict{Int64, Float64} with 64 entries:
   5  =&gt; 16.5
   56 =&gt; 500.0
   16 =&gt; 1000.0
@@ -85,4 +87,4 @@ acqus(relaxation_experiment, :vclist)</code></pre><pre class="documenter-example
  10
  12
  14
- 16</code></pre><h2 id="Window-functions"><a class="docs-heading-anchor" href="#Window-functions">Window functions</a><a id="Window-functions-1"></a><a class="docs-heading-anchor-permalink" href="#Window-functions" title="Permalink"></a></h2><p>The window functions used for data processing are identified when experiments are loaded. These are represented by subtypes of <a href="../api/#NMRTools.NMRBase.WindowFunction"><code>WindowFunction</code></a>, which contain appropriate parameters specifying the particular function applied together with the acquisition time <span>$t_\mathrm{max}$</span> (calculated at the point of application, i.e. after linear prediction but before zero filling).</p><p>Window functions are stored as axis metadata and can be accessed through the <code>:window</code> parameter:</p><pre><code class="language-julia hljs">spec[2, :window] # get the window function for the second dimension</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">CosWindow(0.04783359999999993)</code></pre><p>Available window functions are:</p><ul><li><code>NullWindow(tmax)</code>: no window function applied</li><li><code>UnknownWindow(tmax)</code>: unrecognised window function</li><li><code>ExponentialWindow(lb, tmax)</code>: line broadening specified in Hz</li><li><code>SineWindow(offset, endpoint, power, tmax)</code>: a supertype encompassing some special cases<ul><li><code>CosWindow(tmax)</code>: apodization by a pure half-cosine window</li><li><code>Cos²Window(tmax)</code>: apodization by a pure half-cosine-squared window</li><li><code>GeneralSineWindow(offset, endpoint, power, tmax)</code>: other general cases</li></ul></li><li><code>GaussWindow(expHz, gaussHz, center, tmax)</code>: a supertype encompassing some special cases<ul><li><code>LorentzToGaussWindow(expHz, gaussHz, tmax)</code></li><li><code>GeneralGaussWindow(expHz, gaussHz, center, tmax)</code>: other general cases</li></ul></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial-plotrecipes/">« Plotting</a><a class="docs-footer-nextpage" href="../tutorial-animation/">Animating spectra »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Monday 25 November 2024 13:45">Monday 25 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 16</code></pre><h2 id="Window-functions"><a class="docs-heading-anchor" href="#Window-functions">Window functions</a><a id="Window-functions-1"></a><a class="docs-heading-anchor-permalink" href="#Window-functions" title="Permalink"></a></h2><p>The window functions used for data processing are identified when experiments are loaded. These are represented by subtypes of <a href="../api/#NMRTools.NMRBase.WindowFunction"><code>WindowFunction</code></a>, which contain appropriate parameters specifying the particular function applied together with the acquisition time <span>$t_\mathrm{max}$</span> (calculated at the point of application, i.e. after linear prediction but before zero filling).</p><p>Window functions are stored as axis metadata and can be accessed through the <code>:window</code> parameter:</p><pre><code class="language-julia hljs">spec[2, :window] # get the window function for the second dimension</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">CosWindow(0.04783359999999993)</code></pre><p>Available window functions are:</p><ul><li><code>NullWindow(tmax)</code>: no window function applied</li><li><code>UnknownWindow(tmax)</code>: unrecognised window function</li><li><code>ExponentialWindow(lb, tmax)</code>: line broadening specified in Hz</li><li><code>SineWindow(offset, endpoint, power, tmax)</code>: a supertype encompassing some special cases<ul><li><code>CosWindow(tmax)</code>: apodization by a pure half-cosine window</li><li><code>Cos²Window(tmax)</code>: apodization by a pure half-cosine-squared window</li><li><code>GeneralSineWindow(offset, endpoint, power, tmax)</code>: other general cases</li></ul></li><li><code>GaussWindow(expHz, gaussHz, center, tmax)</code>: a supertype encompassing some special cases<ul><li><code>LorentzToGaussWindow(expHz, gaussHz, tmax)</code></li><li><code>GeneralGaussWindow(expHz, gaussHz, center, tmax)</code>: other general cases</li></ul></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial-plotrecipes/">« Plotting</a><a class="docs-footer-nextpage" href="../tutorial-animation/">Animating spectra »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Saturday 30 November 2024 11:04">Saturday 30 November 2024</span>. Using Julia version 1.11.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
