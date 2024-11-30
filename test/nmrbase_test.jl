@@ -84,6 +84,13 @@ end
     datG = setgradientlist(dat, LinRange(0.05, 0.95, 21), 0.55)
     @test data(datG, 2)[end] == 0.5225
     @test units(datG, 2) == "T m⁻¹"
+
+    # offsets
+    spec = exampledata("1D_1H")
+    spec2 = add_offset(spec, 1, 0.5)
+    @test data(spec2,1)[1] - data(spec,1)[1] == 0.5
+    spec2 = add_offset(spec2, F1Dim, 0.5)
+    @test data(spec2,1)[1] - data(spec,1)[1] == 1
 end
 
 @testset "NMRBase: metadata" begin

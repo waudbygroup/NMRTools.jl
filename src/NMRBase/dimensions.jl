@@ -154,3 +154,49 @@ getω(ax::FrequencyDimension) = 2π * ax[:bf] * (data(ax) .- ax[:offsetppm])
 Return the offset (in rad/s) for a chemical shift (or list of shifts) on a frequency axis.
 """
 getω(ax::FrequencyDimension, δ) = 2π * ax[:bf] * (δ .- ax[:offsetppm])
+
+
+
+"""
+    add_offset!(data::NMRData, dim_ref, offset)
+
+Add an offset to a frequency dimension in an NMRData object. The dimension can be specified as a numerical index or an object like `F1Dim`.
+The metadata is copied using `replacedimension`, and an entry is added or updated in the dimension metadata to record the offset change.
+"""
+function add_offset(spec, dim_ref, offsetppm)
+    dim_no = if dim_ref isa Int
+        dim_ref
+    else
+        findfirst(d -> d isa dim_ref, dims(spec))
+    end
+    # check that dim_no is valid (not nothing, and within the range of dims)
+    if isnothing(dim_no) || dim_no > length(spec.dims) || dim_no < 1
+        throw(NMRToolsError("add_offset: Dimension $dim_ref not found in NMRData object"))
+    end
+
+    dim = dims(spec, dim_no)
+
+    new_data = data(dim) .+ offsetppm
+    if dim_no == 1
+        newdim = F1Dim(new_data)
+    elseif dim_no == 2
+        newdim = F2Dim(new_data)
+    elseif dim_no == 3
+        newdim = F3Dim(new_data)
+    end
+    new_spec = replacedimension(spec, dim_no, newdim)
+    
+    if :referenceoffset ∉ keys(metadata(new_spec, dim_no))
+        metadata(new_spec, dim_no)[:referenceoffset] = offsetppm
+    else
+        metadata(new_spec, dim_no)[:referenceoffset] += offsetppm
+    end
+    # adjust other metadata:
+    # :sf: carrier frequency, in MHz
+    # :offsethz: carrier offset from bf, in Hz
+    # :offsetppm: carrier offset from bf, in ppm
+    metadata(new_spec, dim_no)[:offsetppm] += offsetppm
+    metadata(new_spec, dim_no)[:offsethz] += offsetppm * metadata(new_spec, dim_no, :bf)
+    metadata(new_spec, dim_no)[:sf] += offsetppm * metadata(new_spec, dim_no, :bf) / 1e6
+    return new_spec
+end

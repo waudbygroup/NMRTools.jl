@@ -108,6 +108,7 @@ export replacedimension
 export setkinetictimes
 export setrelaxtimes
 export setgradientlist
+export add_offset
 
 # Metadata
 export AbstractMetadata, Metadata, NoMetadata
