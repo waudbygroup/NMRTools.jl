@@ -97,3 +97,4 @@ getoffset
 | `:td`                | number of **complex** points acquired, including LP                        |
 | `:tdzf`              | number of **complex** points when FT executed, including LP and ZF         |
 | `:window`            | [`WindowFunction`](@ref) encoding applied apodization                      |
+| `:referenceoffset`   | applied referencing, in ppm                                                |

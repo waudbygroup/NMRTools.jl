@@ -37,6 +37,7 @@ Return the metadata for specified key, or `nothing` if not found. Keys are passe
 - `:swppm`: spectrum width, in ppm
 - `:region`: extracted region, expressed as a range in points, otherwise missing
 - `:window`: `WindowFunction` indicating applied apodization
+- `:referenceoffset`: referencing (in ppm) applied to the dimension
 
 See also [`estimatenoise!`](@ref).
 """
@@ -171,6 +172,7 @@ function defaultmetadata(::Type{<:FrequencyDimension})
                                 :region => nothing,
                                 :units => nothing,
                                 :window => nothing,
+                                :referenceoffset => 0.0,
                                 :mcindex => nothing)
     return Metadata{FrequencyDimension}(defaults)
 end

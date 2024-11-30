@@ -177,12 +177,13 @@ function add_offset(spec, dim_ref, offsetppm)
     dim = dims(spec, dim_no)
 
     new_data = data(dim) .+ offsetppm
+    md = deepcopy(metadata(dim))
     if dim_no == 1
-        newdim = F1Dim(new_data)
+        newdim = F1Dim(new_data, metadata=md)
     elseif dim_no == 2
-        newdim = F2Dim(new_data)
+        newdim = F2Dim(new_data, metadata=md)
     elseif dim_no == 3
-        newdim = F3Dim(new_data)
+        newdim = F3Dim(new_data, metadata=md)
     end
     new_spec = replacedimension(spec, dim_no, newdim)
     
@@ -191,12 +192,11 @@ function add_offset(spec, dim_ref, offsetppm)
     else
         metadata(new_spec, dim_no)[:referenceoffset] += offsetppm
     end
-    # adjust other metadata:
-    # :sf: carrier frequency, in MHz
-    # :offsethz: carrier offset from bf, in Hz
-    # :offsetppm: carrier offset from bf, in ppm
+
+    # adjust other metadata
     metadata(new_spec, dim_no)[:offsetppm] += offsetppm
     metadata(new_spec, dim_no)[:offsethz] += offsetppm * metadata(new_spec, dim_no, :bf)
     metadata(new_spec, dim_no)[:sf] += offsetppm * metadata(new_spec, dim_no, :bf) / 1e6
+
     return new_spec
 end

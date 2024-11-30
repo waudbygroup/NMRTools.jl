@@ -73,6 +73,39 @@ A heirarchy of types are defined for NMR dimensions, reflecting the variety of d
         - `GradientDimension`: for e.g. diffusion measurements, with specific types `G1Dim` to `G4Dim`
         - `UnknownDimension`: with specific types `X1Dim` to `X4Dim`
 
+## Adjusting spectrum referencing
+
+The `add_offset` function allows you to adjust the referencing of your NMR spectrum by adding a specified offset to the chemical shift values along a given dimension. This can be useful if you need to correct referencing errors or align spectra.
+
+To use `add_offset`, you need to specify the NMRData object, the dimension to adjust, and the offset value to add. Here is a simple example:
+
+```@example offset
+using NMRTools, Plots #hide
+
+# Load example data
+spec2d_original = exampledata("2D_HN")
+
+# Add an offset of 0.1 ppm to the first dimension (specified as a number)
+spec2d = add_offset(spec2d_original, 1, 0.1)
+
+# Add a further offset of -0.5 ppm to the second dimension (specified as F2Dim)
+spec2d = add_offset(spec2d, F2Dim, -0.5)
+
+label!(spec2d_original, "unreferenced")
+label!(spec2d, "referenced")
+plot([spec2d_original, spec2d])
+savefig("plot-offset.svg"); nothing # hide
+```
+
+![](plot-1D.svg)
+
+In this example, the chemical shift values in the first dimension of `spec2d` are increased by 0.1 ppm, and the values in the second dimension are decreased by 0.5 ppm.
+
+!!! note
+    The `add_offset` function will adjust metadata (`:offsetppm`, `:offsethz` and `:sf`) to keep track of the altered
+    referencing. A new metadata entry `:referenceoffset` will be created to keep track of this referencing.
+
+
 ## Accessing metadata
 
 [`NMRData`](@ref) objects contain comprehensive metadata on processing and acquisition parameters that are populated automatically upon loading a spectrum. Entries are divided into *spectrum* metadata - associated with the experiment in general - and *axis* metadata, that are associated with a particular dimension of the data.
