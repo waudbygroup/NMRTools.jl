@@ -20,6 +20,7 @@ makedocs(;
             "Diffusion analysis" => "tutorial-diffusion.md",
             # "2D phosphorylation kinetics" => "tutorial-phosphorylation.md",
         ],
+        "Utilities" => "utilities.md",
         "Reference guide" => [
         #     "Data" => "ref-data.md",
         #     "Dimensions" => "ref-dimensions.md",
