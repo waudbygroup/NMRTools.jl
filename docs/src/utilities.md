@@ -2,7 +2,11 @@
 
 ## Combining NMR experiments
 
-NMRTools provides utility functions for common operations on NMR experiments. One such function is `sumexpts`, which allows you to combine multiple Bruker NMR experiments with optional weighting factors.
+`sumexpts(OUTPUT, INPUTFILES...)` is a utility function provided by NMRTools that allows you to combine multiple Bruker NMR experiments with optional weighting factors.
+The function accepts the following parameters:
+
+* `OUTPUT`: The experiment number or path where the combined data will be stored
+* `INPUTFILES...`: One or more experiment numbers or paths to be combined
 
 The function works with both 1D experiments (using `fid` files) and multidimensional experiments (using `ser` files).
 
@@ -15,25 +19,25 @@ julia> using NMRTools
 
 julia> cd("myexperiment")
 
-julia> sumexpts(999, 42, 44)
+julia> sumexpts(999, 11, 12)
 === NMR Experiment Summation ===
 Output: 999
-Inputs: 42, 44
+Inputs: 11, 12
 Weights: 1.0, 1.0
-Created output experiment from 42
+Created output experiment from 11
 Data format: Float64 (little-endian)
 Detected nD experiment, using ser files
 Cleaning processed data files in pdata/1...
   Removed: 3rrr
 Removed pdata/101 directory
 Removed pdata/999 directory
-Loading 42/ser
-Loading 44/ser
-Applied weight 1.0 to experiment 42
-Applied weight 1.0 to experiment 44
+Loading 11/ser
+Loading 12/ser
+Applied weight 1.0 to experiment 11
+Applied weight 1.0 to experiment 12
 Writing output to 999/ser
-Scans from 42: 8 × 1.0 = 8.0
-Scans from 44: 16 × 1.0 = 16.0
+Scans from 11: 8 × 1.0 = 8.0
+Scans from 12: 16 × 1.0 = 16.0
 Updated number of scans to 24
 Updated title file with experiment summary
 === Operation completed successfully ===
