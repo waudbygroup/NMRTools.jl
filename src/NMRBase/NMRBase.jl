@@ -9,35 +9,26 @@ const EXPERIMENTAL = """
 const DDdocs = "https://rafaqz.github.io/DimensionalData.jl/stable/api"
 const DDdimdocs = joinpath(DDdocs, "#DimensionalData.Dimension")
 const DDarraydocs = joinpath(DDdocs, "#DimensionalData.AbstractDimensionalArray")
-# const DDabssampleddocs = joinpath(DDdocs, "#DimensionalData.AbstractSampled")
-# const DDsampleddocs = joinpath(DDdocs, "#DimensionalData.Sampled")
-# const DDlocusdocs = joinpath(DDdocs, "#DimensionalData.Locus")
-# const DDselectordocs = joinpath(DDdocs, "#DimensionalData.Selector")
-# const DDtidocs = joinpath(DDdocs, "#DimensionalData.Ti")
+
 
 using LinearAlgebra
-using SimpleTraits
 using Optim
-using Statistics
+using Reexport
+using SimpleTraits
 using SpecialFunctions
+using Statistics
 
-# using Reexport: Reexport
-# Reexport.@reexport using DimensionalData
-using DimensionalData
-using DimensionalData.LookupArrays,
-      DimensionalData.Dimensions
-const DD = DimensionalData
+@reexport using DimensionalData
 
-# using DimensionalData: Name, NoName
-# using .Dimensions: StandardIndices, DimTuple, Dimension
-# using .LookupArrays: LookupArrayTuple
+using DimensionalData.Tables,
+      DimensionalData.Lookups,
+      DimensionalData.Dimensions,
+      DimensionalData.Lookups.IntervalSets
 
-import DimensionalData.refdims_title
-import .LookupArrays: metadata, set, _set, rebuild, basetypeof, Metadata,
-                      order, span, sampling, locus, val, index, bounds, hasselection, units,
-                      SelectorOrInterval,
-                      ForwardOrdered
-import .Dimensions: dims, refdims, lookup, dimstride, kwdims, hasdim, label, _astuple
+using DimensionalData: Name, NoName
+using .Dimensions: StandardIndices, DimTuple
+using .Lookups: LookupTuple
+
 
 include("exceptions.jl")
 include("nuclei.jl")
@@ -72,18 +63,8 @@ export coherenceorder
 # NMRData
 export AbstractNMRData
 export NMRData
-# Selectors
-export Selector, IntSelector, ArraySelector
-export At, Between, Touches, Contains, Near, Where, All, ..
-# getter methods
-export data, parent, dims, refdims, lookup, bounds, missingval
 # traits
 export hasnonfrequencydimension, HasNonFrequencyDimension
-# Dimension/Lookup primitives
-export dimnum, hasdim, hasselection, otherdims
-# utils
-export refdims_title
-export set, rebuild, reorder, modify, broadcast_dims, broadcast_dims!, ForwardOrdered
 # NMR properties
 export scale
 export estimatenoise!
@@ -101,8 +82,7 @@ export T1Dim, T2Dim, T3Dim, T4Dim
 export TrelaxDim, TkinDim
 export G1Dim, G2Dim, G3Dim, G4Dim
 export X1Dim, X2Dim, X3Dim, X4Dim
-# export GradientDim
-# export SpatialDim
+
 export getω
 export replacedimension
 export setkinetictimes
@@ -111,7 +91,6 @@ export setgradientlist
 export add_offset
 
 # Metadata
-export AbstractMetadata, Metadata, NoMetadata
 export metadata
 export defaultmetadata
 export metadatahelp
