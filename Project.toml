@@ -1,7 +1,7 @@
 name = "NMRTools"
 uuid = "c2839fe3-f1de-42fc-897f-c1b0e8db4db6"
 authors = ["Chris Waudby"]
-version = "0.1.11"
+version = "0.1.12"
 
 [deps]
 ArtifactUtils = "8b73e784-e7d8-4ea5-973d-377fed4e3bce"
