@@ -130,5 +130,72 @@ spec2d[2, :bf]
 spec2d[F2Dim, :window]
 ```
 
+## Chemical Shift Referencing
+
+NMRTools.jl provides a unified `reference()` function for convenient chemical shift referencing with intelligent defaults and heteronuclear support. The function can automatically detect 1H axes, apply water referencing with temperature correction, and propagate referencing to all heteronuclear dimensions using proper XI ratios.
+
+### Basic Usage
+
+The simplest usage automatically finds the 1H axis and applies water referencing:
+```julia
+# Ultimate convenience - automatic detection and water referencing
+spec_referenced = reference(spec)
+```
+
+For more control, you can specify the axis and disable propagation:
+```julia
+# Water referencing with axis control  
+spec_referenced = reference(spec, F1Dim)
+spec_referenced = reference(spec, F1Dim, propagate=false)
+```
+
+### Explicit Chemical Shift Referencing
+
+You can reference specific chemical shifts using the `old_shift => new_shift` syntax:
+```julia
+# Correct small offset
+spec_referenced = reference(spec, F1Dim, -0.07 => 0.0)
+
+# Reference water to literature value
+spec_referenced = reference(spec, F1Dim, 4.70 => 4.85)
+
+# Multiple axes simultaneously
+spec_referenced = reference(spec, [F1Dim, F2Dim], [4.7, 120.0] => [0.0, 118.0])
+```
+
+### Temperature and Solvent Detection
+
+The function automatically:
+- Detects temperature from acquisition parameters (`acqus(:te)`)
+- Identifies solvent conditions from `acqus(:solvent)` 
+- Applies appropriate reference standards (TMS for organic, DSS for aqueous)
+- Calculates temperature-dependent water chemical shifts
+
+```julia
+# Manual temperature specification (in Kelvin)
+spec_referenced = reference(spec, F1Dim, temperature=298.15)
+
+# Override reference standard
+spec_referenced = reference(spec, F1Dim, reference_standard=:TMS)
+```
+
+### Heteronuclear Referencing
+
+When `propagate=true` (default), the function automatically applies heteronuclear referencing to all other frequency dimensions using IUPAC-recommended XI ratios:
+```julia
+# Reference 1H,15N HSQC - both dimensions will be referenced
+spec_hsqc = reference(spec_2d, F1Dim, 4.7 => 0.0)
+```
+
+The function provides informational output explaining all calculations:
+```
+[ Info: Detected 1H axis: F1Dim
+[ Info: Detected aqueous conditions from solvent parameter. Using DSS reference standard.
+[ Info: Temperature correction: Water chemical shift at 25.0°C is 7.572 ppm
+[ Info: Applied referencing: 7.572 ppm → 0.0 ppm (offset: -7.572 ppm)
+[ Info: Applied heteronuclear referencing for F2Dim (N15): XI ratio = 0.101329, offset = -74.733 ppm
+[ Info: Heteronuclear referencing complete using DSS standard
+```
+
 
 

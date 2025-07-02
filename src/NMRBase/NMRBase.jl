@@ -109,6 +109,9 @@ export setkinetictimes
 export setrelaxtimes
 export setgradientlist
 export add_offset
+export reference
+export detect_nucleus
+export water_chemical_shift
 
 # Metadata
 export AbstractMetadata, Metadata, NoMetadata
