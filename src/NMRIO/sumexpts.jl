@@ -1,14 +1,14 @@
 #!/usr/bin/env julia
 
 """
-    sumexpts(outputexpt, inputexpts...; weights=[])
+    sumexpts(inputexpts...; out, weights=[])
 
 Sum a collection of Bruker NMR experiments, with optional weighting factors.
 Data will be truncated to fit the shortest data file.
 
 # Arguments
-- `outputexpt`: Output experiment name (string or integer)
 - `inputexpts...`: Input experiment names (strings or integers)
+- `out`: Output experiment name (string or integer)
 - `weights`: Optional vector of weights for each input experiment
 
 # Details
@@ -21,9 +21,9 @@ Data will be truncated to fit the shortest data file.
 - Updates the number of scans in the acqus file to be the sum of individual experiments
 - Prompts before overwriting any existing experiment
 """
-function sumexpts(outputexpt, inputexpts...; weights=[])
+function sumexpts(inputexpts...; out, weights=[])
     # Convert experiment names to strings if needed
-    outputexpt_str = typeof(outputexpt) <: Integer ? string(outputexpt) : outputexpt
+    outputexpt_str = typeof(out) <: Integer ? string(out) : out
     inputexpts_str = [typeof(expt) <: Integer ? string(expt) : expt for expt in inputexpts]
     
     println("=== NMR Experiment Summation ===")

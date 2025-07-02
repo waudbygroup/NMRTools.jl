@@ -2,11 +2,11 @@
 
 ## Combining NMR experiments
 
-`sumexpts(OUTPUT, INPUTFILES...)` is a utility function provided by NMRTools that allows you to combine multiple Bruker NMR experiments with optional weighting factors.
+`sumexpts(INPUTFILES...; out=OUTPUT)` is a utility function provided by NMRTools that allows you to combine multiple Bruker NMR experiments with optional weighting factors.
 The function accepts the following parameters:
 
-* `OUTPUT`: The experiment number or path where the combined data will be stored
 * `INPUTFILES...`: One or more experiment numbers or paths to be combined
+* `out`: The experiment number or path where the combined data will be stored (keyword argument)
 
 The function works with both 1D experiments (using `fid` files) and multidimensional experiments (using `ser` files).
 
@@ -19,7 +19,7 @@ julia> using NMRTools
 
 julia> cd("myexperiment")
 
-julia> sumexpts(999, 11, 12)
+julia> sumexpts(11, 12, out=999)
 === NMR Experiment Summation ===
 Output: 999
 Inputs: 11, 12
@@ -49,7 +49,7 @@ You can also use full paths if your experiments are in different directories:
 
 ```julia
 # Combine experiments from a specific path
-julia> sumexpts("myexperiment/999", "myexperiment/11", "myexperiment/12")
+julia> sumexpts("myexperiment/11", "myexperiment/12", out="myexperiment/999")
 # Output similar to above example
 ```
 
@@ -61,7 +61,7 @@ To combine more than two experiments, simply provide all experiment numbers:
 # Add three experiments together
 julia> cd("myexperiment")
 
-julia> sumexpts(999, 11, 12, 13)
+julia> sumexpts(11, 12, 13, out=999)
 # Output shows all three experiments being combined
 ```
 
@@ -75,7 +75,7 @@ To create a difference spectrum, use the `weights` parameter:
 # Create a difference spectrum (experiment 12 subtracted from experiment 11)
 julia> cd("myexperiment")
 
-julia> sumexpts(999, 11, 12, weights=[1.0, -1.0])
+julia> sumexpts(11, 12, out=999, weights=[1.0, -1.0])
 === NMR Experiment Summation ===
 Output: 999
 Inputs: 11, 12
@@ -111,7 +111,7 @@ You can apply different weights to each experiment to create weighted averages o
 # Weighted combination of three experiments
 julia> cd("myexperiment")
 
-julia> sumexpts(999, 11, 12, 13, weights=[0.5, 1.0, 2.0])
+julia> sumexpts(11, 12, 13, out=999, weights=[0.5, 1.0, 2.0])
 === NMR Experiment Summation ===
 Output: 999
 Inputs: 11, 12, 13
@@ -152,14 +152,14 @@ The function can also be called from the command line:
 
 ```bash
 cd myexperiment
-julia -e 'using NMRTools; sumexpts(999, 11, 12)'
+julia -e 'using NMRTools; sumexpts(11, 12, out=999)'
 ```
 
 Or for creating a difference spectrum:
 
 ```bash
 cd myexperiment
-julia -e 'using NMRTools; sumexpts(999, 11, 12, weights=[1.0, -1.0])'
+julia -e 'using NMRTools; sumexpts(11, 12, out=999, weights=[1.0, -1.0])'
 ```
 
 This allows for easy integration with processing workflows and shell scripts.
