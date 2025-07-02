@@ -63,6 +63,7 @@ export Nucleus
 @exportinstances Nucleus
 export spin
 export gyromagneticratio
+export xi_ratio
 
 # coherences
 export Coherence
@@ -109,6 +110,10 @@ export setkinetictimes
 export setrelaxtimes
 export setgradientlist
 export add_offset
+export reference
+export reference_heteronuclear
+export detect_nucleus
+export water_chemical_shift
 
 # Metadata
 export AbstractMetadata, Metadata, NoMetadata

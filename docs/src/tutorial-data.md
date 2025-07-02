@@ -105,6 +105,37 @@ In this example, the chemical shift values in the first dimension of `spec2d` ar
     The `add_offset` function will adjust metadata (`:offsetppm`, `:offsethz` and `:sf`) to keep track of the altered
     referencing. A new metadata entry `:referenceoffset` will be created to keep track of this referencing.
 
+### Convenient referencing with the `reference` function
+
+The `reference` function provides a more convenient way to reference spectra by specifying the current and desired chemical shift positions directly:
+
+```julia
+# Reference using old_shift => new_shift syntax
+spec_ref = reference(spec, 1, 4.7 => 0.0)  # Move peak from 4.7 to 0.0 ppm
+
+# Reference multiple dimensions simultaneously  
+spec_ref = reference(spec, [1, 2], [4.7, 120.0] => [0.0, 118.0])
+```
+
+### Heteronuclear referencing
+
+For heteronuclear experiments, the `reference_heteronuclear` function can reference all dimensions based on a single ¹H reference, using XI ratios to calculate appropriate offsets for other nuclei:
+
+```julia
+# Reference a ¹H,¹⁵N HSQC with DSS at 0.0 ppm
+spec_ref = reference_heteronuclear(spec, 1, 0.0, reference_standard=:DSS)
+
+# Reference with water temperature correction (25°C)
+spec_ref = reference_heteronuclear(spec, 1, 0.0, temperature=25)
+
+# Reference everything relative to TMS for organic solvents
+spec_ref = reference_heteronuclear(spec, F1Dim, 0.0, reference_standard=:TMS)
+```
+
+The function automatically detects nucleus types from axis labels or chemical shift ranges, and applies the appropriate XI ratios for heteronuclear referencing. It supports both TMS (organic solvents) and DSS (aqueous solvents) reference standards.
+
+Water chemical shift correction is available using the temperature-dependent formula δ(H₂O) = 7.83 - T/96.9, which is automatically applied when a temperature is specified.
+
 
 ## Accessing metadata
 

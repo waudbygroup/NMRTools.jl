@@ -67,3 +67,57 @@ gyromagneticratio(c::SQ) = gyromagneticratio(c.nucleus)
 function gyromagneticratio(c::MQ)
     return sum([gyromagneticratio(t[1]) * t[2] for t in c.coherences])
 end
+
+"""
+    XI_RATIOS
+
+Dictionary containing XI ratios (ratio of frequency relative to 1H) for different nuclei
+in TMS (organic solvents) and DSS (aqueous solvents) according to IUPAC recommendations.
+
+Reference: https://nmr.chem.ucsb.edu/protocols/refppm.html
+           Pure Appl. Chem. 2001, 73, 1795-1818
+"""
+const XI_RATIOS = Dict(
+    :TMS => Dict(
+        H1 => 1.0,  # 1H is the reference
+        C13 => 0.251449530,  # 13C
+        N15 => 0.101329118,  # 15N
+        F19 => 0.940062227,  # 19F
+        P31 => 0.404808636   # 31P
+    ),
+    :DSS => Dict(
+        H1 => 1.0,  # 1H is the reference
+        C13 => 0.251449530,  # 13C (same as TMS)
+        N15 => 0.101329118,  # 15N (same as TMS) 
+        F19 => 0.940062227,  # 19F (same as TMS)
+        P31 => 0.404808636   # 31P (same as TMS)
+    )
+)
+
+"""
+    xi_ratio(nucleus; reference_standard=:TMS)
+
+Return the XI ratio for a nucleus relative to 1H for the specified reference standard.
+
+# Arguments
+- `nucleus`: The nucleus (e.g., C13, N15)
+- `reference_standard`: Either `:TMS` for organic solvents or `:DSS` for aqueous solvents
+
+# Examples
+```julia
+xi_ratio(C13)  # Returns 0.251449530 for TMS
+xi_ratio(N15, reference_standard=:DSS)  # Returns 0.101329118 for DSS
+```
+"""
+function xi_ratio(nucleus::Nucleus; reference_standard::Symbol=:TMS)
+    if reference_standard ∉ [:TMS, :DSS]
+        throw(NMRToolsError("reference_standard must be :TMS or :DSS"))
+    end
+    
+    ratios = XI_RATIOS[reference_standard]
+    if nucleus ∉ keys(ratios)
+        throw(NMRToolsError("XI ratio not defined for nucleus $nucleus"))
+    end
+    
+    return ratios[nucleus]
+end
