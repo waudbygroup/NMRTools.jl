@@ -44,6 +44,7 @@ See also [`estimatenoise!`](@ref).
 function metadata end
 
 metadata(A::AbstractNMRData, key::Symbol) = get(metadata(A), key, nothing)
+metadata(A::AbstractNMRData, dim) = metadata(dims(A, dim))
 metadata(A::AbstractNMRData, dim, key::Symbol) = get(metadata(A, dim), key, nothing)
 metadata(d::NMRDimension, key::Symbol) = get(metadata(d), key, nothing)
 
