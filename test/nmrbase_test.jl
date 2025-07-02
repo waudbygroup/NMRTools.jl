@@ -137,6 +137,66 @@ end
     @test metadatahelp(:window) == "Window function"
 end
 
+@testset "NMRBase: metadata deep-copy behavior" begin
+    # Test that metadata is properly deep-copied during slicing and copying operations
+    axH = F1Dim(8:0.1:9)
+    original = NMRData(0.0:1:10, (axH,))
+    
+    # Set some metadata
+    original[:title] = "Original Data"
+    original[:label] = "Test Spectrum"
+    original[:custom_field] = "test_value"
+    
+    # Test slicing creates deep copies of metadata
+    slice1 = original[1:5]
+    slice2 = original[6:10]
+    
+    # Verify initial values are copied
+    @test slice1[:title] == "Original Data"
+    @test slice2[:title] == "Original Data"
+    @test slice1[:label] == "Test Spectrum"
+    @test slice2[:label] == "Test Spectrum"
+    @test slice1[:custom_field] == "test_value"
+    @test slice2[:custom_field] == "test_value"
+    
+    # Modify metadata in slice1
+    slice1[:title] = "Modified by slice1"
+    slice1[:label] = "Changed label"
+    slice1[:custom_field] = "changed_value"
+    
+    # Verify metadata objects are separate (deep-copied)
+    @test original[:title] == "Original Data"  # Should remain unchanged
+    @test original[:label] == "Test Spectrum"  # Should remain unchanged
+    @test original[:custom_field] == "test_value"  # Should remain unchanged
+    
+    @test slice2[:title] == "Original Data"  # Should remain unchanged
+    @test slice2[:label] == "Test Spectrum"  # Should remain unchanged
+    @test slice2[:custom_field] == "test_value"  # Should remain unchanged
+    
+    @test slice1[:title] == "Modified by slice1"
+    @test slice1[:label] == "Changed label"
+    @test slice1[:custom_field] == "changed_value"
+    
+    # Test that metadata objects are not identical (not sharing references)
+    @test original.metadata !== slice1.metadata
+    @test original.metadata !== slice2.metadata
+    @test slice1.metadata !== slice2.metadata
+    
+    # Test copying NMRData from another NMRData also deep-copies metadata
+    copy1 = NMRData(original)
+    copy1[:title] = "Copy modified"
+    @test original[:title] == "Original Data"  # Should remain unchanged
+    @test copy1[:title] == "Copy modified"
+    @test original.metadata !== copy1.metadata
+    
+    # Test arithmetic operations preserve metadata independence
+    sum_data = slice1 + slice2  # This should work now with deep-copied metadata
+    @test sum_data[:title] == slice1[:title]  # Takes metadata from first operand
+    sum_data[:title] = "Sum modified"
+    @test slice1[:title] == "Modified by slice1"  # Should remain unchanged
+    @test slice2[:title] == "Original Data"  # Should remain unchanged
+end
+
 @testset "NMRBase: nuclei and coherences" begin
     @test spin(H1) == 1 // 2
     @test spin(H2) == 1

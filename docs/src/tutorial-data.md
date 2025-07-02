@@ -44,10 +44,10 @@ spec2d[Near(8.25), 123 .. 124] # select near 8.25 ppm in the first dimension
                                # and between 123 and 124 ppm in the second dimension
 ```
 
-When data are sliced, new NMRData structures are created and their axes are updated to match the new data size.
+When data are sliced, new NMRData structures are created and their axes are updated to match the new data size. Each sliced object will have its own independent copy of metadata.
 
-!!! warning
-    When `NMRData` structures are sliced, copied, or otherwise modified, they inherit the same dictionary of metadata as the original variable. This means that any changes to metadata will affect both variables. To resolve this, make a `deepcopy` of the variable. Note also that any acquisition metadata might not reflect the correct shape of the data any more.
+!!! note
+    When `NMRData` structures are sliced, copied, or otherwise modified, the metadata is automatically deep-copied to ensure independence between objects. This means that changes to metadata in one object will not affect other objects. Note that acquisition metadata might not reflect the correct shape of the data after slicing.
 
 
 ## Accessing axis data
