@@ -37,7 +37,7 @@ import .LookupArrays: metadata, set, _set, rebuild, basetypeof, Metadata,
                       order, span, sampling, locus, val, index, bounds, hasselection, units,
                       SelectorOrInterval,
                       ForwardOrdered
-import .Dimensions: dims, refdims, lookup, dimstride, kwdims, hasdim, label, _astuple
+import .Dimensions: dims, refdims, lookup, hasdim, label, _astuple
 
 include("exceptions.jl")
 include("nuclei.jl")

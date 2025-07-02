@@ -44,43 +44,43 @@ end
     dat1 = exampledata("1D_19F")
     @plottest begin
         plot(dat1)
-    end "plot_1D_19F.png" false
+    end "plot_1D_19F.png" false 0.02
 
     dat2 = exampledata("2D_HN")
     @plottest begin
         plot(dat2)
-    end "plot_2D_HN.png" false
+    end "plot_2D_HN.png" false 0.02
 
     dat3 = exampledata("pseudo2D_XSTE")
     dat3 = setgradientlist(dat3, LinRange(0.05, 0.95, 10), 0.55)
     @plottest begin
         plot(dat3[7 .. 9, :])
-    end "plot_pseudo2D_XSTE.png" false
+    end "plot_pseudo2D_XSTE.png" false 0.02
     @plottest begin
         heatmap(dat3[7 .. 9, :])
-    end "plot_pseudo2D_XSTE_heatmap.png" false
+    end "plot_pseudo2D_XSTE_heatmap.png" false 0.02
 
     dat4 = exampledata("1D_19F_titration")
     @plottest begin
         plot(dat4; xlims=(-125, -122))
-    end "plot_1D_19F_titration.png" false
+    end "plot_1D_19F_titration.png" false 0.02
     @plottest begin
         plot(dat4; xlims=(-125, -121), vstack=true)
-    end "plot_1D_19F_titration_vstack.png" false
+    end "plot_1D_19F_titration_vstack.png" false 0.02
 
     dat5 = exampledata("2D_HN_titration")
     @plottest begin
         plot(dat5)
-    end "plot_2D_HN_titration.png" false
+    end "plot_2D_HN_titration.png" false 0.02
     @plottest begin
         plot(dat5[1])
         plot!(dat5[11]; c=:red)
         xlims!(7, 8)
         ylims!(115, 120)
-    end "plot_2D_HN_overlay.png" false
+    end "plot_2D_HN_overlay.png" false 0.02
 
     @plottest begin
         dat6 = exampledata("3D_HNCA")
         plot(maximum(dat6; dims=2)[:, 1, :] / 3)
-    end "plot_3D_HNCA_projection.png" false
+    end "plot_3D_HNCA_projection.png" false 0.02
 end
