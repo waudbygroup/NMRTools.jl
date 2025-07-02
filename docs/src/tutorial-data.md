@@ -105,37 +105,6 @@ In this example, the chemical shift values in the first dimension of `spec2d` ar
     The `add_offset` function will adjust metadata (`:offsetppm`, `:offsethz` and `:sf`) to keep track of the altered
     referencing. A new metadata entry `:referenceoffset` will be created to keep track of this referencing.
 
-### Convenient referencing with the `reference` function
-
-The `reference` function provides a more convenient way to reference spectra by specifying the current and desired chemical shift positions directly:
-
-```julia
-# Reference using old_shift => new_shift syntax
-spec_ref = reference(spec, 1, 4.7 => 0.0)  # Move peak from 4.7 to 0.0 ppm
-
-# Reference multiple dimensions simultaneously  
-spec_ref = reference(spec, [1, 2], [4.7, 120.0] => [0.0, 118.0])
-```
-
-### Heteronuclear referencing
-
-For heteronuclear experiments, the `reference_heteronuclear` function can reference all dimensions based on a single ¹H reference, using XI ratios to calculate appropriate offsets for other nuclei:
-
-```julia
-# Reference a ¹H,¹⁵N HSQC with DSS at 0.0 ppm
-spec_ref = reference_heteronuclear(spec, 1, 0.0, reference_standard=:DSS)
-
-# Reference with water temperature correction (25°C)
-spec_ref = reference_heteronuclear(spec, 1, 0.0, temperature=25)
-
-# Reference everything relative to TMS for organic solvents
-spec_ref = reference_heteronuclear(spec, F1Dim, 0.0, reference_standard=:TMS)
-```
-
-The function automatically detects nucleus types from axis labels or chemical shift ranges, and applies the appropriate XI ratios for heteronuclear referencing. It supports both TMS (organic solvents) and DSS (aqueous solvents) reference standards.
-
-Water chemical shift correction is available using the temperature-dependent formula δ(H₂O) = 7.83 - T/96.9, which is automatically applied when a temperature is specified.
-
 
 ## Accessing metadata
 
@@ -159,6 +128,73 @@ Axis metadata can be accessed by providing an additional label, which can either
 metadata(spec2d, F2Dim, :label)
 spec2d[2, :bf]
 spec2d[F2Dim, :window]
+```
+
+## Chemical Shift Referencing
+
+NMRTools.jl provides a unified `reference()` function for convenient chemical shift referencing with intelligent defaults and heteronuclear support. The function can automatically detect 1H axes, apply water referencing with temperature correction, and propagate referencing to all heteronuclear dimensions using proper XI ratios.
+
+### Basic Usage
+
+The simplest usage automatically finds the 1H axis and applies water referencing:
+```julia
+# Ultimate convenience - automatic detection and water referencing
+spec_referenced = reference(spec)
+```
+
+For more control, you can specify the axis and disable propagation:
+```julia
+# Water referencing with axis control  
+spec_referenced = reference(spec, F1Dim)
+spec_referenced = reference(spec, F1Dim, propagate=false)
+```
+
+### Explicit Chemical Shift Referencing
+
+You can reference specific chemical shifts using the `old_shift => new_shift` syntax:
+```julia
+# Correct small offset
+spec_referenced = reference(spec, F1Dim, -0.07 => 0.0)
+
+# Reference water to literature value
+spec_referenced = reference(spec, F1Dim, 4.70 => 4.85)
+
+# Multiple axes simultaneously
+spec_referenced = reference(spec, [F1Dim, F2Dim], [4.7, 120.0] => [0.0, 118.0])
+```
+
+### Temperature and Solvent Detection
+
+The function automatically:
+- Detects temperature from acquisition parameters (`acqus(:te)`)
+- Identifies solvent conditions from `acqus(:solvent)` 
+- Applies appropriate reference standards (TMS for organic, DSS for aqueous)
+- Calculates temperature-dependent water chemical shifts
+
+```julia
+# Manual temperature specification (in Kelvin)
+spec_referenced = reference(spec, F1Dim, temperature=298.15)
+
+# Override reference standard
+spec_referenced = reference(spec, F1Dim, reference_standard=:TMS)
+```
+
+### Heteronuclear Referencing
+
+When `propagate=true` (default), the function automatically applies heteronuclear referencing to all other frequency dimensions using IUPAC-recommended XI ratios:
+```julia
+# Reference 1H,15N HSQC - both dimensions will be referenced
+spec_hsqc = reference(spec_2d, F1Dim, 4.7 => 0.0)
+```
+
+The function provides informational output explaining all calculations:
+```
+[ Info: Detected 1H axis: F1Dim
+[ Info: Detected aqueous conditions from solvent parameter. Using DSS reference standard.
+[ Info: Temperature correction: Water chemical shift at 25.0°C is 7.572 ppm
+[ Info: Applied referencing: 7.572 ppm → 0.0 ppm (offset: -7.572 ppm)
+[ Info: Applied heteronuclear referencing for F2Dim (N15): XI ratio = 0.101329, offset = -74.733 ppm
+[ Info: Heteronuclear referencing complete using DSS standard
 ```
 
 

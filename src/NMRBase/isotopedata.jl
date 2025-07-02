@@ -121,3 +121,25 @@ function xi_ratio(nucleus::Nucleus; reference_standard::Symbol=:TMS)
     
     return ratios[nucleus]
 end
+
+"""
+    water_chemical_shift(temperature_kelvin)
+
+Calculate the chemical shift of water based on temperature using the formula:
+δ(H₂O) = 7.83 - (T-273.15)/96.9
+
+where T is temperature in Kelvin.
+
+# Arguments
+- `temperature_kelvin`: Temperature in Kelvin
+
+# Returns
+- Chemical shift of water in ppm
+
+# Reference
+- Gottlieb, H. E.; Kotlyar, V.; Nudelman, A. J. Org. Chem. 1997, 62, 7512-7515.
+"""
+function water_chemical_shift(temperature_kelvin)
+    temperature_celsius = temperature_kelvin - 273.15
+    return 7.83 - temperature_celsius / 96.9
+end

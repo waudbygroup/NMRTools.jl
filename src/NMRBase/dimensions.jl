@@ -194,69 +194,11 @@ function add_offset(spec, dim_ref, offsetppm)
     end
 
     # adjust other metadata
-    if metadata(new_spec, dim_no)[:offsetppm] !== nothing
-        metadata(new_spec, dim_no)[:offsetppm] += offsetppm
-    end
-    if metadata(new_spec, dim_no)[:offsethz] !== nothing && metadata(new_spec, dim_no)[:bf] !== nothing
-        metadata(new_spec, dim_no)[:offsethz] += offsetppm * metadata(new_spec, dim_no, :bf)
-    end
-    if haskey(metadata(new_spec, dim_no), :sf) && metadata(new_spec, dim_no)[:sf] !== nothing && metadata(new_spec, dim_no)[:bf] !== nothing
-        metadata(new_spec, dim_no)[:sf] += offsetppm * metadata(new_spec, dim_no, :bf) / 1e6
-    end
+    metadata(new_spec, dim_no)[:offsetppm] += offsetppm
+    metadata(new_spec, dim_no)[:offsethz] += offsetppm * metadata(new_spec, dim_no, :bf)
+    metadata(new_spec, dim_no)[:sf] += offsetppm * metadata(new_spec, dim_no, :bf) / 1e6
 
     return new_spec
-end
-
-"""
-    reference(spectrum, axis, old_shift => new_shift)
-    reference(spectrum, axes, old_shifts => new_shifts)
-
-Convenient chemical shift referencing function that calculates the offset needed to
-move a peak from `old_shift` to `new_shift` and applies it using `add_offset`.
-
-# Arguments
-- `spectrum`: NMRData object to reference
-- `axis`: Dimension to reference (can be integer index or dimension object like F1Dim)
-- `old_shift => new_shift`: Pair specifying the current position and desired position
-
-For multiple axes, pass vectors/tuples:
-- `axes`: Vector or tuple of dimensions
-- `old_shifts => new_shifts`: Pair of vectors specifying current and desired positions
-
-# Examples
-```julia
-# Reference F1 dimension: move peak from 4.7 ppm to 0.0 ppm
-spec_ref = reference(spec, 1, 4.7 => 0.0)
-
-# Reference F2 dimension using dimension object
-spec_ref = reference(spec, F2Dim, 8.2 => 8.5)
-
-# Reference multiple dimensions simultaneously
-spec_ref = reference(spec, [1, 2], [4.7, 120.0] => [0.0, 118.0])
-```
-
-See also [`add_offset`](@ref).
-"""
-function reference(spec, axis, shift_pair::Pair)
-    old_shift, new_shift = shift_pair
-    offset = new_shift - old_shift
-    return add_offset(spec, axis, offset)
-end
-
-function reference(spec, axes, shift_pair::Pair{<:AbstractVector, <:AbstractVector})
-    old_shifts, new_shifts = shift_pair
-    
-    if length(axes) != length(old_shifts) || length(old_shifts) != length(new_shifts)
-        throw(NMRToolsError("reference: axes, old_shifts, and new_shifts must have the same length"))
-    end
-    
-    result = spec
-    for (axis, old_shift, new_shift) in zip(axes, old_shifts, new_shifts)
-        offset = new_shift - old_shift
-        result = add_offset(result, axis, offset)
-    end
-    
-    return result
 end
 
 """
@@ -321,121 +263,218 @@ function detect_nucleus(spec, axis)
 end
 
 """
-    water_chemical_shift(temperature_celsius)
+    _find_1h_axis(spec)
 
-Calculate the chemical shift of water based on temperature using the formula:
-δ(H₂O) = 7.83 - T/96.9
-
-where T is temperature in °C.
-
-# Arguments
-- `temperature_celsius`: Temperature in degrees Celsius
-
-# Returns
-- Chemical shift of water in ppm
-
-# Reference
-- Gottlieb, H. E.; Kotlyar, V.; Nudelman, A. J. Org. Chem. 1997, 62, 7512-7515.
+Find the first 1H axis in the spectrum. Returns the axis number or nothing if not found.
 """
-function water_chemical_shift(temperature_celsius)
-    return 7.83 - temperature_celsius / 96.9
+function _find_1h_axis(spec)
+    for i in 1:length(dims(spec))
+        if dims(spec, i) isa FrequencyDimension
+            nucleus = detect_nucleus(spec, i)
+            if nucleus == H1
+                return i
+            end
+        end
+    end
+    return nothing
 end
 
 """
-    reference_heteronuclear(spectrum, h1_axis, h1_reference_shift; keyword_args...)
+    _detect_solvent(spec)
 
-Reference all frequency axes in a spectrum based on a single 1H reference.
+Detect whether the spectrum was acquired under aqueous conditions by checking
+the solvent parameter in acquisition data.
 
-This function references the 1H dimension first, then calculates the appropriate
-referencing for all other frequency dimensions using XI ratios. This enables
-simultaneous referencing of heteronuclear experiments.
+Returns :aqueous, :organic, or :unknown.
+"""
+function _detect_solvent(spec)
+    solvent = acqus(spec, :solvent)
+    if !ismissing(solvent) && solvent isa String
+        solvent_upper = uppercase(solvent)
+        if occursin("H2O", solvent_upper) || occursin("D2O", solvent_upper)
+            return :aqueous
+        else
+            return :organic
+        end
+    end
+    return :unknown
+end
+
+"""
+    reference(spec; kwargs...)
+    reference(spec, axis; kwargs...)  
+    reference(spec, axis, old_shift => new_shift; kwargs...)
+    reference(spec, axes, old_shifts => new_shifts; kwargs...)
+
+Reference frequency axes in NMR spectra with intelligent defaults and heteronuclear support.
+
+# Single argument form - ultimate convenience
+- `reference(spec)`: Finds 1H axis automatically, applies water referencing, propagates to all dimensions
+
+# Two argument forms - axis-specific referencing
+- `reference(spec, axis)`: Water referencing on specified axis with propagation
+- `reference(spec, axis; propagate=false)`: Water referencing without propagation
+
+# Explicit shift referencing
+- `reference(spec, axis, old_shift => new_shift)`: Reference specific chemical shifts
+- `reference(spec, axes, old_shifts => new_shifts)`: Multiple axes simultaneously
 
 # Arguments
-- `spectrum`: NMRData object to reference
-- `h1_axis`: The 1H axis (integer index or dimension object like F1Dim)
-- `h1_reference_shift`: The desired chemical shift for the 1H reference (e.g., 0.0 for DSS)
-- `reference_standard`: Reference standard (:TMS, :DSS, or :auto to detect)
-- `temperature`: Temperature in °C for water referencing (if applicable)
-- `h1_old_shift`: Current position of the 1H reference peak (default 4.7 for water)
-- `aqueous`: Whether aqueous conditions (:auto, true, false)
-- `verbose`: Whether to print informational messages
+- `spec`: NMRData object to reference
+- `axis`: Axis to reference (integer index or dimension type like F1Dim)
+- `axes`: Vector of axes for multi-axis referencing
+- `old_shift => new_shift`: Pair specifying current and desired chemical shifts
+- `old_shifts => new_shifts`: Vectors of current and desired chemical shifts
+
+# Keyword Arguments
+- `propagate::Bool=true`: Whether to apply heteronuclear referencing to other dimensions
+- `reference_standard::Symbol=:auto`: Reference standard (:TMS, :DSS, or :auto for detection)
+- `temperature::Union{Nothing,Real}=nothing`: Temperature in Kelvin (default: parse from acqus(:te))
+- `verbose::Bool=true`: Whether to print informational messages
 
 # Examples
 ```julia
-# Reference a 1H,15N HSQC with DSS at 0.0 ppm
-spec_ref = reference_heteronuclear(spec, 1, 0.0, reference_standard=:DSS)
+# Ultimate convenience - automatic detection and water referencing
+reference(spec)
 
-# Reference with water at 25°C (automatically detects aqueous conditions)
-spec_ref = reference_heteronuclear(spec, 1, 0.0, temperature=25)
+# Water referencing with axis control  
+reference(spec, F1Dim)
+reference(spec, F1Dim, propagate=false)
 
-# Reference everything relative to TMS
-spec_ref = reference_heteronuclear(spec, F1Dim, 0.0, reference_standard=:TMS)
+# Explicit shift referencing
+reference(spec, F1Dim, -0.07 => 0.0)  # correct small offset
+reference(spec, F1Dim, 4.70 => 4.85)  # reference water to literature value
+
+# Multiple axes simultaneously
+reference(spec, [F1Dim, F2Dim], [4.7, 120.0] => [0.0, 118.0])
 ```
 
-See also [`reference`](@ref), [`xi_ratio`](@ref), [`water_chemical_shift`](@ref).
+See also [`add_offset`](@ref), [`xi_ratio`](@ref), [`water_chemical_shift`](@ref).
 """
-function reference_heteronuclear(spectrum, h1_axis, h1_reference_shift; 
-                                reference_standard::Symbol=:auto, 
-                                temperature::Union{Nothing,Real}=nothing,
-                                h1_old_shift::Real=4.7, 
-                                aqueous::Union{Symbol,Bool}=:auto, 
-                                verbose::Bool=true)
+function reference(spec; 
+                  propagate::Bool=true,
+                  reference_standard::Symbol=:auto,
+                  temperature::Union{Nothing,Real}=nothing,
+                  verbose::Bool=true)
     
-    # Determine reference standard
-    if reference_standard == :auto
-        if aqueous == :auto
-            # Try to detect from acquisition parameters or use water detection
-            if temperature !== nothing
-                reference_standard = :DSS
-                aqueous = true
-                if verbose
-                    @info "Detected aqueous conditions from temperature parameter. Using DSS reference standard."
-                end
-            else
-                # Default to DSS for now - could add more sophisticated detection
-                reference_standard = :DSS
-                aqueous = true
-                if verbose
-                    @info "No clear indication of solvent type. Defaulting to DSS (aqueous conditions)."
-                end
-            end
-        elseif aqueous == true || aqueous == :DSS
-            reference_standard = :DSS
-        elseif aqueous == false || aqueous == :TMS
-            reference_standard = :TMS
-        end
+    # Find 1H axis automatically
+    h1_axis = _find_1h_axis(spec)
+    if h1_axis === nothing
+        throw(NMRToolsError("No 1H axis found in spectrum for automatic referencing"))
     end
-    
-    # Handle water temperature correction if specified
-    if temperature !== nothing
-        water_shift = water_chemical_shift(temperature)
-        if verbose
-            @info "Temperature correction: Water chemical shift at $(temperature)°C is $(round(water_shift, digits=3)) ppm"
-        end
-        if h1_old_shift ≈ 4.7  # Default water position from Bruker
-            h1_old_shift = water_shift
-            if verbose
-                @info "Adjusting reference position from 4.7 ppm to $(round(water_shift, digits=3)) ppm based on temperature"
-            end
-        end
-    end
-    
-    # First, reference the 1H dimension
-    result = reference(spectrum, h1_axis, h1_old_shift => h1_reference_shift)
-    h1_offset = h1_reference_shift - h1_old_shift
     
     if verbose
-        @info "Applied 1H referencing: $(h1_old_shift) ppm → $(h1_reference_shift) ppm (offset: $(round(h1_offset, digits=3)) ppm)"
+        axis_type = h1_axis == 1 ? "F1Dim" : h1_axis == 2 ? "F2Dim" : "F$(h1_axis)Dim"
+        @info "Detected 1H axis: $axis_type"
     end
     
-    # Now reference all other frequency dimensions using XI ratios
-    for i in 1:length(result.dims)
-        if i == (h1_axis isa Int ? h1_axis : findfirst(d -> d isa h1_axis, dims(result)))
-            continue  # Skip the 1H dimension we already referenced
+    # Apply water referencing to 1H axis
+    return reference(spec, h1_axis; 
+                    propagate=propagate, 
+                    reference_standard=reference_standard, 
+                    temperature=temperature, 
+                    verbose=verbose)
+end
+
+function reference(spec, axis; 
+                  propagate::Bool=true,
+                  reference_standard::Symbol=:auto,
+                  temperature::Union{Nothing,Real}=nothing,
+                  verbose::Bool=true)
+                  
+    # Get temperature for water chemical shift calculation
+    temp_K = if temperature !== nothing
+        temperature
+    else
+        temp_acqus = acqus(spec, :te)
+        if !ismissing(temp_acqus)
+            temp_acqus  # Assuming acqus(:te) returns temperature in Kelvin
+        else
+            if verbose
+                @warn "Temperature not found in acquisition parameters and not provided. Cannot apply temperature-dependent water referencing."
+            end
+            return spec  # Return unchanged if no temperature available
+        end
+    end
+    
+    # Detect reference standard based on solvent
+    if reference_standard == :auto
+        solvent_type = _detect_solvent(spec)
+        if solvent_type == :aqueous
+            reference_standard = :DSS
+            if verbose
+                @info "Detected aqueous conditions from solvent parameter. Using DSS reference standard."
+            end
+        elseif solvent_type == :organic
+            reference_standard = :TMS
+            if verbose
+                @info "Detected organic conditions from solvent parameter. Using TMS reference standard."
+            end
+        else
+            # Default to DSS if uncertain
+            reference_standard = :DSS
+            if verbose
+                @info "Solvent type unclear. Defaulting to DSS (aqueous conditions)."
+            end
+        end
+    end
+    
+    # Calculate water chemical shift at the given temperature
+    water_shift = water_chemical_shift(temp_K)
+    if verbose
+        @info "Temperature correction: Water chemical shift at $(round(temp_K - 273.15, digits=1))°C is $(round(water_shift, digits=3)) ppm"
+    end
+    
+    # Reference water to 0.0 ppm
+    result = reference(spec, axis, water_shift => 0.0; 
+                      propagate=propagate, 
+                      reference_standard=reference_standard, 
+                      verbose=verbose)
+    
+    return result
+end
+
+function reference(spec, axis, shift_pair::Pair; 
+                  propagate::Bool=true,
+                  reference_standard::Symbol=:auto,
+                  verbose::Bool=true)
+                  
+    old_shift, new_shift = shift_pair
+    
+    # First apply the basic referencing
+    result = add_offset(spec, axis, new_shift - old_shift)
+    
+    if verbose
+        @info "Applied referencing: $(old_shift) ppm → $(new_shift) ppm (offset: $(round(new_shift - old_shift, digits=3)) ppm)"
+    end
+    
+    # Apply heteronuclear referencing if requested
+    if propagate
+        # Get the axis number for comparison
+        target_axis_no = if axis isa Int
+            axis
+        else
+            findfirst(d -> d isa axis, dims(result))
         end
         
-        dim = dims(result, i)
-        if dim isa FrequencyDimension
+        # Determine reference standard if auto
+        if reference_standard == :auto
+            solvent_type = _detect_solvent(spec)
+            reference_standard = solvent_type == :organic ? :TMS : :DSS
+            if verbose
+                std_name = reference_standard == :TMS ? "TMS (organic)" : "DSS (aqueous)"
+                @info "Using $(std_name) standard for heteronuclear referencing"
+            end
+        end
+        
+        h1_offset = new_shift - old_shift
+        
+        # Apply heteronuclear referencing to other frequency dimensions
+        for i in 1:length(dims(result))
+            if i == target_axis_no || !(dims(result, i) isa FrequencyDimension)
+                continue  # Skip the referenced axis and non-frequency dimensions
+            end
+            
             nucleus = detect_nucleus(result, i)
             if nucleus !== nothing && nucleus != H1
                 try
@@ -444,21 +483,40 @@ function reference_heteronuclear(spectrum, h1_axis, h1_reference_shift;
                     result = add_offset(result, i, hetero_offset)
                     
                     if verbose
-                        @info "Applied heteronuclear referencing for $(nucleus): XI ratio = $(round(xi, digits=6)), offset = $(round(hetero_offset, digits=3)) ppm"
+                        axis_name = i == 1 ? "F1Dim" : i == 2 ? "F2Dim" : "F$(i)Dim"
+                        @info "Applied heteronuclear referencing for $(axis_name) ($(nucleus)): XI ratio = $(round(xi, digits=6)), offset = $(round(hetero_offset, digits=3)) ppm"
                     end
                 catch e
                     if verbose
-                        @warn "Could not apply heteronuclear referencing for axis $i (nucleus: $nucleus): $e"
+                        axis_name = i == 1 ? "F1Dim" : i == 2 ? "F2Dim" : "F$(i)Dim"
+                        @warn "Could not apply heteronuclear referencing for $(axis_name) (nucleus: $nucleus): $e"
                     end
                 end
             elseif verbose && nucleus === nothing
-                @warn "Could not detect nucleus type for axis $i - skipping heteronuclear referencing"
+                axis_name = i == 1 ? "F1Dim" : i == 2 ? "F2Dim" : "F$(i)Dim"
+                @warn "Could not detect nucleus type for $(axis_name) - skipping heteronuclear referencing"
             end
+        end
+        
+        if verbose
+            @info "Heteronuclear referencing complete using $(reference_standard) standard"
         end
     end
     
-    if verbose
-        @info "Heteronuclear referencing complete using $(reference_standard) standard"
+    return result
+end
+
+function reference(spec, axes, shift_pair::Pair{<:AbstractVector, <:AbstractVector}; kwargs...)
+    old_shifts, new_shifts = shift_pair
+    
+    if length(axes) != length(old_shifts) || length(old_shifts) != length(new_shifts)
+        throw(NMRToolsError("reference: axes, old_shifts, and new_shifts must have the same length"))
+    end
+    
+    result = spec
+    for (axis, old_shift, new_shift) in zip(axes, old_shifts, new_shifts)
+        # Apply referencing without propagation for multi-axis case to avoid conflicts
+        result = reference(result, axis, old_shift => new_shift; propagate=false, kwargs...)
     end
     
     return result

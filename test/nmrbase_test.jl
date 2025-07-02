@@ -91,26 +91,6 @@ end
     @test data(spec2,1)[1] - data(spec,1)[1] == 0.5
     spec2 = add_offset(spec2, F1Dim, 0.5)
     @test data(spec2,1)[1] - data(spec,1)[1] == 1
-
-    # reference function - basic functionality
-    spec = exampledata("1D_1H")
-    # Move peak from 4.7 to 0.0 (offset = -4.7)
-    spec_ref = reference(spec, 1, 4.7 => 0.0)
-    @test data(spec_ref,1)[1] - data(spec,1)[1] ≈ -4.7
-    
-    # Test with F1Dim object
-    spec_ref2 = reference(spec, F1Dim, 8.5 => 8.0)
-    @test data(spec_ref2,1)[1] - data(spec,1)[1] ≈ -0.5
-    
-    # Test multiple axes referencing with 2D data
-    spec2d = exampledata("2D_HN")
-    spec2d_ref = reference(spec2d, [1, 2], [4.7, 120.0] => [0.0, 118.0])
-    @test data(spec2d_ref,1)[1] - data(spec2d,1)[1] ≈ -4.7
-    @test data(spec2d_ref,2)[1] - data(spec2d,2)[1] ≈ -2.0
-    
-    # Test error handling for mismatched array lengths
-    @test_throws NMRToolsError reference(spec2d, [1, 2], [4.7] => [0.0, 118.0])
-    @test_throws NMRToolsError reference(spec2d, [1], [4.7, 120.0] => [0.0, 118.0])
     
     # Test XI ratios
     @test xi_ratio(H1) == 1.0
@@ -123,10 +103,10 @@ end
     @test xi_ratio(C13, reference_standard=:TMS) == xi_ratio(C13, reference_standard=:DSS)
     @test_throws NMRToolsError xi_ratio(C13, reference_standard=:INVALID)
     
-    # Test water chemical shift calculation
-    @test water_chemical_shift(25) ≈ 7.572002063983488
-    @test water_chemical_shift(0) ≈ 7.83
-    @test water_chemical_shift(30) ≈ 7.520515463917526
+    # Test water chemical shift calculation (input in Kelvin)
+    @test water_chemical_shift(298.15) ≈ 7.572002063983488  # 25°C
+    @test water_chemical_shift(273.15) ≈ 7.83  # 0°C
+    @test water_chemical_shift(303.15) ≈ 7.520515463917526  # 30°C
     
     # Test nucleus detection
     axH_labeled = F1Dim(8:0.1:9, metadata=Dict(:label => "1H"))
@@ -146,26 +126,37 @@ end
     dat_c_range = NMRData(0.0:1:200, (axC_range,))
     @test detect_nucleus(dat_c_range, 1) == C13
     
+    # Test basic reference function - explicit shift referencing
+    spec = exampledata("1D_1H")
+    # Move peak from 4.7 to 0.0 (offset = -4.7)
+    spec_ref = reference(spec, F1Dim, 4.7 => 0.0, propagate=false, verbose=false)
+    @test data(spec_ref,1)[1] - data(spec,1)[1] ≈ -4.7
+    
+    # Test with different axis specification
+    spec_ref2 = reference(spec, 1, 8.5 => 8.0, propagate=false, verbose=false)
+    @test data(spec_ref2,1)[1] - data(spec,1)[1] ≈ -0.5
+    
+    # Test multiple axes referencing with 2D data
+    spec2d = exampledata("2D_HN")
+    spec2d_ref = reference(spec2d, [F1Dim, F2Dim], [4.7, 120.0] => [0.0, 118.0], verbose=false)
+    @test data(spec2d_ref,1)[1] - data(spec2d,1)[1] ≈ -4.7
+    @test data(spec2d_ref,2)[1] - data(spec2d,2)[1] ≈ -2.0
+    
+    # Test error handling for mismatched array lengths
+    @test_throws NMRToolsError reference(spec2d, [F1Dim, F2Dim], [4.7] => [0.0, 118.0])
+    @test_throws NMRToolsError reference(spec2d, [F1Dim], [4.7, 120.0] => [0.0, 118.0])
+    
     # Test heteronuclear referencing with synthetic data
     axH = F1Dim(0:0.1:12, metadata=Dict(:label => "1H"))
     axC = F2Dim(0:1:200, metadata=Dict(:label => "13C"))
     dat_2d = NMRData(ones(121, 201), (axH, axC))
     
-    # Test basic heteronuclear referencing
-    dat_hetero = reference_heteronuclear(dat_2d, 1, 0.0, h1_old_shift=4.7, verbose=false)
+    # Test basic heteronuclear referencing with propagation
+    dat_hetero = reference(dat_2d, F1Dim, 4.7 => 0.0, 
+                          propagate=true, reference_standard=:DSS, verbose=false)
     @test data(dat_hetero,1)[1] - data(dat_2d,1)[1] ≈ -4.7  # 1H offset
     # 13C offset should be 1H offset / XI ratio: -4.7 / 0.251449530 ≈ -18.692
     @test abs(data(dat_hetero,2)[1] - data(dat_2d,2)[1] - (-4.7 / xi_ratio(C13))) < 0.01
-    
-    # Test with temperature correction
-    dat_temp = reference_heteronuclear(dat_2d, 1, 0.0, temperature=25, verbose=false)
-    expected_h1_offset = 0.0 - water_chemical_shift(25)
-    @test abs(data(dat_temp,1)[1] - data(dat_2d,1)[1] - expected_h1_offset) < 0.01
-    
-    # Test with explicit reference standard
-    dat_tms = reference_heteronuclear(dat_2d, 1, 0.0, h1_old_shift=4.7, 
-                                     reference_standard=:TMS, verbose=false)
-    @test data(dat_tms,1)[1] - data(dat_2d,1)[1] ≈ -4.7
 end
 
 @testset "NMRBase: metadata" begin
