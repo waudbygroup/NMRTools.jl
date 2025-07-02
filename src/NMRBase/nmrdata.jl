@@ -434,7 +434,7 @@ A trait indicating whether the data object has a non-frequency domain dimension.
 
 ```julia
 @traitfn f(x::X) where {X; HasNonFrequencyDimension{X}} = "This spectrum has a non-frequency domain dimension!"
-@traitfn f(x::X) where {X; Not{HasNonFrequencyDimension{X}}} = "This is a pure frequency-domain spectrum!"
+@traitfn f(x::X) where {X; SimpleTraits.Not{HasNonFrequencyDimension{X}}} = "This is a pure frequency-domain spectrum!"
 ```
 """
 @traitdef HasNonFrequencyDimension{D}
@@ -449,7 +449,7 @@ Base.@pure function SimpleTraits.trait(t::Type{HasNonFrequencyDimension{D}}) whe
     if any(map(dim -> (typeintersect(dim, FrequencyDimension) == Union{}), A.parameters))
         HasNonFrequencyDimension{D}
     else
-        Not{HasNonFrequencyDimension{D}}
+        SimpleTraits.Not{HasNonFrequencyDimension{D}}
     end
 end
 
