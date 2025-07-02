@@ -20,6 +20,22 @@ struct ContourLike end
 
 contourlevels(spacing=1.7, n=12) = (spacing^i for i in 0:(n - 1))
 
+# Helper function to determine normalization scaling and noise
+function get_normalization_params(normalize, spectrum)
+    if normalize === true
+        # Standard normalization using the spectrum's own scale
+        return scale(spectrum), spectrum[:noise]
+    elseif normalize === false
+        # No normalization
+        return 1, spectrum[:noise]
+    elseif isa(normalize, AbstractNMRData)
+        # Use reference spectrum for normalization
+        return scale(normalize), normalize[:noise]
+    else
+        error("normalize parameter must be true, false, or an NMRData object")
+    end
+end
+
 axislabel(dat::NMRData, n=1) = axislabel(dims(dat, n))
 axislabel(dim::FrequencyDimension) = "$(label(dim)) chemical shift (ppm)"
 function axislabel(dim::NMRDimension)
@@ -56,7 +72,7 @@ end
     yticks --> nothing
 
     delete!(plotattributes, :normalize)
-    return data(x), data(Afwd) ./ (normalize ? scale(Afwd) : 1)
+    return data(x), data(Afwd) ./ get_normalization_params(normalize, Afwd)[1]
 end
 
 # 1D plot (non-frequency)
@@ -104,7 +120,7 @@ end
     frame --> :box
 
     delete!(plotattributes, :normalize)
-    return data(x), data(Afwd) ./ (normalize ? scale(Afwd) : 1)
+    return data(x), data(Afwd) ./ get_normalization_params(normalize, Afwd)[1]
 end
 
 # multiple 1D plots
@@ -127,7 +143,7 @@ end
     delete!(plotattributes, :normalize)
 
     voffset = 0
-    vdelta = maximum([maximum(abs.(A)) / (normalize ? scale(A) : 1)
+    vdelta = maximum([maximum(abs.(A)) / get_normalization_params(normalize, A)[1]
                       for A in v]) / length(v)
 
     # TODO add guide lines
@@ -144,7 +160,7 @@ end
             Afwd = reorder(A, ForwardOrdered) # make sure data axes are in forwards order
             x = dims(Afwd, 1)
             label --> label(A)
-            data(x), data(Afwd) ./ (normalize ? scale(A) : 1) .+ voffset
+            data(x), data(Afwd) ./ get_normalization_params(normalize, A)[1] .+ voffset
         end
         if vstack
             voffset += vdelta
@@ -183,7 +199,7 @@ end
 
     normalize = get(plotattributes, :normalize, true)
     delete!(plotattributes, :normalize)
-    scaling = normalize ? scale(dfwd) : 1
+    scaling, noise_level = get_normalization_params(normalize, dfwd)
 
     stype = get(plotattributes, :seriestype, nothing)
     if stype ∈ [:heatmap, :wireframe]
@@ -199,13 +215,13 @@ end
                                                                                        2]]
 
         @series begin
-            levels --> 5 * dfwd[:noise] / scaling .* contourlevels()
+            levels --> 5 * noise_level / scaling .* contourlevels()
             seriescolor := colors[1]
             primary --> true
             data(x), data(y), permutedims(data(dfwd / scaling))
         end
         @series begin
-            levels --> -5 * dfwd[:noise] / scaling .* contourlevels()
+            levels --> -5 * noise_level / scaling .* contourlevels()
             seriescolor := colors[2]
             primary := false
             data(x), data(y), permutedims(data(dfwd / scaling))
@@ -242,7 +258,7 @@ end
     normalize = get(plotattributes, :normalize, true)
     delete!(plotattributes, :normalize)
 
-    scaling = normalize ? scale(z) : 1
+    scaling, _ = get_normalization_params(normalize, z)
 
     stype = get(plotattributes, :seriestype, nothing)
     if stype ∈ [:heatmap, :wireframe]
@@ -329,6 +345,23 @@ end
 
     @info "plotting vector of 2D NMR data (normalize = $normalize)"
 
+    # Determine reference scaling and noise for contour levels
+    if normalize === true
+        # Use first spectrum for contour levels (current behavior)
+        ref_scaling = scale(first(v))
+        ref_noise = first(v)[:noise]
+    elseif normalize === false
+        # No normalization (current behavior)
+        ref_scaling = 1
+        ref_noise = first(v)[:noise]  # Use first spectrum's noise for contour levels
+    elseif isa(normalize, AbstractNMRData)
+        # Use reference spectrum for both scaling and contour levels
+        ref_scaling = scale(normalize)
+        ref_noise = normalize[:noise]
+    else
+        error("normalize parameter must be true, false, or an NMRData object")
+    end
+
     h = 0.0
 
     for d in v
@@ -336,13 +369,12 @@ end
         # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
         x, y = dims(dfwd)
         colors = sequential_palette(h, 5)[[4, 2]]
-        if normalize
-            scaling = scale(dfwd)
-            σ = first(v)[:noise] / scale(first(v)) # use the first experiment to set contour levels from noise
-        else
-            scaling = 1
-            σ = dfwd[:noise]
-        end
+        
+        # Get scaling for this individual spectrum
+        scaling, _ = get_normalization_params(normalize, dfwd)
+        
+        # Use reference noise level for consistent contour levels across all spectra
+        σ = ref_noise / ref_scaling
         @series begin
             levels --> 5σ .* contourlevels()
             seriescolor := colors[1]

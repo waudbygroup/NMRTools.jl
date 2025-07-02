@@ -113,6 +113,36 @@ savefig("plot-2d-scaled.svg"); nothing # hide
 ![](plot-2d-scaled.svg)
 
 
+## Normalizing spectra across plots
+
+By default, each spectrum is normalized using its own scaling factors (number of scans, receiver gain, etc.). However, when creating multiple plots or animations, you may want to use consistent normalization across all spectra. You can achieve this by passing a reference spectrum to the `normalize` parameter:
+
+```@example 2d
+# Use the first spectrum as a reference for normalization
+reference_spec = spec
+scaled_spec = spec * 2  # This spectrum has different intensity
+plot(scaled_spec, normalize=reference_spec, title="Normalized to reference spectrum")
+savefig("plot-2d-ref-normalized.svg"); nothing # hide
+```
+
+![](plot-2d-ref-normalized.svg)
+
+This is particularly useful when plotting series of 2D spectra where you want consistent contour levels:
+
+```@example 2d
+spectra = [spec, spec * 0.5, spec * 2]  # Spectra with different intensities
+plot(spectra, normalize=spec)  # All will use the first spectrum's scale for contour levels
+savefig("plot-2d-series-normalized.svg"); nothing # hide
+```
+
+![](plot-2d-series-normalized.svg)
+
+The `normalize` parameter accepts:
+- `true` (default): Normalize each spectrum individually
+- `false`: No normalization 
+- A reference spectrum: Use the reference spectrum's scaling and noise for normalization
+
+
 ## Overlaying multiple 2D spectra
 
 Multiple 2D spectra can be loaded and overlaid in a similar manner to 1Ds
