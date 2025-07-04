@@ -146,7 +146,7 @@ function loadpdata(filename, allcomponents=false)
     # create set of nuclei across all axes
     md[:nuclei] = Set{Nucleus}()
     for ax in axesmd
-        if ax[:nucleus] !== nothing
+        if get(ax, :nucleus, nothing) !== nothing
             push!(md[:nuclei], ax[:nucleus])
         end
     end
