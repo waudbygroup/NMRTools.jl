@@ -60,6 +60,12 @@ function loadpdata(filename, allcomponents=false)
         else # frequency domain
             dic[:pseudodim] = false
             dic[:label] = procdic[:axnuc]
+            dic[:nucleus] = try
+                nucleus(procdic[:axnuc]) # convert to Nucleus enum
+            catch e
+                @warn "unable to parse nucleus from $(procdic[:axnuc])"
+                nothing
+            end
             dic[:bf] = procdic[:sf]  # NB this includes the addition of SR
             # see bruker processing reference, p. 85
             # (SR = SF - BF1, where SF is proc par and BF1 is acqu par)
@@ -135,6 +141,14 @@ function loadpdata(filename, allcomponents=false)
 
         dic[:procs] = procsdics[i] # store procs file in main axis dictionary
         push!(axesmd, dic)
+    end
+
+    # create set of nuclei across all axes
+    md[:nuclei] = Set{Nucleus}()
+    for ax in axesmd
+        if get(ax, :nucleus, nothing) !== nothing
+            push!(md[:nuclei], ax[:nucleus])
+        end
     end
 
     # 5. determine shape and submatrix size

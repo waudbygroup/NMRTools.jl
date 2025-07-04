@@ -54,6 +54,8 @@ function getacqusmetadata(format, filename, experimentfolder=nothing)
         md[:rg] = acqusmetadata[:rg]
         md[:pulseprogram] = acqusmetadata[:pulprog]
         md[:acqusfilename] = acqusfilename
+        md[:temperature] = get(acqusmetadata, :te, nothing)
+        md[:solvent] = get(acqusmetadata, :solvent, "unknown")
     else
         @warn "cannot locate acqus file for $(filename) - some metadata will be missing"
     end

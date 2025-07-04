@@ -83,7 +83,9 @@ acqus(pseudo3dspec, :vclist)
 | `:ns`            | number of scans                            |
 | `:rg`            | receiver gain                              |
 | `:noise`         | rms noise level                            |
-
+| `:solvent`       | solvent string, e.g. "H2O+D2O"             |
+| `:temperature`   | temperature in K                           |
+| `:nuclei`        | set of `Nucleus` values                    |
 
 ## Available axis metadata symbols
 
@@ -101,6 +103,7 @@ acqus(pseudo3dspec, :vclist)
 | `:swppm`       | spectrum width, in ppm                                                |
 | `:region`      | extracted region, expressed as a range in points, otherwise `missing` |
 | `:window`      | `WindowFunction` object indicating applied apodization                |
+| `:nucleus`	   | `Nucleus` enum value for this dimension                               |
 
 
 ## Window functions
