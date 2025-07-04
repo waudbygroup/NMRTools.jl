@@ -88,9 +88,9 @@ end
     # offsets
     spec = exampledata("1D_1H")
     spec2 = add_offset(spec, 1, 0.5)
-    @test data(spec2,1)[1] - data(spec,1)[1] == 0.5
+    @test data(spec2, 1)[1] - data(spec, 1)[1] == 0.5
     spec2 = add_offset(spec2, F1Dim, 0.5)
-    @test data(spec2,1)[1] - data(spec,1)[1] == 1
+    @test data(spec2, 1)[1] - data(spec, 1)[1] == 1
 end
 
 @testset "NMRBase: metadata" begin
@@ -138,6 +138,68 @@ end
 end
 
 @testset "NMRBase: nuclei and coherences" begin
+    @testset "parse nucleus tests" begin
+        @testset "Mass number followed by element symbol" begin
+            @test nucleus("1H") == H1
+            @test nucleus("2H") == H2
+            @test nucleus("12C") == C12
+            @test nucleus("13C") == C13
+            @test nucleus("14N") == N14
+            @test nucleus("15N") == N15
+            @test nucleus("19F") == F19
+            @test nucleus("31P") == P31
+        end
+
+        @testset "Element symbol followed by mass number" begin
+            @test nucleus("H1") == H1
+            @test nucleus("H2") == H2
+            @test nucleus("C12") == C12
+            @test nucleus("C13") == C13
+            @test nucleus("N14") == N14
+            @test nucleus("N15") == N15
+            @test nucleus("F19") == F19
+            @test nucleus("P31") == P31
+        end
+
+        @testset "Case insensitive parsing" begin
+            @test nucleus("19f") == F19
+            @test nucleus("1h") == H1
+            @test nucleus("13c") == C13
+            @test nucleus("h1") == H1
+            @test nucleus("c13") == C13
+            @test nucleus("f19") == F19
+        end
+
+        @testset "Whitespace handling" begin
+            @test nucleus(" 19F ") == F19
+            @test nucleus("  1H  ") == H1
+            @test nucleus("\t13C\n") == C13
+        end
+
+        @testset "Invalid nucleus strings" begin
+            @test_throws ArgumentError nucleus("16O")  # Not defined in enum
+            @test_throws ArgumentError nucleus("23Na") # Not defined in enum
+            @test_throws ArgumentError nucleus("O16")  # Not defined in enum
+            @test_throws ArgumentError nucleus("Na23") # Not defined in enum
+        end
+
+        @testset "Invalid format strings" begin
+            @test_throws ArgumentError nucleus("H")     # Missing mass number
+            @test_throws ArgumentError nucleus("13")    # Missing element
+            @test_throws ArgumentError nucleus("ABC13") # Invalid element
+            @test_throws ArgumentError nucleus("13XYZ") # Invalid element
+            @test_throws ArgumentError nucleus("")      # Empty string
+            @test_throws ArgumentError nucleus("H1C")   # Invalid format
+            @test_throws ArgumentError nucleus("1H2")   # Invalid format
+        end
+
+        @testset "Edge cases" begin
+            @test_throws ArgumentError nucleus("0H")    # Zero mass number
+            @test_throws ArgumentError nucleus("H0")    # Zero mass number
+            @test_throws ArgumentError nucleus("1000H") # Very large mass number
+        end
+    end # nucleus tests
+
     @test spin(H1) == 1 // 2
     @test spin(H2) == 1
     @test spin(C12) == 0
@@ -183,20 +245,20 @@ end
 end
 
 @testset "NMRBase: stack" begin
-    specs = [loadnmr(joinpath(artifact"1D_19F_titration","1")),
-            loadnmr(joinpath(artifact"1D_19F_titration","2")),
-            loadnmr(joinpath(artifact"1D_19F_titration","3"))]
+    specs = [loadnmr(joinpath(artifact"1D_19F_titration", "1")),
+             loadnmr(joinpath(artifact"1D_19F_titration", "2")),
+             loadnmr(joinpath(artifact"1D_19F_titration", "3"))]
     stacked = stack(specs)
     @test size(stacked) == (32768, 3)
 
-    specs2 = [loadnmr(joinpath(artifact"1D_19F_titration","1")),
+    specs2 = [loadnmr(joinpath(artifact"1D_19F_titration", "1")),
               exampledata("2D_HN")]
     @test_throws DimensionMismatch stack(specs2)
 
-    specs3 = [loadnmr(joinpath(artifact"2D_HN_titration","1/test.ft2")),
-            loadnmr(joinpath(artifact"2D_HN_titration","2/test.ft2")),
-            loadnmr(joinpath(artifact"2D_HN_titration","3/test.ft2")),
-            loadnmr(joinpath(artifact"2D_HN_titration","4/test.ft2"))]
+    specs3 = [loadnmr(joinpath(artifact"2D_HN_titration", "1/test.ft2")),
+              loadnmr(joinpath(artifact"2D_HN_titration", "2/test.ft2")),
+              loadnmr(joinpath(artifact"2D_HN_titration", "3/test.ft2")),
+              loadnmr(joinpath(artifact"2D_HN_titration", "4/test.ft2"))]
     # expect warning that experiments do not have same rg
     @test (@test_logs (:warn,) size(stack(specs3))) == (768, 512, 4)
 end

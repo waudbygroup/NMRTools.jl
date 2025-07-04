@@ -61,6 +61,7 @@ export NMRToolsError
 # Nuclei
 export Nucleus
 @exportinstances Nucleus
+export nucleus
 export spin
 export gyromagneticratio
 
