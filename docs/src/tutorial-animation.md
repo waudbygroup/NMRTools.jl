@@ -54,8 +54,9 @@ nothing # hide
 Now loop over the spectra to produce the animation:
 
 ```@example 1
+refspec = spectra2d[1]
 anim=@animate for spec in spectra2d
-    plot(spec, xlims=(6,10.5), title=label(spec))
+    plot(spec, xlims=(6,10.5), title=label(spec), normalize=refspec)
 end
 
 gif(anim, "titration.gif", fps=8)
@@ -64,4 +65,8 @@ nothing # hide
 
 ![](titration.gif)
 
-Note that spectra have been normalised automatically to account for differences in their number of scans or receiver gain.
+!!! note Normalization
+    The `normalize=refspec` parameter scales all spectra relative to the reference spectrum, defined on the first line
+    as the first spectrum in the titration series. This ensures that contour levels are directly comparable across the
+    different spectra. This normalization automatically compensates for differences in acquisition parameters such as
+    number of scans and receiver gain that would otherwise affect absolute intensities.

@@ -55,8 +55,10 @@ end
     yshowaxis --> false
     yticks --> nothing
 
+    scaling = (normalize !== false) ? scale(Afwd) : 1
+
     delete!(plotattributes, :normalize)
-    return data(x), data(Afwd) ./ (normalize ? scale(Afwd) : 1)
+    return data(x), data(Afwd) ./ scaling
 end
 
 # 1D plot (non-frequency)
@@ -103,8 +105,9 @@ end
     grid --> false
     frame --> :box
 
+    scaling = (normalize !== false) ? scale(Afwd) : 1
     delete!(plotattributes, :normalize)
-    return data(x), data(Afwd) ./ (normalize ? scale(Afwd) : 1)
+    return data(x), data(Afwd) ./ scaling
 end
 
 # multiple 1D plots
@@ -127,7 +130,7 @@ end
     delete!(plotattributes, :normalize)
 
     voffset = 0
-    vdelta = maximum([maximum(abs.(A)) / (normalize ? scale(A) : 1)
+    vdelta = maximum([maximum(abs.(A)) / ((normalize !== false) ? scale(A) : 1)
                       for A in v]) / length(v)
 
     # TODO add guide lines
@@ -138,13 +141,14 @@ end
     # end
 
     for A in v
+        scaling = (normalize !== false) ? scale(A) : 1
         @series begin
             seriestype --> :path
             markershape --> :none
             Afwd = reorder(A, ForwardOrdered) # make sure data axes are in forwards order
             x = dims(Afwd, 1)
             label --> label(A)
-            data(x), data(Afwd) ./ (normalize ? scale(A) : 1) .+ voffset
+            data(x), data(Afwd) ./ scaling .+ voffset
         end
         if vstack
             voffset += vdelta
@@ -183,12 +187,22 @@ end
 
     normalize = get(plotattributes, :normalize, true)
     delete!(plotattributes, :normalize)
-    scaling = normalize ? scale(dfwd) : 1
+
+    if normalize == false
+        σ = dfwd[:noise]
+    elseif normalize == true
+        σ = dfwd[:noise]
+    elseif isa(normalize, AbstractNMRData)
+        refspec = normalize
+        σ = refspec[:noise] * scale(dfwd) / scale(refspec)
+    else
+        error("normalize must be true, false or a reference spectrum")
+    end
 
     stype = get(plotattributes, :seriestype, nothing)
     if stype ∈ [:heatmap, :wireframe]
         # heatmap
-        data(x), data(y), permutedims(data(dfwd / scaling))
+        data(x), data(y), permutedims(data(dfwd))
     else
         # generate light and dark colours for plot contours, based on supplied colour
         # - create a 5-tone palette with the same hue as the passed colour, and select the
@@ -199,16 +213,16 @@ end
                                                                                        2]]
 
         @series begin
-            levels --> 5 * dfwd[:noise] / scaling .* contourlevels()
+            levels --> 5σ .* contourlevels()
             seriescolor := colors[1]
             primary --> true
-            data(x), data(y), permutedims(data(dfwd / scaling))
+            data(x), data(y), permutedims(data(dfwd))
         end
         @series begin
-            levels --> -5 * dfwd[:noise] / scaling .* contourlevels()
+            levels --> -5σ .* contourlevels()
             seriescolor := colors[2]
             primary := false
-            data(x), data(y), permutedims(data(dfwd / scaling))
+            data(x), data(y), permutedims(data(dfwd))
         end
     end
 end
@@ -242,7 +256,15 @@ end
     normalize = get(plotattributes, :normalize, true)
     delete!(plotattributes, :normalize)
 
-    scaling = normalize ? scale(z) : 1
+    if normalize == false
+        scaling = 1
+    elseif normalize == true
+        scaling = scale(z)
+    elseif isa(normalize, AbstractNMRData)
+        scaling = scale(z)
+    else
+        error("normalize must be true, false or a reference spectrum")
+    end
 
     stype = get(plotattributes, :seriestype, nothing)
     if stype ∈ [:heatmap, :wireframe]
@@ -330,32 +352,42 @@ end
     @info "plotting vector of 2D NMR data (normalize = $normalize)"
 
     h = 0.0
+    # scaling calculations:
+    # normalisation:
+    # - if false, clev = 5 * noise(d) * scale(d) / scale(d) = 5 * noise(d), z = d
+    # - if true or refspec, clev = 5 * noise(refspec) * scale(d) / scale(refspec), z = d
 
     for d in v
         dfwd = reorder(d, ForwardOrdered) # make sure data axes are in forwards order
         # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
         x, y = dims(dfwd)
         colors = sequential_palette(h, 5)[[4, 2]]
-        if normalize
-            scaling = scale(dfwd)
-            σ = first(v)[:noise] / scale(first(v)) # use the first experiment to set contour levels from noise
-        else
-            scaling = 1
+
+        if normalize == false
             σ = dfwd[:noise]
+        elseif normalize == true
+            refspec = first(v)
+            σ = refspec[:noise] * scale(dfwd) / scale(refspec)
+        elseif isa(normalize, AbstractNMRData)
+            refspec = normalize
+            σ = refspec[:noise] * scale(dfwd) / scale(refspec)
+        else
+            error("normalize must be true, false or a reference spectrum")
         end
+
         @series begin
             levels --> 5σ .* contourlevels()
             seriescolor := colors[1]
             primary := false # true
             label := nothing
-            data(x), data(y), permutedims(data(dfwd / scaling))
+            data(x), data(y), permutedims(data(dfwd))
         end
         @series begin
             levels --> -5σ .* contourlevels()
             seriescolor := colors[2]
             primary := false
             label := nothing
-            data(x), data(y), permutedims(data(dfwd / scaling))
+            data(x), data(y), permutedims(data(dfwd))
         end
         @series begin
             seriestype := :path

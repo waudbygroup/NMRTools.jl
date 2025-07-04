@@ -40,6 +40,42 @@ end
     @test label(pr[1].args[2]) == "13C,15N ubiquitin"
 end
 
+# @testset "PlotsExt: normalize parameter with reference spectrum" begin
+#     dat1 = exampledata("2D_HN")
+#     dat2 = exampledata("2D_HN") * 2  # scaled version
+
+#     # Test single 2D spectrum with reference normalization
+#     pr_ref = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(:normalize => dat1), dat2)
+#     pr_self = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(:normalize => true), dat2)
+#     pr_none = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(:normalize => false), dat2)
+
+#     # When using reference normalization, the scaling should be based on dat1
+#     @test pr_ref[1].plotattributes[:levels] ≠ pr_self[1].plotattributes[:levels]
+#     @test pr_ref[1].plotattributes[:levels] ≠ pr_none[1].plotattributes[:levels]
+
+#     # Test vector of 2D spectra with reference normalization
+#     dat_vector = [dat1, dat2]
+#     pr_vector_ref = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(:normalize => dat1), dat_vector)
+#     pr_vector_true = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(:normalize => true), dat_vector)
+
+#     # Both should use consistent contour levels when using reference spectrum
+#     @test length(pr_vector_ref) >= 6  # Should have multiple series for contours and legends
+#     @test length(pr_vector_true) >= 6
+
+#     # Test 1D spectrum with reference normalization
+#     dat1_1d = exampledata("1D_19F")
+#     dat2_1d = dat1_1d * 3  # scaled version
+
+#     pr_1d_ref = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(:normalize => dat1_1d), dat2_1d)
+#     pr_1d_self = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(:normalize => true), dat2_1d)
+
+#     # Data should be scaled differently when using reference vs self normalization
+#     @test pr_1d_ref[1].args[2] ≠ pr_1d_self[1].args[2]
+
+#     # Test error handling
+#     @test_throws Exception Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(:normalize => "invalid"), dat1)
+# end
+
 @testset "PlotsExt: visual regression testing" begin
     dat1 = exampledata("1D_19F")
     @plottest begin
