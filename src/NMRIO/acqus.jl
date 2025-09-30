@@ -96,6 +96,9 @@ function parseacqus(acqusfilename::String, auxfiles=true)
 
         # lastly, check for referenced files like vclist, fq1list, and load these in place of filename
         parseacqusauxfiles!(dic, dirname(acqusfilename))
+
+        # parse the pulse program
+        parsepulseprogram!(dic, dirname(acqusfilename))
     end
 
     return dic
@@ -121,6 +124,53 @@ function topspinversion(acqusfilename)
     version = split(firstline)[end]
 
     return VersionNumber(version)
+end
+
+function parsepulseprogram!(dic, basedir)
+    if dic[:topspin] < v"4.0.8"
+        pulprogfilename = joinpath(basedir, "pulseprogram")
+        if isfile(pulprogfilename)
+            prog = read(pulprogfilename, String)
+            prog = replace(prog, "\r\n" => "\n") # replace Windows line endings with Unix
+            dic[:pulseprogram_precomp] = prog
+        end
+    elseif dic[:topspin] < v"4.1.4"
+        # TS 4.0.8 - pulseprogram / pulseprogram.precomp introduced
+        pulprogfilename = joinpath(basedir, "pulseprogram")
+        if isfile(pulprogfilename)
+            prog = read(pulprogfilename, String)
+            prog = replace(prog, "\r\n" => "\n") # replace Windows line endings with Unix
+            dic[:pulseprogram_code] = prog
+        end
+        pulprogfilename = joinpath(basedir, "pulseprogram.precomp")
+        if isfile(pulprogfilename)
+            prog = read(pulprogfilename, String)
+            prog = replace(prog, "\r\n" => "\n") # replace Windows line endings with Unix
+            dic[:pulseprogram_precomp] = prog
+        end
+    else
+        # TS 4.1.4 - lists directory introduced
+        pulprogfilename = joinpath(basedir, "lists", "pp", dic[:pulprog])
+        if isfile(pulprogfilename)
+            prog = read(pulprogfilename, String)
+            prog = replace(prog, "\r\n" => "\n") # replace Windows line endings with Unix
+            dic[:pulseprogram_code] = prog
+        end
+        pulprogfilename = joinpath(basedir, "pulseprogram.precomp")
+        if isfile(pulprogfilename)
+            prog = read(pulprogfilename, String)
+            prog = replace(prog, "\r\n" => "\n") # replace Windows line endings with Unix
+            dic[:pulseprogram_precomp] = prog
+        end
+    end
+end
+
+function pulseprogram(spec::NMRData; precomp=true)
+    if precomp
+        acqus(spec, :pulseprogram_precomp)
+    else
+        acqus(spec, :pulseprogram_code)
+    end
 end
 
 function parseacqusauxfiles!(dic, basedir)

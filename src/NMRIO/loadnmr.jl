@@ -63,6 +63,9 @@ function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
     # 5. estimate the spectrum noise level
     estimatenoise!(spectrum)
 
+    # 6. parse and resolve pulse programme annotations
+    annotate!(spectrum)
+
     return spectrum
 end
 
