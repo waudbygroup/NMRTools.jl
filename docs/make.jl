@@ -19,7 +19,7 @@ makedocs(;
                                 # "2D phosphorylation kinetics" => "tutorial-phosphorylation.md",
                                 ],
                 "Utilities" => "utilities.md",
-                "Reference guide" => ["Annotations" => "ref-annotations.md",
+                "Reference guide" => [
                                       #     "Data" => "ref-data.md",
                                       #     "Dimensions" => "ref-dimensions.md",
                                       #     "File I/O" => "ref-io.md",
