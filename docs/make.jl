@@ -39,4 +39,4 @@ makedocs(;
 
 deploydocs(;
            repo="github.com/waudbygroup/NMRTools.jl.git",
-           versions=["stable" => "v^", "v#.#", "dev" => "master"],)
+           devbranch="master",)
