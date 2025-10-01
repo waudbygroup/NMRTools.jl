@@ -164,16 +164,17 @@ end
 
     # Test nested dictionary access
     spinlock = annotations(cest_data, "spinlock")
-    @test spinlock isa Dict{String,Any}
+    @test spinlock isa Dict
     @test annotations(cest_data, "spinlock", "channel") == "19F"
     @test annotations(cest_data, "spinlock", "duration") == 1
 
     # Test array of dictionaries (hard_pulse)
     hard_pulse = annotations(cest_data, "hard_pulse")
     @test hard_pulse isa Vector
-    @test length(hard_pulse) ≈ 1
+    @test length(hard_pulse) == 1
     @test hard_pulse[1] isa Dict
-    @test hard_pulse[1]["duration"] ≈ 13.29
+    @test hard_pulse[1]["length"] ≈ 13.29
+    @test annotations(cest_data, :hard_pulse, 1)["length"] ≈ 13.29
 end
 
 @testset "NMRBase: nuclei and coherences" begin
