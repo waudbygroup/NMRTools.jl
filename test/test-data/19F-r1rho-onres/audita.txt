@@ -1,0 +1,44 @@
+##TITLE= Audit trail, TopSpin 4.2.0
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= nmrsu
+$$ /home/nmrsu/nmr/sophia_231027_R1p_lig2/105/audita.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2023-10-27 13:03:52.675 +0100>,<nmrsu>,<CZC1459CVK>,<cprserver>,<TopSpin 4.2.0>,
+      <new/edc EXPNO=105 PROCNO=1>)
+(   2,<2023-10-27 14:11:13.237 +0100>,<nmrsu>,<CZC1459CVK>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F3 O1P to -62.946>)
+(   3,<2023-10-27 14:11:19.965 +0100>,<nmrsu>,<CZC1459CVK>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F3 CNST28 to -62.9459991>)
+(   4,<2023-10-27 14:11:26.213 +0100>,<nmrsu>,<CZC1459CVK>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F3 P1 to 12.750>)
+(   5,<2023-10-27 13:23:20.812 +0000>,<nmrsu>,<CZC1459CVK>,<go4>,<TopSpin 4.2.0>,
+      <acquisition in progress>)
+(   6,<2023-10-27 13:26:06.692 +0000>,<nmrsu>,<CZC1459CVK>,<go4>,<TopSpin 4.2.0>,
+      <created by zg on 'AV NEO 600' (CZC1459CVK) by user 'nmrsu'
+       on data set with UUID 'ff63652a-74cb-11ee-aa88-0030d62dd8c2'
+       started at 2023-10-27 13:23:20.812 +0000, POWCHK enabled, PULCHK disabled,
+       terminated by command 'stop' at 2023-10-27 13:26:06.688 +0000
+       configuration hash MD5:
+       50 3A 08 4D E9 61 C7 5C 53 81 14 ED EB 7C E0 DA
+       double data hash MD5: 16K * 1 * 9
+       6B F4 1C 97 B5 F2 E2 51 CD 72 16 B2 9B 4C 27 A8>)
+(   7,<2023-10-27 14:26:08.775 +0100>,<nmrsu>,<CZC1459CVK>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F1 TD to 11>)
+(   8,<2023-10-27 13:26:49.000 +0000>,<nmrsu>,<CZC1459CVK>,<go4>,<TopSpin 4.2.0>,
+      <raw data deleted by zg>)
+(   9,<2023-10-27 13:26:49.001 +0000>,<nmrsu>,<CZC1459CVK>,<go4>,<TopSpin 4.2.0>,
+      <acquisition in progress>)
+(  10,<2023-10-27 14:16:27.381 +0000>,<nmrsu>,<CZC1459CVK>,<go4>,<TopSpin 4.2.0>,
+      <created by zg on 'AV NEO 600' (CZC1459CVK) by user 'nmrsu'
+       on data set with UUID '7b74fcb4-74cc-11ee-aaef-0030d62dd8c2'
+       started at 2023-10-27 13:26:49.001 +0000, POWCHK enabled, PULCHK disabled,
+       completed at 2023-10-27 14:16:27.380 +0000
+       configuration hash MD5:
+       50 3A 08 4D E9 61 C7 5C 53 81 14 ED EB 7C E0 DA
+       double data hash MD5: 16K * 18 * 11
+       EE 5A F6 1E 21 F9 79 E6 EB EC B6 D0 76 B2 49 83>)
+##END=
+
+$$ hash MD5
+$$ B0 7C 9D 59 B8 97 15 22 30 99 81 95 CF 37 86 D9

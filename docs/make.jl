@@ -24,6 +24,7 @@ makedocs(;
                                       #     "Dimensions" => "ref-dimensions.md",
                                       #     "File I/O" => "ref-io.md",
                                       "Metadata" => "ref-metadata.md",
+                                      "Annotations" => "ref-annotations.md",
                                       #     "Window functions" => "ref-windows.md",
                                       "Coherences and isotope data" => "ref-coherences.md"
                                       #     "Exceptions" => "ref-exceptions.md",

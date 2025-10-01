@@ -1,0 +1,38 @@
+##TITLE= Audit trail, TopSpin 3.7.0
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= waudbyc
+$$ /home/waudbyc/nmr/sophia_trp_r1rho_250504/24/pdata/1/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2025-05-05 14:57:57.523 +0100>,<waudbyc>,<cl-nmr-spec702>,<go4>,<TopSpin 3.7.0>,
+      <created by zg on data set with UUID 'a3c12066-29b7-11f0-bcda-a0369f9057e3'
+       started at 2025-05-05 14:48:35.196 +0100,
+       POWCHK enabled, PULCHK disabled,
+       completed at 2025-05-05 14:57:57.521 +0100
+
+       configuration hash MD5:
+       97 5B A2 74 84 0A BC 8A 94 89 B9 5E E9 36 3B 50
+       data hash MD5: 4K * 101
+       07 F7 4D 2D 40 6A 04 D5 EE A9 B7 2F EA 47 84 B5>)
+(   2,<2025-05-05 15:20:50.821 +0100>,<waudbyc>,<cl-nmr-spec702>,<proc2d>,<TopSpin 3.7.0>,
+      <Start of raw data processing
+       xf2 F2: SI = 8K WDW = 1 LB = 3 FT_mod = 6 PKNL = 1 STSR = 3584 STSI = 1K PHC0 = -172.3468 PHC1 = 0 F1: SI = 128
+       data hash MD5: 1K * 128
+       B6 A6 99 2F B3 4B FA 2E C6 07 FF E2 D3 D6 2B FE>)
+$$ /Users/chris/NMR/crick-702/sophia_trp_r1rho_250504/24/pdata/1/auditp.txt
+(   3,<2025-07-11T17:59:19.501+0100>,<chris>,<johann.local>,<proc2d>,<TopSpin 4.4.0>,
+      <Start of raw data processing
+       xf2 F2: SI = 8K WDW = 1 LB = 3 FT_mod = 6 PKNL = 1 STSR = 3584 STSI = 1K PHC0 = -172.3468 PHC1 = 0 F1: SI = 128
+       data hash MD5: 1K * 128
+       B6 A6 99 2F B3 4B FA 2E C6 07 FF E2 D3 D6 2B FE>)
+(   4,<2025-07-11T18:03:22.948+0100>,<chris>,<johann.local>,<cprserver>,<TopSpin 4.4.0>,
+      <changed parameter F2 SI to 4096>)
+(   5,<2025-07-11T18:03:24.030+0100>,<chris>,<johann.local>,<proc2d>,<TopSpin 4.4.0>,
+      <Start of raw data processing
+       xf2 F2: SI = 4K WDW = 1 LB = 3 FT_mod = 6 PKNL = 1 STSR = 1792 STSI = 512 PHC0 = -172.3468 PHC1 = 0 F1: SI = 128
+       data hash MD5: 512 * 128
+       71 90 8A D7 E4 41 9E 3D AB FE 8B B5 E8 F5 4F CC>)
+##END=
+
+$$ hash MD5
+$$ 25 A1 43 84 4B AC F7 6D 1C 4A 7D 47 8B 72 67 C7

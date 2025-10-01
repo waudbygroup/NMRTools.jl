@@ -1,0 +1,30 @@
+;Grad4.incl  -  include file for Gradient Spectroscopy
+;   for AV 4
+;
+;avance-version (16/05/23)
+;
+;$CLASS=Common Incl
+;$COMMENT=
+
+
+/*;blank/unblank gradient amplifier and turn lock-hold on/off*/
+#define BLKGRAD   setrtp0^0 ctrlgrad 4047
+#define UNBLKGRAD setrtp0|0 ctrlgrad 0
+
+/*;blank/unblank gradient amplifier*/
+#define BLKGRAMP   ctrlgrad 4047
+#define UNBLKGRAMP ctrlgrad 0
+
+/*;for Gradient Shimming (BSMS) - new */
+#define SHIM_XY_RAMP_ON  setrtp0|1
+#define SHIM_XY_RAMP_OFF setrtp0^1
+/*;for RCB board (BSMS) - old */
+#define RCB_INCR SHIM_XY_RAMP_ON
+#define RCB_CONT SHIM_XY_RAMP_OFF
+
+
+define list<gradient> EA=<EA>
+
+
+
+;$Id:$

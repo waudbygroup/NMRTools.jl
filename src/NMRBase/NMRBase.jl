@@ -43,6 +43,7 @@ include("exceptions.jl")
 include("nuclei.jl")
 include("coherences.jl")
 include("isotopedata.jl")
+include("power.jl")
 include("dimensions.jl")
 include("nmrdata.jl")
 include("windows.jl")
@@ -69,6 +70,11 @@ export gyromagneticratio
 export Coherence
 export SQ, MQ
 export coherenceorder
+
+# power
+export Power
+export db, watts
+export hz
 
 # NMRData
 export AbstractNMRData

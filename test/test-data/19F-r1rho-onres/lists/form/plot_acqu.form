@@ -1,0 +1,341 @@
+EDIT_PAR COMMAND FILE
+
+DI_MODE         LONG
+ED_ENTRY        ACQU
+ORDER           FILE
+
+
+HEADER		"F2 - Acquisition Parameters"
+T_NAME		Date_
+		TYPE	R64
+		CLASS	ACQU
+		SUBRANGE 0.0 50000000
+		REL	"Date_=itodate(DATE)"
+		INV_REL	"DATE=datetoi(Date_,DATE)"
+		FORMAT	"%14.0f"
+		TEXT	" "
+END
+T_NAME		Time
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1000000
+		REL	"Time=itotime(DATE)"
+		INV_REL	"DATE=timetoi(Time,DATE)"
+		FORMAT	"%14.2f h"
+		TEXT	" "
+END
+NAME		INSTRUM
+		TEXT	" "
+END
+NAME		PROBHD
+		FORMAT	"%14.14s"
+		TEXT	" "
+END
+NAME		PULPROG
+		TEXT	" "
+END
+NAME		TD
+		TEXT	" "
+END
+NAME		SOLVENT
+		TEXT	" "
+END
+NAME		NS
+		TEXT	" "
+END
+NAME		DS
+		TEXT	" "
+END
+T_NAME		SWH
+		TYPE	R64
+		CLASS	ACQU
+		SUBRANGE 0.0 1e8
+		REL	"SWH=SW*SFO1"
+		INV_REL "SW=SWH/SFO1"
+		UNIT	"Hz"
+		FORMAT	"%14.3f Hz"
+		TEXT	" "
+END
+T_NAME          FIDRES
+                TYPE    R32
+                CLASS   ACQU
+                SUBRANGE 0.0 100000
+                REL     "FIDRES=2*SW*SFO1/TD"
+                INV_REL "TD = nextpow(2*SW*SFO1/FIDRES)"
+		UNIT	"Hz"
+		FORMAT	"%14.6f Hz"
+		TEXT	" "
+END
+T_NAME          AQ
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1000
+		REL	"AQ=aqcalc(SW,SFO1,TD,DIGTYP)"
+		INV_REL	"TD=tdcalc(SW,SFO1,1.0e6*AQ,DIGTYP)"
+		UNIT	"sec"
+		FORMAT	"%14.7f sec"
+		TEXT	" "
+END
+NAME		RG
+		TEXT	" "
+END
+T_NAME          DW
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1000000
+		REL	"DW=1/(2*SW*SFO1)"
+		INV_REL	"SW=1000000/(2*(0.005+DW)*SFO1)"
+		UNIT	"usec"
+		FORMAT	"%14.3lf usec"
+		TEXT	" "
+END
+NAME		DE
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+NAME		TE
+		FORMAT	"%14.1f K"
+		TEXT	" "
+END
+CONDITIONAL:
+T_NAME		AMP$$
+		TRANGE	0 31
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -1e38 1e38
+		REL	"AMP$$=AMP[$$]"
+		INV_REL	"AMP[$$]=AMP$$"
+		UNIT	"%"
+		FORMAT	"%14.2f %"
+		TEXT	" "
+END
+T_NAME		CNST$$
+		TRANGE	0 63
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -1e38 1e38
+		REL	"CNST$$=CNST[$$]"
+		INV_REL	"CNST[$$]=CNST$$"
+		FORMAT	"%14.7f"
+		TEXT	" "
+END
+T_NAME		D$$
+		TRANGE	0 63
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"D$$=D[$$]"
+		INV_REL	"D[$$]=D$$"
+		UNIT	"sec"
+		FORMAT	"%14.8f sec"
+		TEXT	" "
+END
+NAME		DSLIST
+		TEXT	" "
+END
+NAME		PHLIST
+		TEXT	" "
+END
+NAME		FQ$$LIST
+		TRANGE	1 8
+		TEXT	" "
+END
+NAME		GPNAM[$$]
+		TRANGE 	0 31
+		TEXT	" "
+END
+T_NAME		GPX$$
+		TRANGE	0 31
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -100.0 100.0
+		REL	"GPX$$=GPX[$$]"
+		INV_REL	"GPX[$$]=GPX$$"
+		UNIT	"%"
+		FORMAT	"%14.2f %"
+		TEXT	" "
+END
+T_NAME		GPY$$
+		TRANGE	0 31
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -100.0 100.0
+		REL	"GPY$$=GPY[$$]"
+		INV_REL	"GPY[$$]=GPY$$"
+		UNIT	"%"
+		FORMAT	"%14.2f %"
+		TEXT	" "
+END
+T_NAME		GPZ$$
+		TRANGE	0 31
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -100.0 100.0
+		REL	"GPZ$$=GPZ[$$]"
+		INV_REL	"GPZ[$$]=GPZ$$"
+		UNIT	"%"
+		FORMAT	"%14.2f %"
+		TEXT	" "
+END
+NAME		HDDUTY
+		FORMAT "%14.1f %"
+		TEXT	" "
+END
+NAME		HL1
+		FORMAT	"%14d dB"
+		TEXT	" "
+END
+NAME		HL2
+		FORMAT	"%14d dB"
+		TEXT	" "
+END
+NAME		HL3
+		FORMAT	"%14d dB"
+		TEXT	" "
+END
+NAME		HL4
+		FORMAT	"%14d dB"
+		TEXT	" "
+END
+T_NAME		IN$$
+		TRANGE	0 63
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"IN$$=IN[$$]"
+		INV_REL	"IN[$$]=IN$$"
+		UNIT	"sec"
+		FORMAT	"%14.8f sec"
+		TEXT	" "
+END
+T_NAME		INP$$
+		TRANGE	0 63
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"INP$$=INP[$$]"
+		INV_REL	"INP[$$]=INP$$"
+		UNIT	"sec"
+		FORMAT	"%14.8f sec"
+		TEXT	" "
+END
+T_NAME		L$$
+		TRANGE	0 31
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"L$$=L[$$]"
+		INV_REL	"L[$$]=L$$"
+		FORMAT	"%14.0f"
+		TEXT	" "
+END
+NAME		NBL
+		TEXT	" "
+END
+NAME		NUC$$
+		TRANGE	1 8
+		NONEDIT
+		TEXT	" "
+END
+T_NAME		P$$
+		TRANGE	0 63
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1.0e10
+		REL	"P$$=P[$$]"
+		INV_REL	"P[$$]=P$$"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+T_NAME		PCPD$$
+		TRANGE	1 8
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0 1e38
+		REL	"PCPD$$=PCPD[$$]"
+		INV_REL	"PCPD[$$]=PCPD$$"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+NAME		CPDPRG[$$]
+		TRANGE	1 8
+		TEXT	" "
+END
+T_NAME		PLW$$
+		TRANGE	0 63
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE ## ##
+		REL	"PLW$$=PLW[$$]"
+		INV_REL	"PLW[$$]=PLW$$"
+		UNIT	"W"
+		FORMAT	"%14.8f W"
+		TEXT	"power PLW$$ "
+END
+NAME		SFO$$
+		TRANGE	1 8
+		FORMAT	"%14.7f MHz"
+		TEXT	" "
+END
+T_NAME		SPW$$
+		TRANGE	0 63
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE ## ##
+		REL	"SPW$$=SPW[$$]"
+		INV_REL	"SPW[$$]=SPW$$"
+		UNIT	"W"
+		FORMAT	"%14.8f W"
+		TEXT	"shaped pulse power SPW$$"
+END
+NAME		SPNAM[$$]
+		TRANGE	0 63
+		TEXT	" "
+END
+T_NAME		SPOAL$$
+		TRANGE	0 63
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -1.0 1.0
+		REL	"SPOAL$$=SPOAL[$$]"
+		INV_REL	"SPOAL[$$]=SPOAL$$"
+		FORMAT	"%14.3f"
+		TEXT	" "
+END
+T_NAME		SPOFFS$$
+		TRANGE	0 63
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -1e38 1e38
+		REL	"SPOFFS$$=SPOFFS[$$]"
+		INV_REL	"SPOFFS[0]=SPOFFS0"
+		UNIT	"Hz"
+		FORMAT	"%14.2f Hz"
+		TEXT	" "
+END
+NAME		TD0
+		TEXT	" "
+END
+NAME		TDav
+		TEXT	" "
+END
+NAME		VCLIST
+		TEXT	" "
+END
+NAME		VDLIST
+		TEXT	" "
+END
+NAME		VPLIST
+		TEXT	" "
+END
+NAME		VTLIST
+		TEXT	" "
+END
+NAME		ZGOPTNS
+		TEXT	" "
+END
+EXCLUDED:
+NAME		MCREST
+NAME		MCWRK

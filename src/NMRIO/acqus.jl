@@ -90,6 +90,8 @@ end
 function parseacqus(acqusfilename::String, auxfiles=true)
     dic = loadjdx(acqusfilename)
 
+    replacepowers!(dic)
+
     if auxfiles
         # add the topspin version to the dictionary
         dic[:topspin] = topspinversion(acqusfilename)
@@ -102,6 +104,19 @@ function parseacqus(acqusfilename::String, auxfiles=true)
     end
 
     return dic
+end
+
+function replacepowers!(dic)
+    if haskey(dic, :plw)
+        # convert Dict{Int64, Float64} to Dict{Int64, Power}
+        dic[:plw] = Dict(k => Power(v, :W) for (k, v) in dic[:plw])
+        dic[:pl] = dic[:plw]  # pl is an alias for plw
+    end
+    if haskey(dic, :spw)
+        # convert Dict{Int64, Float64} to Dict{Int64, Power}
+        dic[:spw] = Dict(k => Power(v, :W) for (k, v) in dic[:spw])
+        dic[:sp] = dic[:spw]  # sp is an alias for spw
+    end
 end
 
 """
@@ -309,7 +324,7 @@ function parsevplist(filename)
     return xf * 1e-6  # return vplist in seconds
 end
 
-"return valist contents in dB"
+"return valist contents as Powers"
 function parsevalist(filename)
     x = readlines(filename)
 
@@ -326,10 +341,10 @@ function parsevalist(filename)
 
     # convert to dB if needed
     if powertoken == "Watt"
-        @info "converting valist from Watt to dB"
-        xf = -10 * log10.(xf)
+        return Power.(xf, :W)
+    else
+        return Power.(xf, :dB)
     end
-    return xf
 end
 
 """

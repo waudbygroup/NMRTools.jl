@@ -262,3 +262,46 @@ end
     # expect warning that experiments do not have same rg
     @test (@test_logs (:warn,) size(stack(specs3))) == (768, 512, 4)
 end
+
+@testset "NMRBase: Power" begin
+    # Test construction from dB
+    p1 = Power(30.0, :dB)
+    @test db(p1) == 30.0
+    @test watts(p1) ≈ 0.001
+
+    # Test construction from Watts
+    p2 = Power(1.0, :W)
+    @test watts(p2) == 1.0
+    @test db(p2) == 0.0
+
+    # Test with integer input
+    p3 = Power(10, :W)
+    @test watts(p3) == 10.0
+    @test db(p3) ≈ -10.0
+
+    # Test zero Watts handling
+    p4 = Power(0.0, :W)
+    @test db(p4) == 120.0
+    @test watts(p4) ≈ 1e-12
+
+    # Test error for missing unit
+    @test_throws ArgumentError Power(10)
+
+    # Test error for invalid unit
+    @test_throws ArgumentError Power(10, :V)
+
+    # Test roundtrip conversions
+    original_watts = 0.5
+    p5 = Power(original_watts, :W)
+    @test watts(p5) ≈ original_watts
+
+    original_db = -6.0
+    p6 = Power(original_db, :dB)
+    @test db(p6) == original_db
+
+    # Test pretty printing contains both units
+    p7 = Power(20.0, :dB)
+    output = string(p7)
+    @test occursin("dB", output)
+    @test occursin("W", output)
+end

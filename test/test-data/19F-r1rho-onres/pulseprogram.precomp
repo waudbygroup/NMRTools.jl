@@ -1,0 +1,327 @@
+# 1 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+
+;@ schema_version: "0.0.1"
+;@ sequence_version: "0.1.0"
+;@ title: 19F on-resonance R1rho relaxation dispersion
+;@ authors:
+;@   - Chris Waudby <c.waudby@ucl.ac.uk>
+;@   - Jan Overbeck
+;@ citation:
+;@   - Hazlett et al. ChemRxiv (2025)
+;@   - Overbeck (2020)
+;@ doi:
+;@   - 10.26434/chemrxiv-2025-vt1wg
+;@ created: 2020-01-01
+;@ last_modified: 2025-08-01
+;@ repository: github.com/waudbygroup/pulseprograms
+;@ status: beta
+;@ experiment_type: [r1rho, 1d]
+;@ features: [relaxation dispersion, on-resonance, temperature compensation]
+;@ nuclei_hint: [19F, 1H]
+;@ dimensions: [spinlock_duration, spinlock_power, f1]
+;@ decoupling: [nothing, nothing, f2]
+;@ acquisition_order: [3, 1, 2]
+;@ hard_pulse:
+;@ - {channel: f1, length: p1, power: pl1}
+;@ - {channel: f2, length: p3, power: pl2}
+;@ decoupling_pulse:
+;@ - {channel: f2, length: p4, power: pl12, program: cpdprg2}
+;@ spinlock: {channel: f1, power: <$VALIST>, duration: <$VPLIST>, offset: 0, alignment: hard pulse}
+
+
+
+
+# 17 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+# 21 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+;cnst28 : offset of SL in ppm
+;p30 : maximum SL length
+;p31 : heating compensation SL length
+;p32 : spin lock lenght T_ex
+;pl25 : spin lock power, = sp4
+;VPLIST : list of spin lock lengths
+;VALIST : list of spin lock powers !in dB!
+
+
+# 1 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Avance.incl" 1
+;Avance4.incl
+;   for AV 4
+;
+;avance-version (16/08/18)
+;
+;$CLASS=Common Incl
+;$COMMENT=
+# 19 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Avance.incl"
+;setrtp0 denotes TimingController
+
+
+# 50 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Avance.incl"
+# 51 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Avance.incl"
+
+
+# 63 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Avance.incl"
+# 89 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Avance.incl"
+# 90 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Avance.incl"
+
+
+# 123 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Avance.incl"
+;#define LOWQ
+;#define HIGHQ
+
+
+;#define MIX_UP
+;#define MIX_DOWN
+# 136 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Avance.incl"
+;$Id:$
+# 30 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw" 2
+
+# 1 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Grad.incl" 1
+;Grad4.incl  -  include file for Gradient Spectroscopy
+;   for AV 4
+;
+;avance-version (16/05/23)
+;
+;$CLASS=Common Incl
+;$COMMENT=
+
+# 26 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Grad.incl"
+define list<gradient> EA=<EA>
+
+
+# 30 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Grad.incl"
+;$Id:$
+# 31 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw" 2
+
+# 1 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Delay.incl" 1
+;Delay.incl  -  include file for commonly used delays
+;
+;version (13/08/07)
+;
+;$CLASS=Common Incl
+;$COMMENT=
+
+# 9 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Delay.incl"
+;general delays
+
+define delay DELTA
+define delay DELTA1
+define delay DELTA2
+define delay DELTA3
+define delay DELTA4
+define delay DELTA5
+define delay DELTA6
+define delay DELTA7
+define delay DELTA8
+define delay DELTA9
+define delay DELTA10
+define delay DELTA11
+define delay DELTA12
+define delay DELTA13
+define delay DELTA14
+define delay DELTA15
+define delay DELTA16
+
+define delay TAU
+define delay TAU1
+define delay TAU2
+define delay TAU3
+define delay TAU4
+define delay TAU5
+define delay TAU6
+define delay TAU7
+define delay TAU8
+define delay TAU9
+# 40 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Delay.incl"
+define delay INCR1
+define delay INCR2
+define delay INCR3
+define delay INCR4
+define delay INCR5
+define delay INCR6
+
+
+;delays for centering pulses
+# 50 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Delay.incl"
+define delay CEN_HN1
+define delay CEN_HN2
+define delay CEN_HN3
+define delay CEN_HC1
+define delay CEN_HC2
+define delay CEN_HC3
+define delay CEN_HC4
+define delay CEN_HP1
+define delay CEN_HP2
+define delay CEN_CN1
+define delay CEN_CN2
+define delay CEN_CN3
+define delay CEN_CN4
+define delay CEN_CP1
+define delay CEN_CP2
+
+
+;loop counters
+# 69 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Delay.incl"
+define loopcounter COUNTER
+define loopcounter SCALEF
+define loopcounter FACTOR1
+define loopcounter FACTOR2
+define loopcounter FACTOR3
+define loopcounter FACTOR4
+define loopcounter FACTOR5
+define loopcounter FACTOR6
+
+
+# 80 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/Delay.incl"
+;$Id:$
+# 32 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw" 2
+
+define list<pulse> plength = <$VPLIST>
+define list<power> list1 = <$VALIST>
+
+"p2=p1*2"
+"d11=30m"
+"l2=0"
+"l3=0"
+aqseq 312
+# 1 "mc_line 42 file /root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw exp. def. part of mc cmd. before ze"
+; dimension 3D; AQ_mode  (F2) QF (F1) QF
+define delay MCWRK
+define delay MCREST
+define loopcounter l2orig
+"l2orig=l2"
+define loopcounter t2loop
+"t2loop=0"
+define loopcounter t1loop
+"t1loop=0"
+define loopcounter ph1loop
+"ph1loop=0"
+define loopcounter ph2loop
+"ph2loop=0"
+define loopcounter F2CNT
+"F2CNT = min( 1 , td2)"
+define loopcounter F1CNT
+"F1CNT = min( 1 , td1)"
+define loopcounter ST2CNT
+"ST2CNT = max( 1 , trunc(td2 / 1))"
+define loopcounter ST1CNT
+"ST1CNT = max( 1 , trunc(td1 / 1))"
+"MCREST = 30m - 30m"
+"MCWRK = 0.250000*30m"
+# 42 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+# 42 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+1 ze
+# 1 "mc_line 42 file /root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw exp. def. of mc cmd. after ze"
+LBLAV, MCWRK
+      "l2 = l2orig + t1loop * 1"
+
+      "list1.idx = t2loop * (1)"
+
+# 43 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+ "p30 = plength.max"
+# 1 "mc_line 44 file /root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw exp. start label for mc cmd."
+2 MCWRK 
+LBLST1, MCWRK  * 2
+LBLST2, MCWRK
+  MCREST
+# 45 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+
+
+# 48 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+ "p32=plength[l2]"
+ "p31=p30-p32"
+; ----------------------------------
+
+
+# 55 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+if "p31 > 0.0"
+ {
+ 1u fq=100(bf ppm):f1
+ 1u list1:f1
+ (p31 ph1):f1
+ }
+; ----------------------------------
+
+ d1
+;50u setrtp0|0 ctrlgrad 0
+
+# 69 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+ 30m
+ 1u fq=cnst28(bf ppm):f1
+if "p32 == 0.0"
+ {
+ 1u pl1:f1
+ p1 ph4
+ }
+else
+ {
+ 1u pl1:f1
+ p1 ph4
+ 1u list1:f1
+ (p32 ph1):f1 ; <-- this is the Spin Lock
+}
+;-----------------------------------
+
+
+# 88 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+ 1u pl1:f1
+ p1 ph5
+;------------------------------------
+
+
+# 95 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+ 1u pl1:f1
+ p1 ph1
+ 4u
+ p1 ph2
+ 4u
+ p1 ph3
+;------------------------------------
+
+; 4u setrtp0^0 ctrlgrad 4047
+ go=2 ph31
+# 1 "mc_line 105 file /root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw exp. mc cmd. in line"
+  MCWRK  wr #0 if #0 zd 
+
+  "t1loop+=1 * (1 - kronecker_delta(1 , td1) )"
+      "l2 = l2orig + t1loop * 1"
+
+      "list1.idx = t2loop * (1)"
+
+  lo to LBLST1 times ST1CNT
+  MCWRK 
+  "t1loop=0"
+  MCWRK 
+
+  "t2loop+=1 * (1 - kronecker_delta(1 , td2) )"
+      "l2 = l2orig + t1loop * 1"
+
+      "list1.idx = t2loop * (1)"
+
+  lo to LBLST2 times ST2CNT
+  MCWRK 
+  "t2loop=0"
+  MCWRK rf #0
+  lo to LBLAV times tdav
+# 108 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+;exit
+HaltAcqu, 1m
+exit
+
+# 113 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
+ph1=0
+ph2=2 0
+ph3=0 0 2 2 1 1 3 3
+ph4=1
+ph5=3
+ph31=0 2 2 0 1 3 3 1
+;pl1 : f1 channel - power level for pulse (default)
+;p1 : f1 channel - 90 degree high power pulse
+;p2 : f1 channel - 180 degree high power pulse
+;d1 : relaxation delay; 1-5 * T1
+;d11: delay for disk I/O [30 msec]
+;ns: 8 * n
+;ds: 128
+
+

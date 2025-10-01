@@ -1,0 +1,24 @@
+##TITLE= Parameter file, TopSpin 4.2.0
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 23	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= nmrsu
+$$ 2023-10-27 14:29:27.070 +0100  nmrsu@CZC1459CVK
+$$ /home/nmrsu/nmr/sophia_231027_R1p_lig2/105/acqu3s
+$$ process /opt/topspin4.2.0/prog/mod/acqdataserver
+##$ACQT0= 0
+##$BF1= 564.940442044
+##$FnILOOP= 1
+##$FnMODE= 1
+##$NUC1= <19F>
+##$NusJSP= 0
+##$NusT2= 1
+##$NusTD= 11
+##$O1= -35560.7410649016
+##$ProjAngle= 0
+##$SFO1= 564.904881302935
+##$SW= 9.79734392779412
+##$SW_h= 5534.56740861457
+##$TD= 11
+##END=

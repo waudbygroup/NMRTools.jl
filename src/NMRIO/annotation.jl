@@ -81,16 +81,13 @@ function resolve_parameter_references!(annotations::Dict, spec::NMRData)
 end
 
 function _resolve_recursive!(obj::Dict, spec::NMRData)
-    @info "Resolving annotations dictionary recursively..."
     for (key, value) in obj
-        @info "Resolving key '$key' with value: $value"
         obj[key] = _resolve_recursive!(value, spec)
     end
     return obj
 end
 
 function _resolve_recursive!(obj::Vector, spec::NMRData)
-    @info "Resolving annotations array recursively..." obj
     for i in eachindex(obj)
         obj[i] = _resolve_recursive!(obj[i], spec)
     end
@@ -101,13 +98,10 @@ function _resolve_recursive!(obj::String, spec::NMRData)
     # Check if this string matches a parameter pattern
     resolved_value = _resolve_parameter(obj, spec)
 
-    @info "Annotation '$obj' resolved to: $resolved_value"
     return isnothing(resolved_value) ? obj : resolved_value
 end
 
 function _resolve_recursive!(obj, spec::NMRData)
-    @info "Resolving annotation object $obj of type $(typeof(obj))..."
-
     # For any other type (numbers, booleans, etc.), return as-is
     return obj
 end
@@ -144,7 +138,6 @@ function _resolve_parameter(param_str::String, spec::NMRData)
         m = match(pattern, param_lower)
         if !isnothing(m)
             index = parse(Int, m.captures[1])
-            @info "Resolving parameter '$param_str' as '$type' with index $index"
             return acqus(spec, type, index)
         end
     end
@@ -153,7 +146,6 @@ function _resolve_parameter(param_str::String, spec::NMRData)
     m = match(r"^f(\d+)$", param_lower)
     if !isnothing(m)
         index = parse(Int, m.captures[1])
-        @info "Resolving parameter '$param_str' as :nuc$index"
         return acqus(spec, Symbol("nuc$index"))
     end
 

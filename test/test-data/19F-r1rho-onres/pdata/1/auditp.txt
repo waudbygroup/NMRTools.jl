@@ -1,0 +1,63 @@
+##TITLE= Audit trail, TopSpin 4.2.0
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= nmrsu
+$$ /home/nmrsu/nmr/sophia_231027_R1p_lig2/105/pdata/1/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2023-10-27 13:03:52.675 +0100>,<nmrsu>,<CZC1459CVK>,<cprserver>,<TopSpin 4.2.0>,
+      <new/edc EXPNO=105 PROCNO=1>)
+(   2,<2023-10-27 14:11:13.237 +0100>,<nmrsu>,<CZC1459CVK>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F3 O1P to -62.946>)
+(   3,<2023-10-27 14:11:19.965 +0100>,<nmrsu>,<CZC1459CVK>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F3 CNST28 to -62.9459991>)
+(   4,<2023-10-27 14:11:26.213 +0100>,<nmrsu>,<CZC1459CVK>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F3 P1 to 12.750>)
+(   5,<2023-10-27 13:23:20.812 +0000>,<nmrsu>,<CZC1459CVK>,<go4>,<TopSpin 4.2.0>,
+      <acquisition in progress>)
+(   6,<2023-10-27 13:26:06.692 +0000>,<nmrsu>,<CZC1459CVK>,<go4>,<TopSpin 4.2.0>,
+      <created by zg on 'AV NEO 600' (CZC1459CVK) by user 'nmrsu'
+       on data set with UUID 'ff63652a-74cb-11ee-aa88-0030d62dd8c2'
+       started at 2023-10-27 13:23:20.812 +0000, POWCHK enabled, PULCHK disabled,
+       terminated by command 'stop' at 2023-10-27 13:26:06.688 +0000
+       configuration hash MD5:
+       50 3A 08 4D E9 61 C7 5C 53 81 14 ED EB 7C E0 DA
+       double data hash MD5: 16K * 1 * 9
+       6B F4 1C 97 B5 F2 E2 51 CD 72 16 B2 9B 4C 27 A8>)
+(   7,<2023-10-27 14:26:08.775 +0100>,<nmrsu>,<CZC1459CVK>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F1 TD to 11>)
+(   8,<2023-10-27 13:26:49.000 +0000>,<nmrsu>,<CZC1459CVK>,<go4>,<TopSpin 4.2.0>,
+      <raw data deleted by zg>)
+(   9,<2023-10-27 13:26:49.001 +0000>,<nmrsu>,<CZC1459CVK>,<go4>,<TopSpin 4.2.0>,
+      <acquisition in progress>)
+(  10,<2023-10-27 14:16:27.381 +0000>,<nmrsu>,<CZC1459CVK>,<go4>,<TopSpin 4.2.0>,
+      <created by zg on 'AV NEO 600' (CZC1459CVK) by user 'nmrsu'
+       on data set with UUID '7b74fcb4-74cc-11ee-aaef-0030d62dd8c2'
+       started at 2023-10-27 13:26:49.001 +0000, POWCHK enabled, PULCHK disabled,
+       completed at 2023-10-27 14:16:27.380 +0000
+       configuration hash MD5:
+       50 3A 08 4D E9 61 C7 5C 53 81 14 ED EB 7C E0 DA
+       double data hash MD5: 16K * 18 * 11
+       EE 5A F6 1E 21 F9 79 E6 EB EC B6 D0 76 B2 49 83>)
+(  11,<2023-10-27 17:36:54.532 +0100>,<nmrsu>,<CZC1459CVK>,<ftnd>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       ftnd 3
+       F3: SI = 16K WDW = 1 LB = 20 FT_mod = 6 PKNL = 1 PHC0 = 233.755 PHC1 = 0
+       data hash MD5: 16K * 32 * 16
+       28 D7 8D 05 48 38 68 AD AF AF D9 43 6E 4B B1 2D>)
+$$ /Users/chris/NMR/sop-600/sophia_231027_R1p_lig2/105/pdata/1/auditp.txt
+(  12,<2024-06-20T12:38:06.042+0100>,<chris>,<eduroam-int-dhcp-97-98-195.ucl.ac.uk>,<cprserver>,<TopSpin 4.4.0>,
+      <changed parameter F3 SI to 4096>)
+(  13,<2024-06-20T12:38:08.826+0100>,<chris>,<eduroam-int-dhcp-97-98-195.ucl.ac.uk>,<cprserver>,<TopSpin 4.4.0>,
+      <changed parameter F3 STSR to 1200>)
+(  14,<2024-06-20T12:38:11.051+0100>,<chris>,<eduroam-int-dhcp-97-98-195.ucl.ac.uk>,<cprserver>,<TopSpin 4.4.0>,
+      <changed parameter F3 STSI to 1200>)
+(  15,<2024-06-20T12:38:14.980+0100>,<chris>,<eduroam-int-dhcp-97-98-195.ucl.ac.uk>,<ftnd>,<TopSpin 4.4.0>,
+      <Start of raw data processing
+       ftnd 3
+       F3: SI = 4K WDW = 1 LB = 20 FT_mod = 6 PKNL = 1 STSR = 1200 STSI = 1200 PHC0 = 233.755 PHC1 = 0
+       data hash MD5: 1216 * 32 * 16
+       6D 25 52 92 71 3F 82 6E 60 C2 59 28 CD C6 12 4C>)
+##END=
+
+$$ hash MD5
+$$ 35 46 23 91 99 15 32 97 CD 67 15 17 EF 36 C5 2E

@@ -1,0 +1,136 @@
+;Avance4.incl
+;   for AV 4
+;
+;avance-version (16/08/18)
+;
+;$CLASS=Common Incl
+;$COMMENT=
+
+
+#ifndef AVANCE_INCL
+#define AVANCE_INCL
+
+
+/*;use 2H channel for lock or pulse (lockswitch)*/
+#define H2_LOCK h2lock         ;SEL_2H plus interleave_incr
+#define H2_PULSE h2pulse       ;SEL_2H plus interleave_incr
+
+/*;turn lock-hold on/off (BSMS)*/
+;setrtp0 denotes TimingController
+#define LOCKH_ON setrtp0|0
+#define LOCKH_OFF setrtp0^0
+
+/*;homospoil on/off (BSMS)*/
+#define HOMOSPOIL_ON setrtp0|2
+#define HOMOSPOIL_OFF setrtp0^2
+/*;old */
+#define HS_ON setrtp0|2
+#define HS_OFF setrtp0^2
+
+
+/*;for receiver systems*/
+
+/*;generate dwell clock*/
+#define DWELL_GEN cpdngs17
+#define DWELL_GEN1 cpdngs17:f1
+#define DWELL_GEN2 cpdngs18:f2
+#define DWELL_GEN3 cpdngs19:f3
+#define DWELL_GEN4 cpdngs20:f4
+
+/*; hold or release dwell clock */
+#define DWELL_HOLD setrtp1|1
+#define DWELL_RELEASE setrtp1^1
+#define DWELL_HOLD_F1 setrtp1|1
+#define DWELL_RELEASE_F1 setrtp1^1
+#define DWELL_HOLD_F2 setrtp2|1
+#define DWELL_RELEASE_F2 setrtp2^1
+#define DWELL_HOLD_F3 setrtp3|1
+#define DWELL_RELEASE_F3 setrtp3^1
+#define DWELL_HOLD_F4 setrtp4|1
+#define DWELL_RELEASE_F4 setrtp4^1
+
+/*;blank/unblank receiver path*/
+#define REC_BLK setrtp1^26
+#define REC_UNBLK setrtp1|26
+#define REC_BLK_F1 setrtp1^26
+#define REC_UNBLK_F1 setrtp1|26
+#define REC_BLK_F2 setrtp2^26
+#define REC_UNBLK_F2 setrtp2|26
+#define REC_BLK_F3 setrtp3^26
+#define REC_UNBLK_F3 setrtp3|26
+#define REC_BLK_F4 setrtp4^26
+#define REC_UNBLK_F4 setrtp4|26
+
+/*;generate dwell clock*/
+/*;start acuisition of next TD points*/
+/*;former DWL_CLK_ON etc. */
+/*;turn dwell clock on => receiver will acquire TD points */
+/*;note that DWL_CLK_OFF is set automatically and is obsolete*/
+#define START_NEXT_SCAN setrtp1|0
+#define START_NEXT_SCAN_F1 setrtp1|0
+#define START_NEXT_SCAN_F2 setrtp2|0
+#define START_NEXT_SCAN_F3 setrtp3|0
+#define START_NEXT_SCAN_F4 setrtp4|0
+
+
+/*;interleave increment signal*/
+#define INTERLEAVE_INCR_ON setrtp0|47
+#define INTERLEAVE_INCR_OFF setrtp0^47
+
+
+/*;trigger outputs 1-4*/
+#define TTL1_LOW setrtp0|6
+#define TTL2_LOW setrtp0|7
+#define TTL3_LOW setrtp0|8
+#define TTL4_LOW setrtp0|9
+#define TTL1_HIGH setrtp0^6
+#define TTL2_HIGH setrtp0^7
+#define TTL3_HIGH setrtp0^8
+#define TTL4_HIGH setrtp0^9
+
+
+
+/*;for imaging systems*/
+
+/*;trigger signal for gradient synchronisation*/
+#define GRAD_SYNC trigpe3
+
+
+
+/*;old commands no longer required - kept for compatibility */
+
+/*;allow for 2H decoupling (lockswitch)*/
+#define LOCKDEC_ON
+#define LOCKDEC_OFF
+
+/*;use 19F channel for lock or pulse (lockswitch)*/
+#define F19_LOCK
+#define F19_PULSE
+
+/*;allow for 19F decoupling (lockswitch)*/
+#define FLOCKDEC_ON
+#define FLOCKDEC_OFF
+
+/*;switch between 1H or 19F output (H amplifier)*/
+#define SWITO_F
+#define SWITO_H
+
+/*;select output for 19F (amplifier)*/
+#define QNP_X
+#define QNP_F
+
+/*;for Q-switch probes*/
+;#define LOWQ
+;#define HIGHQ
+
+/*;for mixing probe*/
+;#define MIX_UP
+;#define MIX_DOWN
+
+
+
+#endif
+
+
+
+;$Id:$
