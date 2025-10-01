@@ -121,3 +121,68 @@ Available window functions:
 * `GaussWindow(expHz, gaussHz, center, tmax)`: a supertype encompassing some special cases
   - `LorentzToGaussWindow(expHz, gaussHz, tmax)`
   - `GeneralGaussWindow(expHz, gaussHz, center, tmax)`: other general cases
+
+
+## Power representation
+
+Power levels from acquisition parameters (such as pulse powers from the acqus file) are represented using the `Power` type, which handles both Watts (W) and dB attenuation units.
+
+### Creating Power objects
+
+Power values must be created with an explicit unit specification:
+
+```julia
+# Create from dB attenuation
+p1 = Power(30.0, :dB)
+
+# Create from Watts
+p2 = Power(0.001, :W)
+
+```
+
+### Accessing values
+
+Once created, you can retrieve values in either unit:
+
+```julia
+p = Power(20.0, :dB)
+
+db(p)    # Returns: 20.0 (dB)
+watts(p) # Returns: 0.01 (W)
+```
+
+The conversions use the standard NMR formulas:
+- Converting W to dB: `-10 * log10(watts)`
+- Converting dB to W: `10^(-dB/10)`
+
+### Special cases
+
+Zero watts is handled specially to avoid mathematical issues with logarithms:
+
+```julia
+p_zero = Power(0.0, :W)
+db(p_zero)    # Returns: 120.0 (representing very high attenuation)
+watts(p_zero) # Returns: ≈ 1e-12
+```
+
+This is particularly relevant when parsing acqus files where power levels might be set to zero for unused entries.
+
+### Converting to radiofrequency strength
+
+Power values can be converted to radiofrequency strength in Hz using calibration data:
+
+```julia
+# Using a known reference calibration
+ref_power = Power(30.0, :dB)
+ref_hz = 25000.0  # 25 kHz at reference power
+
+test_power = Power(36.0, :dB)  # 6 dB higher attenuation
+rf_strength = hz(test_power, ref_power, ref_hz)  # ≈ 12500 Hz
+
+# Using pulse calibration parameters
+pulse_length = 10.0  # μs
+flip_angle = 90.0    # degrees
+rf_strength = hz(test_power, ref_power, pulse_length, flip_angle)
+```
+
+The conversion uses the standard relationship `Hz = ref_Hz * 10^(-ΔdB/20)` where ΔdB is the power difference between the test and reference powers.

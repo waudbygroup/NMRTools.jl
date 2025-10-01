@@ -90,15 +90,33 @@ end
 function parseacqus(acqusfilename::String, auxfiles=true)
     dic = loadjdx(acqusfilename)
 
+    replacepowers!(dic)
+
     if auxfiles
         # add the topspin version to the dictionary
         dic[:topspin] = topspinversion(acqusfilename)
 
         # lastly, check for referenced files like vclist, fq1list, and load these in place of filename
         parseacqusauxfiles!(dic, dirname(acqusfilename))
+
+        # parse the pulse program
+        parsepulseprogram!(dic, dirname(acqusfilename))
     end
 
     return dic
+end
+
+function replacepowers!(dic)
+    if haskey(dic, :plw)
+        # convert Dict{Int64, Float64} to Dict{Int64, Power}
+        dic[:plw] = Dict(k => Power(v, :W) for (k, v) in dic[:plw])
+        dic[:pl] = dic[:plw]  # pl is an alias for plw
+    end
+    if haskey(dic, :spw)
+        # convert Dict{Int64, Float64} to Dict{Int64, Power}
+        dic[:spw] = Dict(k => Power(v, :W) for (k, v) in dic[:spw])
+        dic[:sp] = dic[:spw]  # sp is an alias for spw
+    end
 end
 
 """
@@ -121,6 +139,53 @@ function topspinversion(acqusfilename)
     version = split(firstline)[end]
 
     return VersionNumber(version)
+end
+
+function parsepulseprogram!(dic, basedir)
+    if dic[:topspin] < v"4.0.8"
+        pulprogfilename = joinpath(basedir, "pulseprogram")
+        if isfile(pulprogfilename)
+            prog = read(pulprogfilename, String)
+            prog = replace(prog, "\r\n" => "\n") # replace Windows line endings with Unix
+            dic[:pulseprogram_precomp] = prog
+        end
+    elseif dic[:topspin] < v"4.1.4"
+        # TS 4.0.8 - pulseprogram / pulseprogram.precomp introduced
+        pulprogfilename = joinpath(basedir, "pulseprogram")
+        if isfile(pulprogfilename)
+            prog = read(pulprogfilename, String)
+            prog = replace(prog, "\r\n" => "\n") # replace Windows line endings with Unix
+            dic[:pulseprogram_code] = prog
+        end
+        pulprogfilename = joinpath(basedir, "pulseprogram.precomp")
+        if isfile(pulprogfilename)
+            prog = read(pulprogfilename, String)
+            prog = replace(prog, "\r\n" => "\n") # replace Windows line endings with Unix
+            dic[:pulseprogram_precomp] = prog
+        end
+    else
+        # TS 4.1.4 - lists directory introduced
+        pulprogfilename = joinpath(basedir, "lists", "pp", dic[:pulprog])
+        if isfile(pulprogfilename)
+            prog = read(pulprogfilename, String)
+            prog = replace(prog, "\r\n" => "\n") # replace Windows line endings with Unix
+            dic[:pulseprogram_code] = prog
+        end
+        pulprogfilename = joinpath(basedir, "pulseprogram.precomp")
+        if isfile(pulprogfilename)
+            prog = read(pulprogfilename, String)
+            prog = replace(prog, "\r\n" => "\n") # replace Windows line endings with Unix
+            dic[:pulseprogram_precomp] = prog
+        end
+    end
+end
+
+function pulseprogram(spec::NMRData; precomp=true)
+    if precomp
+        acqus(spec, :pulseprogram_precomp)
+    else
+        acqus(spec, :pulseprogram_code)
+    end
 end
 
 function parseacqusauxfiles!(dic, basedir)
@@ -259,7 +324,7 @@ function parsevplist(filename)
     return xf * 1e-6  # return vplist in seconds
 end
 
-"return valist contents in dB"
+"return valist contents as Powers"
 function parsevalist(filename)
     x = readlines(filename)
 
@@ -276,10 +341,10 @@ function parsevalist(filename)
 
     # convert to dB if needed
     if powertoken == "Watt"
-        @info "converting valist from Watt to dB"
-        xf = -10 * log10.(xf)
+        return Power.(xf, :W)
+    else
+        return Power.(xf, :dB)
     end
-    return xf
 end
 
 """

@@ -1,0 +1,275 @@
+#*******************************************************************
+#
+# $Source:$
+#
+# Copyright (c) 1995 - 2008
+# BRUKER BioSpin GmbH
+# D-76287 Rheinstetten, Germany
+#
+# All Rights Reserved
+#
+#
+# $Id:$
+#*******************************************************************
+EDIT_PAR COMMAND FILE
+
+DI_MODE         LONG
+ED_ENTRY        ACQU
+ORDER           FILE
+
+
+HEADER		"====== General ======"
+NAME		PULPROG
+END
+NAME		TD
+END
+NAME		SW
+END
+T_NAME		SWH
+		TYPE	R64
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"SWH=SW*SFO1"
+		INV_REL "SW=SWH/SFO1"
+		UNIT	"Hz"
+		FORMAT	"%14.2f Hz"
+		TEXT	"sweep width in acquisition direction"
+END
+T_NAME          AQ
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"AQ=aqcalc(SW,SFO1,TD,DIGTYP,FnMODE)"
+		INV_REL	"TD=tdcalc(SW,SFO1,1.0e6*AQ,DIGTYP,FnMODE)"
+		UNIT	"sec"
+		FORMAT	"%14.7f sec"
+                TEXT	"acquisition time"
+END
+NAME		RG
+END
+T_NAME          DW
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"DW=1/(2*SW*SFO1)"
+		INV_REL	"SW=1000000/(2*(0.005+DW)*SFO1)"
+		UNIT	"usec"
+		FORMAT	"%14.3f usec"
+		TEXT	"dwell time "
+END
+NAME		DE
+		FORMAT	"%14.2f usec"
+END
+T_NAME		GRPDLY
+		TYPE	R64
+		SUBRANGE 0 1e38
+		CLASS	ACQU
+		REL	"GRPDLY=GRPDLY"
+		INV_REL	"GRPDLY=GRPDLY"				
+		UNIT	"no"
+		TEXT	"group delay of digital filter"
+		FORMAT	"%14.0f"
+		NONEDIT
+END
+T_NAME		D1
+TYPE	R32
+CLASS	ACQU
+SUBRANGE 0.0 1e38
+REL	"D1=D[1]"
+INV_REL	"D[1]=D1"
+UNIT	"sec"
+FORMAT	"%14.9f sec"
+		TEXT		"relaxation delay; 1-5 * T1"
+END
+NAME		DS
+		TEXT		"128"
+END
+NAME		NS
+		TEXT		"8 * n"
+END
+NAME		TDav	
+TEXT	"number of averages in nD"
+END
+NAME		VALIST
+		TEXT		"list of spin lock powers !in dB!"
+END
+NAME		VPLIST
+		TEXT		"list of spin lock lengths"
+END
+HEADER		"======== CHANNEL f1 ========"
+NAME		SFO1
+FORMAT	"%14.7f MHz"
+TEXT	"frequency of ch. 1"
+END
+NAME		O1
+FORMAT	"%14.2f Hz"
+TEXT	"frequency of ch. 1"
+END
+T_NAME		O1P
+TYPE	R64
+CLASS	ACQU
+SUBRANGE -1e38 1e38
+REL	"O1P=O1/BF1"
+INV_REL	"O1=O1P*BF1"
+UNIT	"ppm"
+FORMAT	"%14.3f ppm"
+TEXT	"frequency of ch. 1"
+END
+NAME		NUC1
+NONEDIT
+TEXT	"nucleus for channel 1"
+END
+T_NAME		CNST28
+TYPE	R32
+CLASS	ACQU
+SUBRANGE -1e38 1e38
+REL	"CNST28=CNST[28]"
+INV_REL	"CNST[28]=CNST28"
+FORMAT	"%14.7f"
+		TEXT		"offset of SL in ppm"
+END
+NAME		FQ1LIST
+TEXT "frequency list 1"
+END
+T_NAME		l2
+		TYPE	I32
+		SUBRANGE 0 2147483647
+		CLASS	ACQU
+		REL	"l2=0"
+		INV_REL	"D[0]=l2"
+		UNIT	"no"
+		TEXT	"l2=0"
+		FORMAT	"%14d"
+		NONEDIT
+END
+T_NAME		P1
+TYPE	R32
+CLASS	ACQU
+SUBRANGE 0.0 1.0e10
+REL	"P1=P[1]"
+INV_REL	"P[1]=P1"
+UNIT	"usec"
+FORMAT	"%14.3f usec"
+		TEXT		"f1 channel - 90 degree high power pulse"
+END
+T_NAME		P30
+TYPE	R32
+CLASS	ACQU
+SUBRANGE 0.0 1.0e10
+REL	"P30=P[30]"
+INV_REL	"P[30]=P30"
+UNIT	"usec"
+FORMAT	"%14.3f usec"
+		TEXT		"maximum SL length"
+END
+T_NAME		P31
+TYPE	R32
+CLASS	ACQU
+SUBRANGE 0.0 1.0e10
+REL	"P31=P[31]"
+INV_REL	"P[31]=P31"
+UNIT	"usec"
+FORMAT	"%14.3f usec"
+		TEXT		"heating compensation SL length"
+END
+T_NAME		P32
+TYPE	R32
+CLASS	ACQU
+SUBRANGE 0.0 1.0e10
+REL	"P32=P[32]"
+INV_REL	"P[32]=P32"
+UNIT	"usec"
+FORMAT	"%14.3f usec"
+		TEXT		"spin lock lenght T_ex"
+END
+T_NAME		PLW1
+TYPE	R32
+CLASS	ACQU
+SUBRANGE 0 73.5455
+REL	"PLW1=PLW[1]"
+INV_REL	"PLW[1]=PLW1"
+UNIT	"W"
+FORMAT	"%14.5g W"
+		TEXT		"f1 channel - power level for pulse (default)"
+END
+T_NAME		PLdB1
+TYPE	R32
+CLASS	ACQU
+SUBRANGE -18.7656 1000
+REL	"if(PLW[1]>0)PLdB1=-10*log(PLW[1])/LN10;else PLdB1=1000;"
+INV_REL	"PLW[1]=0;if(PLdB1<1000)PLW[1]=pow(10.0,(-PLdB1)/10.0)"
+UNIT	"dB"
+FORMAT	"%14.2f dB"
+TEXT	"power PL1 in dB"
+END
+T_NAME		l2orig
+		TYPE	I32
+		SUBRANGE 0 2147483647
+		CLASS	ACQU
+		REL	"l2orig=l2"
+		INV_REL	"D[0]=l2orig"
+		UNIT	"no"
+		TEXT	"l2orig=l2"
+		FORMAT	"%14d"
+		NONEDIT
+END
+T_NAME		list1
+		TYPE	R32
+		SUBRANGE -35.0 120
+		CLASS	ACQU
+		REL	"list1= 36.8200"
+		INV_REL	"D[0]=list1"
+		UNIT	"dB"
+		TEXT	"list1[18]={ 36.82dB 30.80dB... }"
+		FORMAT	"%14.5g dB"
+		NONEDIT
+END
+T_NAME		plength
+		TYPE	R32
+		SUBRANGE 0 1e10
+		CLASS	ACQU
+		REL	"plength=        100.00 usec"
+		INV_REL	"D[0]=plength"
+		UNIT	"usec"
+		TEXT	"plength[11]={  100.00 usec 5000.00 usec... }"
+		FORMAT	"%14.2f usec"
+		NONEDIT
+END
+HEADER		"======== F2 INDIRECT DIMENSION ========"
+T_NAME		td2
+		TYPE	I32
+		CLASS	ACQU
+		REL	"td2=18"
+		INV_REL	"TD=TD"
+		FORMAT	"%d"
+		TEXT	"F2 Time domain size"
+		NONEDIT
+END
+T_NAME		sw_F2
+		TYPE	R32
+		CLASS	ACQU
+		REL	"sw_F2=9.797344"
+		INV_REL	"SW=SW"
+		FORMAT	"%f"
+		TEXT	"F2 Sweep width [ppm]"
+		NONEDIT
+END
+HEADER		"======== F1 INDIRECT DIMENSION ========"
+T_NAME		td1
+		TYPE	I32
+		CLASS	ACQU
+		REL	"td1=11"
+		INV_REL	"TD=TD"
+		FORMAT	"%d"
+		TEXT	"F1 Time domain size"
+		NONEDIT
+END
+T_NAME		sw_F1
+		TYPE	R32
+		CLASS	ACQU
+		REL	"sw_F1=9.797344"
+		INV_REL	"SW=SW"
+		FORMAT	"%f"
+		TEXT	"F1 Sweep width [ppm]"
+		NONEDIT
+END

@@ -1,0 +1,24 @@
+##TITLE= Parameter file, TopSpin 3.7.0
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 103	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= waudbyc
+$$ 2025-05-05 14:57:55.587 +0100  waudbyc@cl-nmr-spec702
+$$ /home/waudbyc/nmr/sophia_trp_r1rho_250504/24/acqu2s
+$$ process /opt/topspin3.7.0/prog/mod/go4
+##$ACQT0= 0
+##$BF1= 700.2
+##$FnILOOP= 0
+##$FnMODE= 1
+##$NUC1= <1H>
+##$NusJSP= 0
+##$NusT2= 1
+##$NusTD= 101
+##$O1= 3290.94
+##$ProjAngle= 0
+##$SFO1= 700.20329094
+##$SW= 10.0010971257321
+##$SW_h= 7002.80112044818
+##$TD= 101
+##END=

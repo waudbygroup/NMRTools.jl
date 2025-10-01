@@ -137,6 +137,46 @@ end
     @test metadatahelp(:window) == "Window function"
 end
 
+@testset "NMRBase: annotations" begin
+    # Test with 19F CEST data
+    cest_data = loadnmr(joinpath("test-data", "19F-cest"))
+
+    # Test basic annotation access - returns entire annotations dictionary
+    all_annot = annotations(cest_data)
+    @test all_annot isa Dict{String,Any}
+    @test haskey(all_annot, "title")
+
+    # Test single key access with string
+    @test annotations(cest_data, "title") == "19F CEST"
+
+    # Test single key access with symbol
+    @test annotations(cest_data, :title) == "19F CEST"
+
+    # Test array access
+    exp_type = annotations(cest_data, "experiment_type")
+    @test exp_type isa Vector
+    @test "cest" in exp_type
+
+    # Test dimensions array
+    dims_array = annotations(cest_data, "dimensions")
+    @test dims_array[1] == "spinlock_offset"
+    @test annotations(cest_data, "dimensions", 1) == "spinlock_offset"
+
+    # Test nested dictionary access
+    spinlock = annotations(cest_data, "spinlock")
+    @test spinlock isa Dict
+    @test annotations(cest_data, "spinlock", "channel") == "19F"
+    @test annotations(cest_data, "spinlock", "duration") == 1
+
+    # Test array of dictionaries (hard_pulse)
+    hard_pulse = annotations(cest_data, "hard_pulse")
+    @test hard_pulse isa Vector
+    @test length(hard_pulse) == 1
+    @test hard_pulse[1] isa Dict
+    @test hard_pulse[1]["length"] ≈ 13.29
+    @test annotations(cest_data, :hard_pulse, 1)["length"] ≈ 13.29
+end
+
 @testset "NMRBase: nuclei and coherences" begin
     @testset "parse nucleus tests" begin
         @testset "Mass number followed by element symbol" begin
@@ -261,4 +301,47 @@ end
               loadnmr(joinpath(artifact"2D_HN_titration", "4/test.ft2"))]
     # expect warning that experiments do not have same rg
     @test (@test_logs (:warn,) size(stack(specs3))) == (768, 512, 4)
+end
+
+@testset "NMRBase: Power" begin
+    # Test construction from dB
+    p1 = Power(30.0, :dB)
+    @test db(p1) == 30.0
+    @test watts(p1) ≈ 0.001
+
+    # Test construction from Watts
+    p2 = Power(1.0, :W)
+    @test watts(p2) == 1.0
+    @test db(p2) == 0.0
+
+    # Test with integer input
+    p3 = Power(10, :W)
+    @test watts(p3) == 10.0
+    @test db(p3) ≈ -10.0
+
+    # Test zero Watts handling
+    p4 = Power(0.0, :W)
+    @test db(p4) == 120.0
+    @test watts(p4) ≈ 1e-12
+
+    # Test error for missing unit
+    @test_throws ArgumentError Power(10)
+
+    # Test error for invalid unit
+    @test_throws ArgumentError Power(10, :V)
+
+    # Test roundtrip conversions
+    original_watts = 0.5
+    p5 = Power(original_watts, :W)
+    @test watts(p5) ≈ original_watts
+
+    original_db = -6.0
+    p6 = Power(original_db, :dB)
+    @test db(p6) == original_db
+
+    # Test pretty printing contains both units
+    p7 = Power(20.0, :dB)
+    output = string(p7)
+    @test occursin("dB", output)
+    @test occursin("W", output)
 end

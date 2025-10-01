@@ -135,6 +135,69 @@ end
 acqus(A::AbstractNMRData, key::String) = acqus(A, Symbol(lowercase(key)))
 acqus(A::AbstractNMRData, key, index) = acqus(A, key)[index]
 
+"""
+    annotations(nmrdata)
+    annotations(nmrdata, key)
+    annotations(nmrdata, key, index)
+    annotations(nmrdata, key1, key2)
+
+Return annotation data from pulse programme, or `nothing` if it does not exist.
+Keys can be passed as strings or symbols. If no key is specified, the entire
+annotations dictionary is returned.
+
+This function provides nested access to annotations stored in `metadata[:annotations]`.
+Multiple keys can be chained to access nested dictionaries or specific array elements.
+
+# Examples
+```julia-repl
+julia> annotations(spec, "title")
+"19F CEST"
+
+julia> annotations(spec, "dimensions")
+2-element Vector{String}:
+ "spinlock_frequency"
+ "f1"
+
+julia> annotations(spec, "dimensions", 1)
+"spinlock_frequency"
+
+julia> annotations(spec, "spinlock", "duration")
+0.5
+
+julia> annotations(spec, :hard_pulse)
+1-element Vector{Dict{String, Any}}:
+ Dict("channel" => "f1", "length" => 9.2, "power" => -3.0)
+```
+
+See also [`metadata`](@ref), [`acqus`](@ref).
+"""
+annotations(A::AbstractNMRData) = metadata(A, :annotations)
+
+# Single key access: annotations(spec, "title")
+function annotations(A::AbstractNMRData, key::Union{String,Symbol})
+    annot = annotations(A)
+    isnothing(annot) && return nothing
+    key_str = string(key)
+    return get(annot, key_str, nothing)
+end
+
+# Two keys: annotations(spec, "dimensions", 1) or annotations(spec, "spinlock", "duration")
+function annotations(A::AbstractNMRData, key1::Union{String,Symbol}, key2::Union{String,Symbol,Integer})
+    val = annotations(A, key1)
+    isnothing(val) && return nothing
+
+    if val isa AbstractDict
+        # Nested dictionary access
+        key2_str = string(key2)
+        return get(val, key2_str, nothing)
+    elseif val isa AbstractVector && key2 isa Integer
+        # Array indexing
+        return key2 <= length(val) ? val[key2] : nothing
+    else
+        return nothing
+    end
+end
+
 # # Metadata for NMRData #############################################################################
 
 function defaultmetadata(::Type{<:AbstractNMRData})

@@ -1,0 +1,16 @@
+##TITLE= Parameter file, TopSpin 3.7.0
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 1	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= waudbyc
+$$ 2025-05-05 14:39:32.401 +0100  waudbyc@cl-nmr-spec702
+$$ /home/waudbyc/nmr/sophia_trp_r1rho_250504/24/pdata/1/outd
+$$ process /opt/topspin3.7.0/prog/au/bin/iexpno
+##$CURPLOT= <>
+##$CURPRIN= <$>
+##$DFORMAT= <normdp>
+##$LAYOUT= <+/1D_BB.xwp>
+##$LFORMAT= <normlp>
+##$PFORMAT= <normpl>
+##END=
