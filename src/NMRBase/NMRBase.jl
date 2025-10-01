@@ -124,6 +124,7 @@ export defaultmetadata
 export metadatahelp
 export label, label!, units
 export acqus
+export annotations
 
 # Window functions
 export WindowFunction

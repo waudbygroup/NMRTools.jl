@@ -56,20 +56,34 @@ to auxiliary files (following TopSpin conventions).
 
 ## Using Annotations in NMRTools.jl
 
-The complete annotation schema is defined at https://waudbylab.org/pulseprograms/schema/fields/. In NMRTools.jl, parsed annotation data is accessible via the `:annotations` metadata field.
+The complete annotation schema is defined at https://waudbylab.org/pulseprograms/schema/fields/. In NMRTools.jl, parsed annotation data is accessible via the `:annotations` metadata field or the [`annotations()`](@ref) convenience function.
 
 ### Accessing annotation data
+
+Annotations can be accessed using the `annotations()` function, which provides convenient nested access to annotation data:
 
 ```julia
 # Load a spectrum with annotations
 spec = loadnmr("path/to/annotated/experiment")
 
 # Access all annotations
-annotations = spec[:annotations]
+all_annotations = annotations(spec)
 
 # Access specific annotation fields
-experiment_type = annotations["experiment_type"]
+experiment_type = annotations(spec, "experiment_type")
+
+# Access nested dictionary fields
+spinlock_duration = annotations(spec, "spinlock", "duration")
+
+# Access array elements by index
+first_dimension = annotations(spec, "dimensions", 1)
+
+# Alternatively, use direct metadata access
+annotations_dict = spec[:annotations]
+experiment_type = annotations_dict["experiment_type"]
 ```
+
+The `annotations()` function accepts both string and symbol keys, and returns `nothing` if the requested field does not exist.
 
 ### Example: 19F R1ρ on-resonance experiment
 
@@ -113,15 +127,18 @@ spec = loadnmr("test/test-data/19F-r1rho-onres")
 # View all available annotations
 spec[:annotations]
 
-# Access experiment metadata
-spec[:annotations]["title"]           # "19F on-resonance R1rho relaxation dispersion"
-spec[:annotations]["experiment_type"] # ["r1rho", "1d"]
-spec[:annotations]["features"]        # ["relaxation dispersion", "on-resonance", "temperature compensation"]
+# Access experiment metadata using annotations() function
+annotations(spec, "title")           # "19F on-resonance R1rho relaxation dispersion"
+annotations(spec, "experiment_type") # ["r1rho", "1d"]
+annotations(spec, "features")        # ["relaxation dispersion", "on-resonance", "temperature compensation"]
 
-# Access spinlock parameters with parsed variable lists
-spinlock = spec[:annotations]["spinlock"]
-spinlock["power"]     # list of powers, [Power(36.82 dB, 0.0002079696687103696 W), ...]
-spinlock["duration"]  # list of duratinos, [0.00001, 0.005, 0.01, ...]
-spinlock["channel"]   # "19F"
-spinlock["offset"]    # 0 (on-resonance)
+# Access nested spinlock parameters
+annotations(spec, "spinlock", "power")    # list of powers, [Power(36.82 dB, 0.0002079696687103696 W), ...]
+annotations(spec, "spinlock", "duration") # list of durations, [0.00001, 0.005, 0.01, ...]
+annotations(spec, "spinlock", "channel")  # "19F"
+annotations(spec, "spinlock", "offset")   # 0 (on-resonance)
+
+# Access dimension information
+annotations(spec, "dimensions")    # ["spinlock_duration", "spinlock_power", "f1"]
+annotations(spec, "dimensions", 1) # "spinlock_duration"
 ```

@@ -137,6 +137,45 @@ end
     @test metadatahelp(:window) == "Window function"
 end
 
+@testset "NMRBase: annotations" begin
+    # Test with 19F CEST data
+    cest_data = loadnmr(joinpath("test-data", "19F-cest"))
+
+    # Test basic annotation access - returns entire annotations dictionary
+    all_annot = annotations(cest_data)
+    @test all_annot isa Dict{String,Any}
+    @test haskey(all_annot, "title")
+
+    # Test single key access with string
+    @test annotations(cest_data, "title") == "19F CEST"
+
+    # Test single key access with symbol
+    @test annotations(cest_data, :title) == "19F CEST"
+
+    # Test array access
+    exp_type = annotations(cest_data, "experiment_type")
+    @test exp_type isa Vector
+    @test "cest" in exp_type
+
+    # Test dimensions array
+    dims_array = annotations(cest_data, "dimensions")
+    @test dims_array[1] == "spinlock_offset"
+    @test annotations(cest_data, "dimensions", 1) == "spinlock_offset"
+
+    # Test nested dictionary access
+    spinlock = annotations(cest_data, "spinlock")
+    @test spinlock isa Dict{String,Any}
+    @test annotations(cest_data, "spinlock", "channel") == "19F"
+    @test annotations(cest_data, "spinlock", "duration") == 1
+
+    # Test array of dictionaries (hard_pulse)
+    hard_pulse = annotations(cest_data, "hard_pulse")
+    @test hard_pulse isa Vector
+    @test length(hard_pulse) ≈ 1
+    @test hard_pulse[1] isa Dict
+    @test hard_pulse[1]["duration"] ≈ 13.29
+end
+
 @testset "NMRBase: nuclei and coherences" begin
     @testset "parse nucleus tests" begin
         @testset "Mass number followed by element symbol" begin
