@@ -139,7 +139,7 @@ end
 
 @testset "NMRBase: annotations" begin
     # Test with 19F CEST data
-    cest_data = loadnmr(joinpath("test-data", "19F-cest"))
+    cest_data = loadnmr(joinpath("test-data", "19f-cest-ts3"))
 
     # Test basic annotation access - returns entire annotations dictionary
     all_annot = annotations(cest_data)
@@ -159,22 +159,26 @@ end
 
     # Test dimensions array
     dims_array = annotations(cest_data, "dimensions")
-    @test dims_array[1] == "spinlock_offset"
-    @test annotations(cest_data, "dimensions", 1) == "spinlock_offset"
+    @test dims_array[1] == "cest.offset"
+    @test annotations(cest_data, "dimensions", 1) == "cest.offset"
 
     # Test nested dictionary access
-    spinlock = annotations(cest_data, "spinlock")
+    spinlock = annotations(cest_data, "cest")
     @test spinlock isa Dict
-    @test annotations(cest_data, "spinlock", "channel") == "19F"
-    @test annotations(cest_data, "spinlock", "duration") == 1
+    @test annotations(cest_data, "cest", "channel") == "19F"
+    @test annotations(cest_data, "cest", "duration") == 1
+    @test annotations(cest_data, "cest.offset") isa FQList
 
-    # Test array of dictionaries (hard_pulse)
-    hard_pulse = annotations(cest_data, "hard_pulse")
-    @test hard_pulse isa Vector
-    @test length(hard_pulse) == 1
-    @test hard_pulse[1] isa Dict
-    @test hard_pulse[1]["length"] ≈ 13.29
-    @test annotations(cest_data, :hard_pulse, 1)["length"] ≈ 13.29
+    # Test array of dictionaries (reference_pulse)
+    refs = annotations(cest_data, "reference_pulse")
+    @test refs isa Vector
+    @test length(refs) == 1
+    @test refs[1] isa Dict
+    @test refs[1]["duration"] ≈ 13.29
+    @test annotations(cest_data, :reference_pulse, 1)["duration"] ≈ 13.29
+    p, pl = reference_pulse(cest_data, "19F")
+    @test p ≈ 13.29
+    @test watts(pl) ≈ 8.0
 end
 
 @testset "NMRBase: nuclei and coherences" begin

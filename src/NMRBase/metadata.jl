@@ -216,6 +216,54 @@ function annotations(A::AbstractNMRData, keys::Union{String,Symbol,Integer}...)
     return current
 end
 
+"""
+    reference_pulse(spec, nucleus) -> (pulse_length, power)
+
+Get the reference pulse calibration for a given nucleus from pulse programme annotations.
+Returns a tuple of (pulse_length, power) or `nothing` if not found.
+
+The reference pulse is the calibrated 90° hard pulse used as the basis for all power 
+calculations on that channel.
+
+# Arguments
+- `spec`: NMRData object with annotations
+- `nucleus`: Nucleus symbol or string (e.g., :19F, "19F", :1H, "1H")
+
+# Returns
+- `(pulse_length, power)`: Tuple where pulse_length is in μs and power is a Power object
+- `nothing`: If no reference pulse found for the specified nucleus
+
+# Examples
+```julia-repl
+julia> reference_pulse(spec, "19F")
+(13.29, Power(-9.03 dB, 8.0 W))
+
+julia> reference_pulse(spec, :1H)
+(9.2, Power(-3.0 dB, 32.0 W))
+```
+
+See also [`annotations`](@ref).
+"""
+function reference_pulse(spec::AbstractNMRData, nucleus)
+    ref_pulses = annotations(spec, "reference_pulse")
+    isnothing(ref_pulses) && return nothing
+
+    nucleus_str = string(nucleus)
+
+    for pulse in ref_pulses
+        if get(pulse, "channel", nothing) == nucleus_str
+            pulse_length = get(pulse, "duration", nothing)
+            power = get(pulse, "power", nothing)
+
+            if !isnothing(pulse_length) && !isnothing(power)
+                return (pulse_length, power)
+            end
+        end
+    end
+
+    return nothing
+end
+
 # # Metadata for NMRData #############################################################################
 
 function defaultmetadata(::Type{<:AbstractNMRData})

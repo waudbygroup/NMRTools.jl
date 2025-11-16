@@ -1,7 +1,7 @@
 # NMR Pulse Programme Semantic Annotation System
 
 !!! warning "Alpha Development Status"
-    This annotation system is in early alpha development. The schema, syntax, and functionality are subject to significant changes. Use with caution in production environments.
+    This annotation system is in early alpha development (currently v0.0.2). The schema, syntax, and functionality are subject to significant changes. Use with caution in production environments.
 
 ## Motivation
 
@@ -36,32 +36,53 @@ Both individual pulse programmes and the annotation system itself are versioned 
 
 ### Basic Format
 
-Annotations are extensions of Bruker comment lines, and are marked `;@ `.
+Annotations are extensions of Bruker comment lines, marked with `;@ `.
 Within these lines, annotations are written in YAML format. The initial `;@ ` will be
 stripped when parsing, permitting multi-line entries.
-
 ```
 ;@ parameter: text value
 ;@ parameter1: 0.123
 ;@ parameter2: [list, of, items]
-;@ parameter3: {associative: array, key:value}
+;@ parameter3: {associative: array, key: value}
 ;@ parameter4: |
 ;@   This is
 ;@   a multi-line
 ;@   entry.
 ```
 
-**Angle brackets `<>`** within an entry should be interpreted as a reference
-to auxiliary files (following TopSpin conventions).
+### Parameter References
+
+Parameter and list variable names are referenced directly without special syntax:
+```yaml
+;@ r1rho:
+;@   power: VALIST      # List variable
+;@   duration: VPLIST   # List variable  
+;@   offset: cnst28     # Constant parameter
+```
+
+The context distinguishes parameter names (letters) from literal values (numbers). NMRTools automatically resolves these references to actual values from the acqus file when loading data.
+
+### Dimension References
+
+Dimensions use dotted path notation that references into experiment-specific parameter blocks:
+```yaml
+;@ dimensions: [r1rho.power, r1rho.duration, f1]
+;@ r1rho:
+;@   power: VALIST
+;@   duration: VPLIST
+```
+
+This creates an explicit connection: `r1rho.power` refers to the `power` field in the `r1rho` block, which is controlled by the `VALIST` parameter.
 
 ## Using Annotations in NMRTools.jl
 
-The complete annotation schema is defined at https://waudbylab.org/pulseprograms/schema/fields/. In NMRTools.jl, parsed annotation data is accessible via the `:annotations` metadata field or the [`annotations()`](@ref) convenience function.
+The complete annotation schema is defined in the [pulse programmes repository](https://github.com/waudbygroup/pulseprograms). See the [schema documentation](https://waudbylab.org/pulseprograms/schema/fields/) and [controlled vocabulary](https://github.com/waudbygroup/pulseprograms/blob/main/VOCABULARY.md) for details.
+
+In NMRTools.jl, parsed annotation data is accessible via the `:annotations` metadata field or the [`annotations()`](@ref) convenience function.
 
 ### Accessing annotation data
 
-Annotations can be accessed using the `annotations()` function, which provides convenient nested access to annotation data:
-
+Annotations can be accessed using the `annotations()` function, which provides convenient nested access to annotation data. Dotted notation is automatically expanded:
 ```julia
 # Load a spectrum with annotations
 spec = loadnmr("path/to/annotated/experiment")
@@ -72,73 +93,137 @@ all_annotations = annotations(spec)
 # Access specific annotation fields
 experiment_type = annotations(spec, "experiment_type")
 
-# Access nested dictionary fields
-spinlock_duration = annotations(spec, "spinlock", "duration")
+# Access nested dictionary fields - these are equivalent:
+r1rho_duration = annotations(spec, "r1rho", "duration")
+r1rho_duration = annotations(spec, "r1rho.duration")
 
 # Access array elements by index
 first_dimension = annotations(spec, "dimensions", 1)
 
-# Alternatively, use direct metadata access
-annotations_dict = spec[:annotations]
-experiment_type = annotations_dict["experiment_type"]
+# Deep nesting with dotted notation
+calibration_start = annotations(spec, "calibration.duration.start")
 ```
 
 The `annotations()` function accepts both string and symbol keys, and returns `nothing` if the requested field does not exist.
 
+### Helper Functions
+
+#### `reference_pulse(spec, nucleus)`
+
+Get the reference pulse calibration for a given nucleus:
+```julia
+# Get 19F reference pulse (returns tuple of pulse length and power)
+p1, pl1 = reference_pulse(spec, "19F")
+
+# Get 1H reference pulse
+p3, pl2 = reference_pulse(spec, :1H)
+```
+
+Returns `nothing` if no reference pulse is found for the specified nucleus.
+
 ### Example: 19F R1ρ on-resonance experiment
 
-This example experiment is annotated as follows:
-
+This example experiment is annotated as follows (schema v0.0.2):
 ```
-;@ schema_version: "0.0.1"
+;@ schema_version: "0.0.2"
 ;@ sequence_version: "0.1.0"
 ;@ title: 19F on-resonance R1rho relaxation dispersion
 ;@ authors:
 ;@   - Chris Waudby <c.waudby@ucl.ac.uk>
 ;@   - Jan Overbeck
 ;@ created: 2020-01-01
-;@ last_modified: 2025-08-01
+;@ last_modified: 2025-11-15
 ;@ repository: github.com/waudbygroup/pulseprograms
 ;@ status: beta
 ;@ experiment_type: [r1rho, 1d]
-;@ features: [relaxation dispersion, on-resonance, temperature compensation]
-;@ nuclei_hint: [19F, 1H]
+;@ features: [on_resonance, temperature_compensation]
+;@ typical_nuclei: [19F, 1H]
 ;@ citation:
 ;@   - Overbeck (2020)
-;@ dimensions: [spinlock_duration, spinlock_power, f1]
-;@ acquisition_order: [3, 1, 2]
-;@ decoupling: [nothing, nothing, f2]
-;@ hard_pulse:
-;@ - {channel: f1, length: p1, power: pl1}
-;@ - {channel: f2, length: p3, power: pl2}
-;@ decoupling_pulse:
-;@ - {channel: f2, length: p4, power: pl12, program: cpdprg2}
-;@ spinlock: {channel: f1, power: <VALIST>, duration: <VPLIST>, offset: 0, alignment: hard_pulse}
+;@ dimensions: [r1rho.power, r1rho.duration, f1]
+;@ acquisition_order: [f1, r1rho.duration, r1rho.power]
+;@ reference_pulse:
+;@   - {channel: f1, pulse: p1, power: pl1}
+;@   - {channel: f2, pulse: p3, power: pl2}
+;@ r1rho:
+;@   channel: f1
+;@   power: VALIST
+;@   duration: VPLIST
+;@   offset: 0
+;@   alignment: hard_pulse
 ```
 
-Using the test data `19F-r1rho-onres`, we can parse these annotations:
-
+Using annotated data, we can access the experiment metadata:
 ```julia
 using NMRTools
 
 # Load the annotated experiment
-spec = loadnmr("test/test-data/19F-r1rho-onres")
+spec = loadnmr("path/to/experiment")
 
-# View all available annotations
-spec[:annotations]
-
-# Access experiment metadata using annotations() function
+# Access experiment metadata
 annotations(spec, "title")           # "19F on-resonance R1rho relaxation dispersion"
 annotations(spec, "experiment_type") # ["r1rho", "1d"]
-annotations(spec, "features")        # ["relaxation dispersion", "on-resonance", "temperature compensation"]
+annotations(spec, "features")        # ["on_resonance", "temperature_compensation"]
 
-# Access nested spinlock parameters
-annotations(spec, "spinlock", "power")    # list of powers, [Power(36.82 dB, 0.0002079696687103696 W), ...]
-annotations(spec, "spinlock", "duration") # list of durations, [0.00001, 0.005, 0.01, ...]
-annotations(spec, "spinlock", "channel")  # "19F"
-annotations(spec, "spinlock", "offset")   # 0 (on-resonance)
+# Access nested r1rho parameters (dotted notation works)
+annotations(spec, "r1rho.power")     # Vector of power values resolved from VALIST
+annotations(spec, "r1rho.duration")  # Vector of duration values resolved from VPLIST
+annotations(spec, "r1rho", "channel") # "f1"
+annotations(spec, "r1rho", "offset")  # 0 (on-resonance)
 
 # Access dimension information
-annotations(spec, "dimensions")    # ["spinlock_duration", "spinlock_power", "f1"]
-annotations(spec, "dimensions", 1) # "spinlock_duration"
+annotations(spec, "dimensions")       # ["r1rho.power", "r1rho.duration", "f1"]
+annotations(spec, "dimensions", 1)    # "r1rho.power"
+
+# Get reference pulse calibration
+p1, pl1 = reference_pulse(spec, "19F")
 ```
+
+### Additional Examples
+
+#### CEST Experiment
+```yaml
+;@ schema_version: "0.0.2"
+;@ sequence_version: "1.0.0"
+;@ title: 19F CEST
+;@ experiment_type: [cest, 1d]
+;@ typical_nuclei: [19F]
+;@ dimensions: [cest.offset, f1]
+;@ acquisition_order: [f1, cest.offset]
+;@ reference_pulse:
+;@   - {channel: f1, pulse: p1, power: pl1}
+;@ cest:
+;@   channel: f1
+;@   power: pl8
+;@   duration: d18
+;@   offset: FQ1LIST
+```
+
+#### Diffusion Experiment
+```yaml
+;@ schema_version: "0.0.2"
+;@ sequence_version: "2.0.1"
+;@ title: 1H STE diffusion
+;@ experiment_type: [diffusion, 1d]
+;@ features: [ste, watergate]
+;@ typical_nuclei: [1H]
+;@ dimensions: [diffusion.gradient_strength, f1]
+;@ acquisition_order: [f1, diffusion.gradient_strength]
+;@ reference_pulse:
+;@   - {channel: f1, pulse: p1, power: pl1}
+;@ diffusion:
+;@   type: bipolar
+;@   coherence: [f1, 1]
+;@   big_delta: d20
+;@   little_delta: p31
+;@   tau: d17
+;@   gradient_strength: {type: linear, start: cnst1, end: cnst2, scale: gpz6}
+;@   gradient_shape: gpnam6
+```
+
+## Resources
+
+- [Pulse Programme Repository](https://github.com/waudbygroup/pulseprograms)
+- [Schema Documentation](https://waudbylab.org/pulseprograms/schema/fields/)
+- [Controlled Vocabulary (VOCABULARY.md)](https://github.com/waudbygroup/pulseprograms/blob/main/VOCABULARY.md)
+- [Decision Log](https://github.com/waudbygroup/pulseprograms/blob/main/DECISIONS.md) - Design rationale and schema evolution

@@ -28,6 +28,18 @@ const NUCLEUS_LOOKUP = Dict("H1" => H1, "1H" => H1,
                             "F19" => F19, "19F" => F19,
                             "P31" => P31, "31P" => P31)
 
+# Dictionary mapping Nucleus enum values to strings
+const NUCLEUS_STRINGS = Dict(H1 => "1H",
+                             H2 => "2H",
+                             C12 => "12C",
+                             C13 => "13C",
+                             N14 => "14N",
+                             N15 => "15N",
+                             F19 => "19F",
+                             P31 => "31P")
+
+Base.string(n::Nucleus) = get(NUCLEUS_STRINGS, n, "Unknown")
+
 """
     nucleus(label::AbstractString) -> Nucleus
 

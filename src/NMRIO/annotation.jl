@@ -15,9 +15,10 @@ function annotate!(spec::NMRData)
     # Check schema version
     schema_version = get(annotations, "schema_version", nothing)
     if isnothing(schema_version)
-        @warn "Pulse programme has no schema_version field. Annotations may not parse correctly."
+        return nothing
     elseif schema_version != "0.0.2"
         @warn "Pulse programme uses unsupported schema version $schema_version. Only v0.0.2 is currently supported. Annotations may not parse correctly."
+        return nothing
     end
 
     # Resolve parameter references to actual values
@@ -132,7 +133,9 @@ function _resolve_parameter(param_str::String, spec::NMRData)
     m = match(r"^f(\d+)$", param)
     if !isnothing(m)
         index = parse(Int, m.captures[1])
-        return acqus(spec, Symbol("nuc$index"))
+        nuc = acqus(spec, Symbol("nuc$index"))
+        # return nucleus(nuc) # causes bugs when trying to replace a string with a Nucleus type
+        return nuc
     end
 
     # Define indexed parameter types (strings map to symbols in acqus)

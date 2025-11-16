@@ -125,6 +125,7 @@ export metadatahelp
 export label, label!, units
 export acqus
 export annotations
+export reference_pulse
 
 # Window functions
 export WindowFunction
