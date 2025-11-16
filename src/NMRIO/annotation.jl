@@ -2,6 +2,7 @@
     NMR Pulse Programme Annotation Parser for NMRTools.jl
     
     Parses semantic annotations from NMR pulse programme strings into structured dictionaries.
+    Supports schema ≥ v0.0.2.
 """
 
 function annotate!(spec::NMRData)
@@ -10,7 +11,18 @@ function annotate!(spec::NMRData)
         return nothing
     end
     annotations = parse_annotations(pp)
+
+    # Check schema version
+    schema_version = get(annotations, "schema_version", nothing)
+    if isnothing(schema_version)
+        @warn "Pulse programme has no schema_version field. Annotations may not parse correctly."
+    elseif schema_version != "0.0.2"
+        @warn "Pulse programme uses unsupported schema version $schema_version. Only v0.0.2 is currently supported. Annotations may not parse correctly."
+    end
+
+    # Resolve parameter references to actual values
     resolve_parameter_references!(annotations, spec)
+
     return spec[:annotations] = annotations
 end
 
@@ -58,10 +70,7 @@ end
     resolve_parameter_references!(annotations::Dict{String, Any}, spec::NMRData)
 
 Recursively traverse the annotations dictionary and resolve parameter references.
-References are strings matching Bruker parameter patterns like:
-- p1, p2, p3, ... (pulse lengths)
-- pl1, pl2, pl3, ... (pulse powers)  
-- d1, d18, ... (delays)
+References are bare parameter names like p1, pl1, d20, VALIST, etc.
 
 Parameters are resolved using the acqus() function to get values from the acqus file.
 
@@ -71,8 +80,8 @@ Parameters are resolved using the acqus() function to get values from the acqus 
 
 # Examples
 ```julia
-# Before resolution: {"length": "p1", "power": "pl1"}
-# After resolution: {"length": 9.2, "power": -3.0}
+# Before resolution: {"pulse": "p1", "power": "pl1", "duration": "VDLIST"}
+# After resolution: {"pulse": 9.2, "power": Power(...), "duration": [0.01, 0.02, ...]}
 ```
 """
 function resolve_parameter_references!(annotations::Dict, spec::NMRData)
@@ -97,7 +106,6 @@ end
 function _resolve_recursive!(obj::String, spec::NMRData)
     # Check if this string matches a parameter pattern
     resolved_value = _resolve_parameter(obj, spec)
-
     return isnothing(resolved_value) ? obj : resolved_value
 end
 
@@ -112,63 +120,43 @@ end
 Attempt to resolve a parameter string using the acqus data.
 Returns the resolved value or nothing if not a recognized parameter.
 
-Handles parameter patterns:
-- p1, p2, p3, ... -> acqus(spec, :p, 1), acqus(spec, :p, 2), ...
-- pl1, pl2, pl3, ... -> acqus(spec, :pl, 1), acqus(spec, :pl, 2), ...
-- d1, d18, ... -> acqus(spec, :d, 1), acqus(spec, :d, 18), ...
-- cnst1, cnst2, ... -> acqus(spec, :cnst, 1), acqus(spec, :cnst, 2), ...
+Handles parameter patterns (case-insensitive):
+- Indexed parameters: p1, pl1, d20, cnst8, gpz6, etc.
+- Nucleus assignments: f1, f2, f3, f4
+- Any other parameter names that exist in acqus (including lists)
 """
 function _resolve_parameter(param_str::String, spec::NMRData)
-    # Convert to lowercase for case-insensitive matching
-    param_lower = lowercase(strip(param_str))
+    param = strip(param_str)
 
-    # patterns to match:
-    patterns = [r"^p(\d+)$" => :p,              # p
-                r"^pl(\d+)$" => :plw,           # pl
-                r"^spnam(\d+)$" => :spnam,      # d
-                r"^cnst(\d+)$" => :cnst,        # spnam
-                r"^sp(\d+)$" => :spw,           # sp
-                r"^d(\d+)$" => :d,              # cnst
-                r"^gpnam(\d+)$" => :gpnam,      # gpnam
-                r"^gpx(\d+)$" => :gpx,          # gpx
-                r"^gpy(\d+)$" => :gpy,          # gpy
-                r"^gpz(\d+)$" => :gpz]
-
-    for (pattern, type) in patterns
-        m = match(pattern, param_lower)
-        if !isnothing(m)
-            index = parse(Int, m.captures[1])
-            return acqus(spec, type, index)
-        end
-    end
-
-    # nuclei: f1 => :nuc1, f2 => :nuc2, etc.
-    m = match(r"^f(\d+)$", param_lower)
+    # Nucleus assignments: f1 => nuc1, f2 => nuc2, etc.
+    m = match(r"^f(\d+)$", param)
     if !isnothing(m)
         index = parse(Int, m.captures[1])
         return acqus(spec, Symbol("nuc$index"))
     end
 
-    # match lists (e.g. '<$FQ1LIST>')
-    patterns = [r"^<\$fq1list>$" => :fq1list,
-                r"^<\$fq2list>$" => :fq2list,
-                r"^<\$fq3list>$" => :fq3list,
-                r"^<\$fq4list>$" => :fq4list,
-                r"^<\$fq5list>$" => :fq5list,
-                r"^<\$fq6list>$" => :fq6list,
-                r"^<\$fq7list>$" => :fq7list,
-                r"^<\$fq8list>$" => :fq8list,
-                r"^<\$vclist>$" => :vclist,
-                r"^<\$vdlist>$" => :vdlist,
-                r"^<\$valist>$" => :valist,
-                r"^<\$vplist>$" => :vplist]
-    for (pattern, type) in patterns
-        m = match(pattern, param_lower)
-        if !isnothing(m)
-            return acqus(spec, type)
-        end
+    # Define indexed parameter types (strings map to symbols in acqus)
+    indexed_params = ["p", "pl", "sp", "spnam", "d", "cnst", "gpnam", "gpx", "gpy", "gpz"]
+
+    # Try to match indexed parameters
+    for prefix in indexed_params
+        m = match(Regex("^$(prefix)(\\d+)\$"), param)
+        isnothing(m) && continue
+
+        index = parse(Int, m.captures[1])
+        symbol = Symbol(prefix)
+        return acqus(spec, symbol, index)
     end
 
-    # No match found
+    # Check if this parameter exists directly in acqus (handles lists and other parameters)
+    # Convert to symbol for acqus lookup
+    param_symbol = Symbol(param)
+    direct_value = acqus(spec, param_symbol)
+
+    if !isnothing(direct_value) && !ismissing(direct_value)
+        return direct_value
+    end
+
+    # No match found - return nothing to keep original string
     return nothing
 end

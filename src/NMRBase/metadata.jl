@@ -140,10 +140,14 @@ acqus(A::AbstractNMRData, key, index) = acqus(A, key)[index]
     annotations(nmrdata, key)
     annotations(nmrdata, key, index)
     annotations(nmrdata, key1, key2)
+    annotations(nmrdata, keys...)
 
 Return annotation data from pulse programme, or `nothing` if it does not exist.
 Keys can be passed as strings or symbols. If no key is specified, the entire
 annotations dictionary is returned.
+
+Dotted names are automatically split and dereferenced, e.g. `annotations(spec, "cest.duration")`
+is equivalent to `annotations(spec, "cest", "duration")`.
 
 This function provides nested access to annotations stored in `metadata[:annotations]`.
 Multiple keys can be chained to access nested dictionaries or specific array elements.
@@ -155,47 +159,61 @@ julia> annotations(spec, "title")
 
 julia> annotations(spec, "dimensions")
 2-element Vector{String}:
- "spinlock_frequency"
+ "cest.offset"
  "f1"
 
 julia> annotations(spec, "dimensions", 1)
-"spinlock_frequency"
+"cest.offset"
 
-julia> annotations(spec, "spinlock", "duration")
+julia> annotations(spec, "cest", "duration")
 0.5
 
-julia> annotations(spec, :hard_pulse)
+julia> annotations(spec, "cest.duration")
+0.5
+
+julia> annotations(spec, :reference_pulse)
 1-element Vector{Dict{String, Any}}:
- Dict("channel" => "f1", "length" => 9.2, "power" => -3.0)
+ Dict("channel" => "f1", "pulse" => 9.2, "power" => -3.0)
+
+julia> annotations(spec, "calibration.duration.start")
+0.001
 ```
 
 See also [`metadata`](@ref), [`acqus`](@ref).
 """
 annotations(A::AbstractNMRData) = metadata(A, :annotations)
 
-# Single key access: annotations(spec, "title")
-function annotations(A::AbstractNMRData, key::Union{String,Symbol})
+# Variadic version: handles any number of keys
+function annotations(A::AbstractNMRData, keys::Union{String,Symbol,Integer}...)
     annot = annotations(A)
     isnothing(annot) && return nothing
-    key_str = string(key)
-    return get(annot, key_str, nothing)
-end
 
-# Two keys: annotations(spec, "dimensions", 1) or annotations(spec, "spinlock", "duration")
-function annotations(A::AbstractNMRData, key1::Union{String,Symbol}, key2::Union{String,Symbol,Integer})
-    val = annotations(A, key1)
-    isnothing(val) && return nothing
+    # Expand dotted notation and navigate
+    current = annot
+    for key in keys
+        if key isa Integer
+            # Array indexing
+            if current isa AbstractVector && 1 <= key <= length(current)
+                current = current[key]
+            else
+                return nothing
+            end
+        else
+            # String/symbol key - may contain dots
+            key_parts = (k -> split(k, '.'))(string(key))
 
-    if val isa AbstractDict
-        # Nested dictionary access
-        key2_str = string(key2)
-        return get(val, key2_str, nothing)
-    elseif val isa AbstractVector && key2 isa Integer
-        # Array indexing
-        return key2 <= length(val) ? val[key2] : nothing
-    else
-        return nothing
+            for part in key_parts
+                if current isa AbstractDict
+                    current = get(current, part, nothing)
+                    isnothing(current) && return nothing
+                else
+                    return nothing
+                end
+            end
+        end
     end
+
+    return current
 end
 
 # # Metadata for NMRData #############################################################################
