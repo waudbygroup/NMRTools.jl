@@ -1,0 +1,661 @@
+EDIT_PAR COMMAND FILE
+
+DI_MODE         LONG
+ED_ENTRY        ACQU
+ORDER           FILE
+
+
+HEADER		"F2 - Acquisition Parameters"
+T_NAME		Date_
+		TYPE	R64
+		CLASS	ACQU
+		SUBRANGE 0.0 50000000
+		REL	"Date_=itodate(DATE)"
+		INV_REL	"DATE=datetoi(Date_,DATE)"
+		FORMAT	"%14.0f"
+		TEXT	" "
+END
+T_NAME		Time
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1000000
+		REL	"Time=itotime(DATE)"
+		INV_REL	"DATE=timetoi(Time,DATE)"
+		FORMAT	"%14.2f h"
+		TEXT	" "
+END
+NAME		INSTRUM
+		TEXT	" "
+END
+NAME		PROBHD
+		FORMAT	"%14.14s"
+		TEXT	" "
+END
+NAME		PULPROG
+		TEXT	" "
+END
+NAME		TD
+		TEXT	" "
+END
+NAME		SOLVENT
+		TEXT	" "
+END
+NAME		NS
+		TEXT	" "
+END
+NAME		DS
+		TEXT	" "
+END
+T_NAME		SWH
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e8
+		REL	"SWH=SW*SFO1"
+		INV_REL "SW=SWH/SFO1"
+		UNIT	"Hz"
+		FORMAT	"%14.3f Hz"
+		TEXT	" "
+END
+T_NAME          FIDRES
+                TYPE    R32
+                CLASS   ACQU
+                SUBRANGE 0.0 100000
+                REL     "FIDRES=2*SW*SFO1/TD"
+                INV_REL "TD = nextpow(2*SW*SFO1/FIDRES)"
+		UNIT	"Hz"
+		FORMAT	"%14.6f Hz"
+		TEXT	" "
+END
+T_NAME          AQ
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1000
+		REL	"AQ=aqcalc(SW,SFO1,TD,DIGTYP)"
+		INV_REL	"TD=tdcalc(SW,SFO1,1.0e6*AQ,DIGTYP)"
+		UNIT	"sec"
+		FORMAT	"%14.7f sec"
+		TEXT	" "
+END
+NAME		RG
+		TEXT	" "
+END
+T_NAME          DW
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1000000
+		REL	"DW=1/(2*SW*SFO1)"
+		INV_REL	"SW=1000000/(2*(0.005+DW)*SFO1)"
+		UNIT	"usec"
+		FORMAT	"%14.3lf usec"
+		TEXT	" "
+END
+NAME		DE
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+NAME		TE
+		FORMAT	"%14.1f K"
+		TEXT	" "
+END
+T_NAME		CNST41
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -1e38 1e38
+		REL	"CNST41=CNST[41]"
+		INV_REL	"CNST[41]=CNST41"
+		FORMAT	"%14.7f"
+		TEXT	" "
+END
+T_NAME		CNST43
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -1e38 1e38
+		REL	"CNST43=CNST[43]"
+		INV_REL	"CNST[43]=CNST43"
+		FORMAT	"%14.7f"
+		TEXT	" "
+END
+T_NAME		D0
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"D0=D[0]"
+		INV_REL	"D[0]=D0"
+		UNIT	"sec"
+		FORMAT	"%14.8f sec"
+		TEXT	" "
+END
+T_NAME		D1
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"D1=D[1]"
+		INV_REL	"D[1]=D1"
+		UNIT	"sec"
+		FORMAT	"%14.8f sec"
+		TEXT	" "
+END
+T_NAME		D11
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"D11=D[11]"
+		INV_REL	"D[11]=D11"
+		UNIT	"sec"
+		FORMAT	"%14.8f sec"
+		TEXT	" "
+END
+T_NAME		D16
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"D16=D[16]"
+		INV_REL	"D[16]=D16"
+		UNIT	"sec"
+		FORMAT	"%14.8f sec"
+		TEXT	" "
+END
+T_NAME		D25
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"D25=D[25]"
+		INV_REL	"D[25]=D25"
+		UNIT	"sec"
+		FORMAT	"%14.8f sec"
+		TEXT	" "
+END
+T_NAME		D26
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"D26=D[26]"
+		INV_REL	"D[26]=D26"
+		UNIT	"sec"
+		FORMAT	"%14.8f sec"
+		TEXT	" "
+END
+T_NAME		IN0
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1e38
+		REL	"IN0=IN[0]"
+		INV_REL	"IN[0]=IN0"
+		UNIT	"sec"
+		FORMAT	"%14.8f sec"
+		TEXT	" "
+END
+NAME		TDav
+		TEXT	" "
+END
+NAME		ZGOPTNS
+		TEXT	" "
+END
+NAME		SFO1
+		FORMAT	"%14.7f MHz"
+		TEXT	" "
+END
+NAME		NUC1
+		NONEDIT
+		TEXT	" "
+END
+T_NAME		CNST19
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -1e38 1e38
+		REL	"CNST19=CNST[19]"
+		INV_REL	"CNST[19]=CNST19"
+		FORMAT	"%14.7f"
+		TEXT	" "
+END
+T_NAME		P1
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1.0e10
+		REL	"P1=P[1]"
+		INV_REL	"P[1]=P1"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+T_NAME		P41
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1.0e10
+		REL	"P41=P[41]"
+		INV_REL	"P[41]=P41"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+T_NAME		P42
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1.0e10
+		REL	"P42=P[42]"
+		INV_REL	"P[42]=P42"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+T_NAME		P43
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1.0e10
+		REL	"P43=P[43]"
+		INV_REL	"P[43]=P43"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+T_NAME		PLW1
+		TYPE	R32
+		CLASS	ACQU
+		REL	"PLW1=PLW[1]"
+		INV_REL	"PLW[1]=PLW1"
+		UNIT	"W"
+		FORMAT	"%14.8f W"
+		TEXT	"power PLW1 "
+END
+NAME		SPNAM[25]
+		TEXT	" "
+END
+T_NAME		spoal25
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoal25=1"
+		INV_REL	"D[0]=spoal25"
+		UNIT	"no"
+		TEXT	" "
+		FORMAT	"%14.7f"
+		NONEDIT
+END
+T_NAME		spoffs25
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoffs25=bf1*(cnst19/1000000)-o1"
+		INV_REL	"D[0]=spoffs25"
+		UNIT	"Hz"
+		TEXT	" "
+		FORMAT	"%14.2f Hz"
+		NONEDIT
+END
+T_NAME		SPW25
+		TYPE	R32
+		CLASS	ACQU
+		REL	"SPW25=SPW[25]"
+		INV_REL	"SPW[25]=SPW25"
+		UNIT	"W"
+		FORMAT	"%14.8f W"
+		TEXT	"shaped pulse power SPW25"
+END
+NAME		SPNAM[26]
+		TEXT	" "
+END
+T_NAME		spoal26
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoal26=0.5"
+		INV_REL	"D[0]=spoal26"
+		UNIT	"no"
+		TEXT	" "
+		FORMAT	"%14.7f"
+		NONEDIT
+END
+T_NAME		spoffs26
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoffs26=bf1*(cnst19/1000000)-o1"
+		INV_REL	"D[0]=spoffs26"
+		UNIT	"Hz"
+		TEXT	" "
+		FORMAT	"%14.2f Hz"
+		NONEDIT
+END
+T_NAME		SPW26
+		TYPE	R32
+		CLASS	ACQU
+		REL	"SPW26=SPW[26]"
+		INV_REL	"SPW[26]=SPW26"
+		UNIT	"W"
+		FORMAT	"%14.8f W"
+		TEXT	"shaped pulse power SPW26"
+END
+NAME		SPNAM[27]
+		TEXT	" "
+END
+T_NAME		spoal27
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoal27=0"
+		INV_REL	"D[0]=spoal27"
+		UNIT	"no"
+		TEXT	" "
+		FORMAT	"%14.7f"
+		NONEDIT
+END
+T_NAME		spoffs27
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoffs27=bf1*(cnst19/1000000)-o1"
+		INV_REL	"D[0]=spoffs27"
+		UNIT	"Hz"
+		TEXT	" "
+		FORMAT	"%14.2f Hz"
+		NONEDIT
+END
+T_NAME		SPW27
+		TYPE	R32
+		CLASS	ACQU
+		REL	"SPW27=SPW[27]"
+		INV_REL	"SPW[27]=SPW27"
+		UNIT	"W"
+		FORMAT	"%14.8f W"
+		TEXT	"shaped pulse power SPW27"
+END
+NAME		SPNAM[28]
+		TEXT	" "
+END
+T_NAME		spoal28
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoal28=1"
+		INV_REL	"D[0]=spoal28"
+		UNIT	"no"
+		TEXT	" "
+		FORMAT	"%14.7f"
+		NONEDIT
+END
+T_NAME		spoffs28
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoffs28=bf1*(cnst19/1000000)-o1"
+		INV_REL	"D[0]=spoffs28"
+		UNIT	"Hz"
+		TEXT	" "
+		FORMAT	"%14.2f Hz"
+		NONEDIT
+END
+T_NAME		SPW28
+		TYPE	R32
+		CLASS	ACQU
+		REL	"SPW28=SPW[28]"
+		INV_REL	"SPW[28]=SPW28"
+		UNIT	"W"
+		FORMAT	"%14.8f W"
+		TEXT	"shaped pulse power SPW28"
+END
+NAME		SPNAM[29]
+		TEXT	" "
+END
+T_NAME		spoal29
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoal29=0"
+		INV_REL	"D[0]=spoal29"
+		UNIT	"no"
+		TEXT	" "
+		FORMAT	"%14.7f"
+		NONEDIT
+END
+T_NAME		spoffs29
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoffs29=bf1*(cnst19/1000000)-o1"
+		INV_REL	"D[0]=spoffs29"
+		UNIT	"Hz"
+		TEXT	" "
+		FORMAT	"%14.2f Hz"
+		NONEDIT
+END
+T_NAME		SPW29
+		TYPE	R32
+		CLASS	ACQU
+		REL	"SPW29=SPW[29]"
+		INV_REL	"SPW[29]=SPW29"
+		UNIT	"W"
+		FORMAT	"%14.8f W"
+		TEXT	"shaped pulse power SPW29"
+END
+NAME		SFO3
+		FORMAT	"%14.7f MHz"
+		TEXT	" "
+END
+NAME		NUC3
+		NONEDIT
+		TEXT	" "
+END
+T_NAME		P21
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1.0e10
+		REL	"P21=P[21]"
+		INV_REL	"P[21]=P21"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+T_NAME		P56
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1.0e10
+		REL	"P56=P[56]"
+		INV_REL	"P[56]=P56"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+T_NAME		P57
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1.0e10
+		REL	"P57=P[57]"
+		INV_REL	"P[57]=P57"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+T_NAME		PLW3
+		TYPE	R32
+		CLASS	ACQU
+		REL	"PLW3=PLW[3]"
+		INV_REL	"PLW[3]=PLW3"
+		UNIT	"W"
+		FORMAT	"%14.8f W"
+		TEXT	"power PLW3 "
+END
+NAME		SPNAM[39]
+		TEXT	" "
+END
+T_NAME		SPOAL39
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -1.0 1.0
+		REL	"SPOAL39=SPOAL[39]"
+		INV_REL	"SPOAL[39]=SPOAL39"
+		FORMAT	"%14.3f"
+		TEXT	" "
+END
+T_NAME		spoffs39
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoffs39=0"
+		INV_REL	"D[0]=spoffs39"
+		UNIT	"Hz"
+		TEXT	" "
+		FORMAT	"%14.2f Hz"
+		NONEDIT
+END
+T_NAME		SPW39
+		TYPE	R32
+		CLASS	ACQU
+		REL	"SPW39=SPW[39]"
+		INV_REL	"SPW[39]=SPW39"
+		UNIT	"W"
+		FORMAT	"%14.8f W"
+		TEXT	"shaped pulse power SPW39"
+END
+NAME		SPNAM[40]
+		TEXT	" "
+END
+T_NAME		SPOAL40
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -1.0 1.0
+		REL	"SPOAL40=SPOAL[40]"
+		INV_REL	"SPOAL[40]=SPOAL40"
+		FORMAT	"%14.3f"
+		TEXT	" "
+END
+T_NAME		spoffs40
+		TYPE	R32
+		SUBRANGE -1e38 1e38
+		CLASS	ACQU
+		REL	"spoffs40=0"
+		INV_REL	"D[0]=spoffs40"
+		UNIT	"Hz"
+		TEXT	" "
+		FORMAT	"%14.2f Hz"
+		NONEDIT
+END
+T_NAME		SPW40
+		TYPE	R32
+		CLASS	ACQU
+		REL	"SPW40=SPW[40]"
+		INV_REL	"SPW[40]=SPW40"
+		UNIT	"W"
+		FORMAT	"%14.8f W"
+		TEXT	"shaped pulse power SPW40"
+END
+NAME		GPNAM[1]
+		TEXT	" "
+END
+T_NAME		GPZ1
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -100.0 100.0
+		REL	"GPZ1=GPZ[1]"
+		INV_REL	"GPZ[1]=GPZ1"
+		UNIT	"%"
+		FORMAT	"%14.2f %"
+		TEXT	" "
+END
+NAME		GPNAM[2]
+		TEXT	" "
+END
+T_NAME		GPZ2
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -100.0 100.0
+		REL	"GPZ2=GPZ[2]"
+		INV_REL	"GPZ[2]=GPZ2"
+		UNIT	"%"
+		FORMAT	"%14.2f %"
+		TEXT	" "
+END
+NAME		GPNAM[3]
+		TEXT	" "
+END
+T_NAME		GPZ3
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -100.0 100.0
+		REL	"GPZ3=GPZ[3]"
+		INV_REL	"GPZ[3]=GPZ3"
+		UNIT	"%"
+		FORMAT	"%14.2f %"
+		TEXT	" "
+END
+NAME		GPNAM[4]
+		TEXT	" "
+END
+T_NAME		GPZ4
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -100.0 100.0
+		REL	"GPZ4=GPZ[4]"
+		INV_REL	"GPZ[4]=GPZ4"
+		UNIT	"%"
+		FORMAT	"%14.2f %"
+		TEXT	" "
+END
+NAME		GPNAM[5]
+		TEXT	" "
+END
+T_NAME		GPZ5
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -100.0 100.0
+		REL	"GPZ5=GPZ[5]"
+		INV_REL	"GPZ[5]=GPZ5"
+		UNIT	"%"
+		FORMAT	"%14.2f %"
+		TEXT	" "
+END
+NAME		GPNAM[6]
+		TEXT	" "
+END
+T_NAME		GPZ6
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -100.0 100.0
+		REL	"GPZ6=GPZ[6]"
+		INV_REL	"GPZ[6]=GPZ6"
+		UNIT	"%"
+		FORMAT	"%14.2f %"
+		TEXT	" "
+END
+NAME		GPNAM[7]
+		TEXT	" "
+END
+T_NAME		GPZ7
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE -100.0 100.0
+		REL	"GPZ7=GPZ[7]"
+		INV_REL	"GPZ[7]=GPZ7"
+		UNIT	"%"
+		FORMAT	"%14.2f %"
+		TEXT	" "
+END
+T_NAME		P16
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1.0e10
+		REL	"P16=P[16]"
+		INV_REL	"P[16]=P16"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+T_NAME		P19
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1.0e10
+		REL	"P19=P[19]"
+		INV_REL	"P[19]=P19"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END
+T_NAME		P29
+		TYPE	R32
+		CLASS	ACQU
+		SUBRANGE 0.0 1.0e10
+		REL	"P29=P[29]"
+		INV_REL	"P[29]=P29"
+		UNIT	"usec"
+		FORMAT	"%14.2f usec"
+		TEXT	" "
+END

@@ -88,6 +88,9 @@ function getacqusmetadata(format, filename, experimentfolder=nothing)
 end
 
 function parseacqus(acqusfilename::String, auxfiles=true)
+    # auxfiles flag is used for reading acqu2s, acqu3s etc.
+    # where we don't want to parse aux files again
+
     dic = loadjdx(acqusfilename)
 
     replacepowers!(dic)
@@ -96,11 +99,14 @@ function parseacqus(acqusfilename::String, auxfiles=true)
         # add the topspin version to the dictionary
         dic[:topspin] = topspinversion(acqusfilename)
 
-        # lastly, check for referenced files like vclist, fq1list, and load these in place of filename
-        parseacqusauxfiles!(dic, dirname(acqusfilename))
-
         # parse the pulse program
         parsepulseprogram!(dic, dirname(acqusfilename))
+
+        # parse pulseprogram lists
+        parsepulseprogramlists!(dic, dirname(acqusfilename))
+
+        # check for referenced files like vclist, fq1list, and load these in place of filename
+        parseacqusauxfiles!(dic, dirname(acqusfilename))
     end
 
     return dic
@@ -178,6 +184,10 @@ function parsepulseprogram!(dic, basedir)
             dic[:pulseprogram_precomp] = prog
         end
     end
+    # convenience - link :pulsepgraom to :pulseprogram_precomp
+    if haskey(dic, :pulseprogram_precomp)
+        dic[:pulseprogram] = dic[:pulseprogram_precomp]
+    end
 end
 
 function pulseprogram(spec::NMRData; precomp=true)
@@ -185,6 +195,90 @@ function pulseprogram(spec::NMRData; precomp=true)
         acqus(spec, :pulseprogram_precomp)
     else
         acqus(spec, :pulseprogram_code)
+    end
+end
+
+"""
+Example lines to parse:
+define list<gradient> EA=<EA>
+define list<gradient> EA3 = { 1.0000 0.8750 }
+define list<pulse> taulist = <\$VPLIST>
+define list<power> powerlist = <\$VALIST>
+define list<gradient> diff=<Difframp>
+define list<frequency> F19sat = <\$FQ1LIST>
+
+NB gradient files have weird syntax!!
+"""
+function parsepulseprogramlists!(dic, basedir)
+    haskey(dic, :pulseprogram_precomp) || return nothing
+    pulprog = dic[:pulseprogram_precomp]
+    lines = split(pulprog, '\n')
+
+    for line in lines
+        if occursin(r"^\s*define list<", line)
+            # parse the line
+            m = match(r"define list<(\w+)> (\w+)\s*=\s*(.+)", line)
+            if m !== nothing
+                listtype = m.captures[1]
+                listname = m.captures[2]
+                listvalue = strip(m.captures[3])
+                parselist!(dic, basedir, listtype, listname, listvalue)
+            end
+        end
+    end
+end
+
+function parselist!(dic, basedir, listtype, listname, listvalue)
+    @debug "Parsing list definition: type='$listtype', name='$listname', value='$listvalue'"
+    if startswith(listvalue, "<\$") && endswith(listvalue, ">")
+        # e.g. <$VCLIST> - dereference filename using vclist parameter
+        paramname = lowercase(listvalue[3:(end - 1)])
+        # if topspin 3, use this as filename directly, otherwise lookup and load from lists directory
+        if dic[:topspin] < v"4.1.4"
+            filename = joinpath(basedir, paramname)
+        else
+            listfile = get(dic, Symbol(paramname), "")
+            filename = joinpath(basedir, "lists", listdirectory(listtype), listfile)
+        end
+        isfile(filename) || return nothing
+        lines = readlines(filename)
+    elseif startswith(listvalue, "<") && endswith(listvalue, ">")
+        # e.g. <EA> - direct filename reference
+        listfile = listvalue[2:(end - 1)]
+        if dic[:topspin] < v"4.1.4"
+            filename = joinpath(basedir, listfile)
+        else
+            filename = joinpath(basedir, "lists", listdirectory(listtype), listfile)
+        end
+        isfile(filename) || return nothing
+        lines = readlines(filename)
+    elseif startswith(listvalue, "{") && endswith(listvalue, "}")
+        # e.g. { 1.0000 0.8750 } or {0, 40, 20} - inline list
+        inner = strip(listvalue[2:(end - 1)])
+        lines = split(inner, r"[,\s]+")
+    else
+        @warn "unsupported list value format '$listvalue' in pulseprogram"
+        return nothing
+    end
+    return parselistdata!(dic, listtype, listname, lines)
+end
+
+function listdirectory(listtype)
+    if listtype == "loopcounter"
+        return "vc"
+    elseif listtype == "delay"
+        return "vd"
+    elseif listtype == "pulse"
+        return "vp"
+    elseif listtype == "power"
+        return "va"
+    elseif listtype == "frequency"
+        return "f1"
+    elseif listtype == "gradient"
+        return "gp"
+    else
+        @warn "unsupported list type '$listtype' in pulseprogram"
+        return ""
     end
 end
 
@@ -203,28 +297,28 @@ function _parseacqusauxfiles_TS3!(dic, basedir)
     if get(dic, :vclist, "") != ""
         filename = joinpath(basedir, "vclist")
         if isfile(filename)
-            dic[:vclist] = parsevclist(filename)
+            dic[:vclist] = parsevclist(readlines(filename))
         end
     end
 
     if get(dic, :vdlist, "") != ""
         filename = joinpath(basedir, "vdlist")
         if isfile(filename)
-            dic[:vdlist] = parsevdlist(filename)
+            dic[:vdlist] = parsevdlist(readlines(filename))
         end
     end
 
     if get(dic, :vplist, "") != ""
         filename = joinpath(basedir, "vplist")
         if isfile(filename)
-            dic[:vplist] = parsevplist(filename)
+            dic[:vplist] = parsevplist(readlines(filename))
         end
     end
 
     if get(dic, :valist, "") != ""
         filename = joinpath(basedir, "valist")
         if isfile(filename)
-            dic[:valist] = parsevalist(filename)
+            dic[:valist] = parsevalist(readlines(filename))
         end
     end
 
@@ -235,36 +329,36 @@ function _parseacqusauxfiles_TS3!(dic, basedir)
         filename = joinpath(basedir, string(k))
         isfile(filename) || continue
 
-        dic[k] = parsefqlist(filename)
+        dic[k] = parsefqlist(readlines(filename))
     end
 end
 
 function _parseacqusauxfiles_TS4!(dic, basedir)
     vclistfile = joinpath(basedir, "lists", "vc", get(dic, :vclist, ""))
     if isfile(vclistfile)
-        dic[:vclist] = parsevclist(vclistfile)
+        dic[:vclist] = parsevclist(readlines(vclistfile))
     end
 
     vdlistfile = joinpath(basedir, "lists", "vd", get(dic, :vdlist, ""))
     if isfile(vdlistfile)
-        dic[:vdlist] = parsevdlist(vdlistfile)
+        dic[:vdlist] = parsevdlist(readlines(vdlistfile))
     end
 
     vplistfile = joinpath(basedir, "lists", "vp", get(dic, :vplist, ""))
     if isfile(vplistfile)
-        dic[:vplist] = parsevplist(vplistfile)
+        dic[:vplist] = parsevplist(readlines(vplistfile))
     end
 
     valistfile = joinpath(basedir, "lists", "va", get(dic, :valist, ""))
     if isfile(valistfile)
-        dic[:valist] = parsevalist(valistfile)
+        dic[:valist] = parsevalist(readlines(valistfile))
     end
 
     for k in
         (:fq1list, :fq2list, :fq3list, :fq4list, :fq5list, :fq6list, :fq7list, :fq8list)
         fqlistfile = joinpath(basedir, "lists", "f1", get(dic, k, ""))
         isfile(fqlistfile) || continue
-        dic[k] = parsefqlist(fqlistfile)
+        dic[k] = parsefqlist(readlines(fqlistfile))
     end
 
     # lists/pp (pulseprogram)
@@ -277,66 +371,81 @@ function _parseacqusauxfiles_TS4!(dic, basedir)
     # referred to by name in the acqus file
 end
 
-function parsevclist(filename)
-    x = readlines(filename)
-    xint = tryparse.(Int, x)
+function parselistdata!(dic, listtype, listname, lines)
+    @debug "Parsing list data for listtype='$listtype', listname='$listname'"
+    if listtype == "loopcounter"
+        dic[Symbol(listname)] = parsevclist(lines)
+    elseif listtype == "delay"
+        dic[Symbol(listname)] = parsevdlist(lines)
+    elseif listtype == "pulse"
+        dic[Symbol(listname)] = parsevplist(lines)
+    elseif listtype == "power"
+        dic[Symbol(listname)] = parsevalist(lines)
+    elseif listtype == "frequency"
+        dic[Symbol(listname)] = parsefqlist(lines)
+    elseif listtype == "gradient"
+        dic[Symbol(listname)] = parsegplist(lines)
+    else
+        @warn "unsupported list type '$listtype' in pulseprogram"
+        return nothing
+    end
+end
+
+function parsevclist(lines)
+    xint = tryparse.(Int, lines)
     if any(xint .== nothing)
-        @warn "Unable to parse format of vclist $filename"
-        return x
+        @warn "Unable to parse format of vclist"
+        return lines
     end
 
     return xint
 end
 
 "return vdlist contents in seconds"
-function parsevdlist(filename)
-    x = readlines(filename)
+function parsevdlist(lines)
     # default unit for vdlist is seconds
-    x = replace.(x, "u" => "e-6")
-    x = replace.(x, "m" => "e-3")
-    x = replace.(x, "s" => "")
-    xf = tryparse.(Float64, x)
+    lines = replace.(lines, "u" => "e-6")
+    lines = replace.(lines, "m" => "e-3")
+    lines = replace.(lines, "s" => "")
+    xf = tryparse.(Float64, lines)
     if any(xf .== nothing)
-        @warn "Unable to parse format of vdlist $filename"
-        return x
+        @warn "Unable to parse format of vdlist"
+        return lines
     end
 
     return xf
 end
 
 "return vplist contents in seconds"
-function parsevplist(filename)
-    x = readlines(filename)
+function parsevplist(lines)
     # default unit for vplist is seconds
-    x = map(x) do line
+    lines = map(lines) do line
         line = replace(line, "u" => "")
         line = replace(line, "m" => "e3")
         return line = replace(line, "s" => "e6")
     end
 
-    xf = tryparse.(Float64, x)
+    xf = tryparse.(Float64, lines)
 
     if any(xf .== nothing)
-        @warn "Unable to parse format of vplist $filename"
-        return x
+        @warn "Unable to parse format of vplist"
+        return lines
     end
 
     return xf * 1e-6  # return vplist in seconds
 end
 
 "return valist contents as Powers"
-function parsevalist(filename)
-    x = readlines(filename)
-
+function parsevalist(lines)
     # power unit must be specified on first lien
-    powertoken = popfirst!(x)
+    powertoken = popfirst!(lines)
 
     # parse the rest of the list
-    xf = tryparse.(Float64, x)
+    xf = tryparse.(Float64, lines)
 
     if any(xf .== nothing)
-        @warn "Unable to parse format of valist $filename"
-        return x
+        @warn "Unable to parse format of valist"
+        return lines
     end
 
     # convert to dB if needed
@@ -348,7 +457,7 @@ function parsevalist(filename)
 end
 
 """
-    parsefqlist(filename)
+    parsefqlist(lines)
 
 Return contents of the specified fqlist.
 
@@ -365,15 +474,13 @@ p            | sfo         | ppm
 P            | bf          | ppm
 
 """
-function parsefqlist(filename)
-    x = readlines(filename)
-
-    if tryparse(Float64, x[1]) !== nothing
+function parsefqlist(lines)
+    if tryparse(Float64, lines[1]) !== nothing
         # first line is a number => no header line => sfo hz
         unit = :Hz
         relative = true
     else
-        firstline = popfirst!(x)
+        firstline = popfirst!(lines)
         if firstline == "p"
             unit = :ppm
             relative = true
@@ -393,20 +500,35 @@ function parsefqlist(filename)
             unit = :ppm
             relative = true
         else
-            @warn "Unable to parse format of fqlist $filename"
-            return x
+            @warn "Unable to parse format of fqlist"
+            return lines
         end
     end
 
     # parse the rest of the list
-    xf = tryparse.(Float64, x)
+    xf = tryparse.(Float64, lines)
 
     if any(xf .== nothing)
-        @warn "Unable to parse format of fqlist $filename"
-        return x
+        @warn "Unable to parse format of fqlist"
+        return lines
     end
 
     fqlist = FQList(xf, unit, relative)
 
     return fqlist
+end
+
+function parsegplist(lines)
+    # filter out comments (starting with #)
+    lines = filter(line -> !startswith(strip(line), "#"), lines)
+
+    # gradient list - unit is percent of max gradient
+    xf = tryparse.(Float64, lines)
+
+    if any(xf .== nothing)
+        @warn "Unable to parse format of gradient list"
+        return lines
+    end
+
+    return xf
 end

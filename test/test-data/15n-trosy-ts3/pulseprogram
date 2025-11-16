@@ -1,0 +1,469 @@
+# 1 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+;b_trosyetf3gpsi.3.cw
+;avance-version (21/09/15)
+;best-TROSY
+;2D H-1/X correlation via TROSY
+;   using sensitivity improvement
+;phase sensitive using Echo/Antiecho 
+;using f3 - channel
+;using shaped pulses for inversion and refocussing on f3
+;uncompensated version d25=d26
+;with additional 180degree pulse on N-15
+;(use parameterset B_TROSYETF3GPSI)
+;
+;Z. Solyom, M. Schwarten, L. Geist, R. Konrat D. Willbold &
+;   Bernhard Brutscher, J. Biomol. NMR 55, 311-321 (2013)
+;A. Favier & B. Brutscher, J. Biomol. NMR 49, 9-15 (2011)
+;(E. Lescop, P. Schanda & B. Brutscher,
+;   J. Magn. Reson.  187 163-169 (2007))
+;(T. Schulte-Herbrueggen & O.W. Sorensen, J. Magn. Reson. 144, 
+;   123 - 128 (2000))
+;
+;$CLASS=HighRes
+;$DIM=2D
+;$TYPE=
+;$SUBTYPE=
+;$COMMENT=
+
+
+prosol relations=<triple>
+# 1 "/opt/topspin/exp/stan/nmr/lists/pp/Avance.incl" 1
+;Avance3.incl
+;   for AV III
+;
+;avance-version (13/06/17)
+;
+;$CLASS=HighRes Incl
+;$COMMENT=
+
+
+# 169 "/opt/topspin/exp/stan/nmr/lists/pp/Avance.incl"
+;$Id: Avance3.incl,v 1.10.2.2 2013/08/30 09:43:33 ber Exp $
+# 31 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw" 2
+
+# 1 "/opt/topspin/exp/stan/nmr/lists/pp/Grad.incl" 1
+;Grad2.incl  -  include file for Gradient Spectroscopy
+;   for TCU3
+;
+;avance-version (07/01/17)
+;
+;$CLASS=HighRes Incl
+;$COMMENT=
+
+# 27 "/opt/topspin/exp/stan/nmr/lists/pp/Grad.incl"
+define list<gradient> EA=<EA>
+
+
+# 31 "/opt/topspin/exp/stan/nmr/lists/pp/Grad.incl"
+;$Id: Grad2.incl,v 1.14 2012/01/31 17:49:21 ber Exp $
+# 32 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw" 2
+
+# 1 "/opt/topspin/exp/stan/nmr/lists/pp/Delay.incl" 1
+;Delay.incl  -  include file for commonly used delays
+;
+;version (13/08/07)
+;
+;$CLASS=HighRes Incl
+;$COMMENT=
+
+# 9 "/opt/topspin/exp/stan/nmr/lists/pp/Delay.incl"
+;general delays
+
+define delay DELTA
+define delay DELTA1
+define delay DELTA2
+define delay DELTA3
+define delay DELTA4
+define delay DELTA5
+define delay DELTA6
+define delay DELTA7
+define delay DELTA8
+define delay DELTA9
+define delay DELTA10
+define delay DELTA11
+define delay DELTA12
+define delay DELTA13
+define delay DELTA14
+define delay DELTA15
+define delay DELTA16
+
+define delay TAU
+define delay TAU1
+define delay TAU2
+define delay TAU3
+define delay TAU4
+define delay TAU5
+define delay TAU6
+define delay TAU7
+define delay TAU8
+define delay TAU9
+# 40 "/opt/topspin/exp/stan/nmr/lists/pp/Delay.incl"
+define delay INCR1
+define delay INCR2
+define delay INCR3
+define delay INCR4
+define delay INCR5
+define delay INCR6
+
+
+;delays for centering pulses
+# 50 "/opt/topspin/exp/stan/nmr/lists/pp/Delay.incl"
+define delay CEN_HN1
+define delay CEN_HN2
+define delay CEN_HN3
+define delay CEN_HC1
+define delay CEN_HC2
+define delay CEN_HC3
+define delay CEN_HC4
+define delay CEN_HP1
+define delay CEN_HP2
+define delay CEN_CN1
+define delay CEN_CN2
+define delay CEN_CN3
+define delay CEN_CN4
+define delay CEN_CP1
+define delay CEN_CP2
+
+
+;loop counters
+# 69 "/opt/topspin/exp/stan/nmr/lists/pp/Delay.incl"
+define loopcounter COUNTER
+define loopcounter SCALEF
+define loopcounter FACTOR1
+define loopcounter FACTOR2
+define loopcounter FACTOR3
+define loopcounter FACTOR4
+define loopcounter FACTOR5
+define loopcounter FACTOR6
+
+
+# 80 "/opt/topspin/exp/stan/nmr/lists/pp/Delay.incl"
+;$Id: Delay.incl,v 1.14.2.1 2013/08/30 09:43:33 ber Exp $
+# 33 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw" 2
+
+
+# 36 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+define list<gradient> EA3 = { 1.0000 0.8750 }
+define list<gradient> EA5 = { 0.6667 1.0000 }
+define list<gradient> EA7 = { 1.0000 0.6595 }
+
+
+"d11=30m"
+# 43 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+"d25=2.7m"
+"d26=2.7m"
+
+"p19=500u"
+"p29=250u"
+"d16=200u"
+
+# 55 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+"cnst19=8.2"
+
+
+"p41=1958*950.45/bf1" 
+"spw25=plw1*(pow((p1/p41)/0.125,2))" 
+"spoffs25=bf1*(cnst19/1000000)-o1"  
+"spoal25=1"
+"spw27=plw1*(pow((p1/p41)/0.125,2))" 
+"spoffs27=bf1*(cnst19/1000000)-o1"  
+"spoal27=0"
+"cnst41=0.529"
+# 68 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+"p42=1434*700.2/bf1" 
+"spw26=plw1*(pow((p1*2/p42)/0.0798,2))"   
+"spoffs26=bf1*(cnst19/1000000)-o1" 
+"spoal26=0.5"
+
+
+"p43=1251*950.45/bf1" 
+"spw28=plw1*(pow((p1/p43)/0.06103,2))" 
+"spoffs28=bf1*(cnst19/1000000)-o1"  
+"spoal28=1"
+"spw29=plw1*(pow((p1/p43)/0.06103,2))" 
+"spoffs29=bf1*(cnst19/1000000)-o1"  
+"spoal29=0"
+"cnst43=0.69"
+# 85 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+"d0=3u"
+
+"in0=inf1/2"
+
+# 90 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+"DELTA1=d26-p29-d16-larger(p56,p42)/2-p41*cnst41"
+"DELTA6=d25-p29-d16-larger(p56,p42)/2-p43*cnst43"
+"DELTA7=d26-p16-d16-larger(p57,p42)/2"
+"DELTA8=de+4u"
+
+
+# 98 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+"DELTA=d0*2+p21*4/PI+de+4u"
+
+
+# 102 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+"spoffs13=bf2*(cnst26/1000000)-o2"
+
+"spoffs39=0"
+"spoffs40=0"
+
+# 108 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+"acqt0=0"
+baseopt_echo
+
+
+# 1 "mc_line 112 file /home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw exp. def. part of mc cmd. before ze"
+; dimension 2D; AQ_mode  (F1) Echo-Antiecho
+define delay MCWRK
+define delay MCREST
+define delay d0orig
+"d0orig=d0"
+define loopcounter t1loop
+"t1loop=0"
+define loopcounter ph1loop
+"ph1loop=0"
+define loopcounter ST1CNT
+"ST1CNT = trunc(td1 / 2)"
+"MCREST = 3m - 3m"
+"MCWRK = 0.043478*3m"
+
+    dccorr
+# 112 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+1 d11 ze
+# 1 "mc_line 112 file /home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw exp. def. of mc cmd. after ze"
+LBLAV, MCWRK
+      "d0=d0orig + t1loop * in0 "
+      "phval6 = (ph1loop % 2) * 180"
+      MCWRK ip6 + phval6
+      "phval7 = (ph1loop % 2) * 180"
+      MCWRK ip7 + phval7
+      "phval5 = (t1loop * 180)%360"
+      MCWRK ip5 + phval5
+      "phval31 = (t1loop * 180)%360"
+      MCWRK ip31 + phval31
+      MCWRK
+      "phval0 = ph1loop * 1"
+      MCWRK setgrad EA3
+      MCWRK
+      "phval0 = ph1loop * 1"
+      MCWRK setgrad EA5
+      MCWRK
+      "phval0 = ph1loop * 1"
+      MCWRK setgrad EA7
+# 113 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+# 1 "mc_line 113 file /home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw exp. start label for mc cmd."
+2 MCWRK  * 11
+LBLF1, MCWRK  * 11
+LBLST1, MCWRK
+  MCREST
+# 114 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+  
+  (p56:sp39 ph1):f3
+  d1
+  50u setnmr3|0 setnmr0|34|32|33 ctrlgrad 0
+# 119 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+  (p41:sp25 ph1)
+  p29:gp1
+  d16
+  DELTA1
+  (center (p42:sp26 ph1) (p56:sp39 ph1):f3 )
+  DELTA1
+  p29:gp1
+  d16
+  (p41:sp27 ph2):f1
+
+  p29:gp2
+  d16 pl3:f3
+
+  (p21 ph5):f3
+  d0
+# 140 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+  d0
+  (p56:sp39 ph1):f3
+  DELTA
+
+  p19:gp3*EA3
+  d16
+
+  (p43:sp29 ph6)
+  p29:gp4
+  d16
+  DELTA6
+  (center (p42:sp26 ph1) (p56:sp39 ph1):f3 )
+  DELTA6
+  p29:gp4
+  d16
+  (p43:sp28 ph1)
+# 157 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+  p19:gp5*EA5
+  d16 pl3:f3
+  DELTA8
+
+  (p21 ph2):f3
+  p16:gp6
+  d16
+  DELTA7
+  (center (p42:sp26 ph1) (p57:sp40 ph1):f3 )
+  DELTA7
+  p16:gp6
+  d16 pl3:f3
+  (p21 ph7:r):f3
+
+  p19:gp7*EA7
+  d16
+  4u setnmr3^0 setnmr0^34^32^33 ctrlgrad 7
+# 175 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+  go=2 ph31
+# 1 "mc_line 176 file /home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw exp. mc cmd. in line"
+  MCWRK  wr #0 if #0 zd 
+
+  "ph1loop+=1"
+      "d0=d0orig + t1loop * in0 "
+      "phval6 = (ph1loop % 2) * 180"
+      MCWRK ip6 + phval6
+      "phval7 = (ph1loop % 2) * 180"
+      MCWRK ip7 + phval7
+      "phval5 = (t1loop * 180)%360"
+      MCWRK ip5 + phval5
+      "phval31 = (t1loop * 180)%360"
+      MCWRK ip31 + phval31
+      MCWRK
+      "phval0 = ph1loop * 1"
+      MCWRK setgrad EA3
+      MCWRK
+      "phval0 = ph1loop * 1"
+      MCWRK setgrad EA5
+      MCWRK
+      "phval0 = ph1loop * 1"
+      MCWRK setgrad EA7
+  lo to LBLF1 times 2
+  MCWRK 
+
+  "t1loop+=1"
+      "d0=d0orig + t1loop * in0 "
+      "phval6 = (ph1loop % 2) * 180"
+      MCWRK ip6 + phval6
+      "phval7 = (ph1loop % 2) * 180"
+      MCWRK ip7 + phval7
+      "phval5 = (t1loop * 180)%360"
+      MCWRK ip5 + phval5
+      "phval31 = (t1loop * 180)%360"
+      MCWRK ip31 + phval31
+      MCWRK
+      "phval0 = ph1loop * 1"
+      MCWRK setgrad EA3
+      MCWRK
+      "phval0 = ph1loop * 1"
+      MCWRK setgrad EA5
+      MCWRK
+      "phval0 = ph1loop * 1"
+      MCWRK setgrad EA7
+  lo to LBLST1 times ST1CNT
+  MCWRK 
+  "t1loop=0"
+  "ph1loop=0"
+  MCWRK rf #0
+  lo to LBLAV times tdav
+# 178 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+exit
+
+
+ph1=0
+ph2=1 
+ph3=2
+ph4=3
+ph5=0 2
+ph6=3
+ph7=2
+ph31=0 2
+# 191 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+;pl1 : f1 channel - power level for pulse (default)
+;pl3 : f3 channel - power level for pulse (default)
+;sp13: f2 channel - shaped pulse 180 degree (Ca and C=O, adiabatic)
+;sp25: f1 channel - shaped pulse  90 degree (Pc9_4_90.1000)
+;spnam25: Pc9_4_90.100
+;sp26: f1 channel - shaped pulse 180 degree (Reburp.1000)
+;spnam26: Reburp.1000
+;sp27: f1 channel - shaped pulse  90 degree (Pc9_4_90.1000)
+;                   for time reversed pulse
+;spnam27: Pc9_4_90.1000
+;sp28: f1 channel - shaped pulse  90 degree (Eburp2.1000)
+;spnam28: Eburp2.1000
+;sp29: f1 channel - shaped pulse  90 degree (Eburp2tr.1000)
+;                   for time reversed pulse
+;spnam29: Eburp2tr.1000
+;sp39: f3 channel - shaped pulse 180 degree (Bip720,50,20.1)
+;spnam39: Bip720,50,20.1
+;sp40: f3 channel - shaped pulse 180 degree (Reburp.1000)
+;spnam40: Reburp.1000
+;p8 : f2 channel - 180 degree shaped pulse for inversion (adiabatic)
+;p16: homospoil/gradient pulse                         [1 msec]
+;p19: gradient pulse 2                                 [500 usec]
+;p21: f3 channel -  90 degree high power pulse
+;p29: gradient pulse 3                                 [250 usec]
+;p41: f1 channel -  90 degree shaped pulse for excitation
+;                      Pc9_4_90.1000             (2.2ms at 600.13 MHz)
+;p42: f1 channel - 180 degree shaped pulse for refocussing
+;                      Reburp.1000               (1.4ms at 600.13 MHz)
+;p43: f1 channel -  90 degree shaped pulse for excitation
+;                      Eburp2.1000/Eburp2tr.1000 (1.7ms at 600.13 MHz)
+;p56: f3 channel - 180 degree shaped pulse for inversion
+;                      Bip720,50,20.1            (500us at 600.13 MHz)
+;p57: f3 channel - 180 degree shaped pulse for refocussing
+;                      Reburp.1000               (1.6ms at 600.13 MHz)
+;p42: f1 channel - 180 degree shaped pulse for refocussing
+;                      Reburp.1000               (2.0ms at 600.13 MHz)
+;p43: f1 channel -  90 degree shaped pulse for excitation
+;                      Eburp2.1000/Eburp2tr.1000 (1.92ms at 600.13 MHz)
+;p56: f3 channel - 180 degree shaped pulse for inversion
+;p57: f3 channel - 180 degree shaped pulse for refocussing
+;d0 : incremented delay (F1)                           [3 usec]
+;d1 : relaxation delay; 1-5 * T1 [100-500 msec]
+;d11: delay for disk I/O                               [30 msec]
+;d16: delay for homospoil/gradient recovery
+;d25: 1/(4J'(NH)                                       [2.7 msec]
+;d26: 1/(4J(NH)                                        [2.7 msec]
+;cnst26: Call chemical shift (offset, in ppm)          [101 ppm]
+;cnst41: compensation of chemical shift evolution during p41
+;           Pc9_4_90.1000: 0.529
+;cnst43: compensation of chemical shift evolution during p43
+;           Eburp2.1000: 0.69
+;inf1: 1/SW(N) = 2 * DW(N)
+;in0: 1/(2 * SW(N)) = DW(N)
+;nd0: 2
+;ns: 2 * n
+;ds: >= 16
+;td1: number of experiments
+;FnMODE: echo-antiecho
+
+
+;for z-only gradients:
+;gpz1: 2%
+;gpz2: 21%
+;gpz3: -80%
+;gpz4: 5%
+;gpz5: 30%
+;gpz6: 45%
+;gpz7: 30.13%
+# 260 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+;use gradient files:   
+;gpnam1: SMSQ10.32
+;gpnam2: SMSQ10.100
+;gpnam3: SMSQ10.100
+;gpnam4: SMSQ10.32
+;gpnam5: SMSQ10.100
+;gpnam6: SMSQ10.100
+;gpnam7: SMSQ10.100
+
+
+# 271 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+                                          ;preprocessor-flags-start
+;LABEL_CN: for C-13 and N-15 labeled samples start experiment with 
+;             option -DLABEL_CN (eda: ZGOPTNS)
+                                          ;preprocessor-flags-end
+										  
+
+										  
+
+# 280 "/home/waudbyc/pp_702/b_trosyetf3gpsi.3.cw"
+										  
+;$Id: $

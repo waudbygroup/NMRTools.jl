@@ -1,0 +1,23 @@
+##TITLE= Audit trail, TopSpin 4.4.0
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH & Co. KG
+##OWNER= chris
+$$ /Users/chris/NMR/crick-702/pallavi_trxl2_240322/26/pdata/1/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2024-03-23 18:24:20.716 +0000>,<waudbyc>,<cl-nmr-spec702>,<go4>,<TopSpin 3.6.2>,
+      <created by zg
+	started at 2024-03-23 13:30:58.233 +0000,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       C7 09 58 05 03 37 6B 34 E6 9E FB 65 AF 3F FE 32
+       data hash MD5: 3K * 192
+       2D 15 AB DD 11 A5 58 53 47 E4 28 3E C4 22 34 C9>)
+(   2,<2024-04-10T14:41:22.309+0100>,<chris>,<eduroam-int-dhcp-97-200-116.ucl.ac.uk>,<proc2d>,<TopSpin 4.4.0>,
+      <Start of raw data processing
+       xfb F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 4 SSB = 2 FT_mod = 6 PKNL = 1 STSR = 0 STSI = 2K PHC0 = -87.50001 PHC1 = 0 F1: SI = 256 ME_mod = 2 NCOEF = 32 WDW = 4 SSB = 2 FT_mod = 6 FCOR = 0.5 PHC0 = 0 PHC1 = 0
+       data hash MD5: 2K * 256
+       29 D5 D2 46 A3 9D 15 98 42 11 FA B8 44 E7 93 3C>)
+##END=
+
+$$ hash MD5
+$$ EF C7 93 77 E7 B9 86 92 17 23 DD 0D 25 DE 76 42

@@ -25,6 +25,8 @@ function loadpdata(filename, allcomponents=false)
     elseif isfile(joinpath(pdir, "3rrr"))
         ndim = 3
         datafiles = ["3rrr", "3rri", "3rir", "3rii", "3irr", "3iri", "3iir", "3iii"]
+    else
+        throw(NMRToolsError("can't load bruker data, pdata directory $pdir does not contain binary data files of supported dimensions (1D, 2D, 3D)"))
     end
     ndim > 0 ||
         throw(NMRToolsError("can't load bruker data, pdata directory $pdir does not contain binary data files (1r/2rr/3rrr etc.)"))

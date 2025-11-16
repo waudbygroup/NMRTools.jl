@@ -1,0 +1,31 @@
+##TITLE= Audit trail, TopSpin 3.6.2
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= waudbyc
+$$ /home/waudbyc/nmr/kleopatra_231201_CRT_GSG_C163S/106/pdata/1/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2023-12-02 18:45:37.259 +0000>,<waudbyc>,<cl-nmr-spec702>,<go4>,<TopSpin 3.6.2>,
+      <created by zg
+	started at 2023-12-02 18:01:08.634 +0000,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       CE 44 DC 1A AE 3F D9 FF 65 C1 FF 2F 60 FF E8 0F
+       data hash MD5: 2K * 8
+       06 B1 1D 87 B4 A2 04 00 59 45 88 C9 57 C0 28 11>)
+(   2,<2023-12-03 16:21:23.274 +0000>,<waudbyc>,<cl-nmr-spec702>,<proc2d>,<TopSpin 3.6.2>,
+      <Start of raw data processing
+       xf2 F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 1 LB = 30 FT_mod = 6 PKNL = 1 STSR = 0 STSI = 2K PHC0 = 13.15499 PHC1 = 0 F1: SI = 8
+       data hash MD5: 2K * 8
+       DF C1 E8 C6 E5 E7 66 A2 DC E4 5E 8E C6 11 3E 45>)
+$$ /Users/chris/NMR/crick-702/kleopatra_231201_CRT_GSG_C163S/106/pdata/1/auditp.txt
+(   3,<2023-12-07 16:43:48.482 +0000>,<chris>,<eduroam-int-dhcp-97-74-45.ucl.ac.uk>,<cprserver>,<TopSpin 4.2.0>,
+      <changed parameter F2 STSI to 0>)
+(   4,<2023-12-07 16:43:50.360 +0000>,<chris>,<eduroam-int-dhcp-97-74-45.ucl.ac.uk>,<proc2d>,<TopSpin 4.2.0>,
+      <Start of raw data processing
+       xf2 F2: SI = 4K BC_mod = 6 BCFW = 0.5 WDW = 1 LB = 30 FT_mod = 6 PKNL = 1 PHC0 = 13.15499 PHC1 = 0 F1: SI = 8
+       data hash MD5: 4K * 8
+       00 85 F6 CC 50 4B AC 37 34 17 91 91 92 46 01 FB>)
+##END=
+
+$$ hash MD5
+$$ 03 AC 7F AF 29 7D F9 70 2A DB B5 97 68 E0 D5 74

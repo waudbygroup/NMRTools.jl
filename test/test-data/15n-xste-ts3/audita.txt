@@ -1,0 +1,18 @@
+##TITLE= Audit trail, TopSpin 3.6.2
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= waudbyc
+$$ /home/waudbyc/nmr/kleopatra_231201_CRT_GSG_C163S/106/audita.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2023-12-02 18:45:37.259 +0000>,<waudbyc>,<cl-nmr-spec702>,<go4>,<TopSpin 3.6.2>,
+      <created by zg
+	started at 2023-12-02 18:01:08.634 +0000,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       CE 44 DC 1A AE 3F D9 FF 65 C1 FF 2F 60 FF E8 0F
+       data hash MD5: 2K * 8
+       06 B1 1D 87 B4 A2 04 00 59 45 88 C9 57 C0 28 11>)
+##END=
+
+$$ hash MD5
+$$ 40 2A 21 FA 81 38 E7 61 FE 8A 48 50 69 B6 62 E8

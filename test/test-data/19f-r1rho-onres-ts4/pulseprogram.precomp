@@ -3,8 +3,8 @@
 # 1 "<command-line>"
 # 1 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw"
 
-;@ schema_version: "0.0.1"
-;@ sequence_version: "0.1.0"
+;@ schema_version: "0.0.2"
+;@ sequence_version: "0.1.1"
 ;@ title: 19F on-resonance R1rho relaxation dispersion
 ;@ authors:
 ;@   - Chris Waudby <c.waudby@ucl.ac.uk>
@@ -15,21 +15,17 @@
 ;@ doi:
 ;@   - 10.26434/chemrxiv-2025-vt1wg
 ;@ created: 2020-01-01
-;@ last_modified: 2025-08-01
+;@ last_modified: 2025-11-15
 ;@ repository: github.com/waudbygroup/pulseprograms
 ;@ status: beta
 ;@ experiment_type: [r1rho, 1d]
-;@ features: [relaxation dispersion, on-resonance, temperature compensation]
-;@ nuclei_hint: [19F, 1H]
-;@ dimensions: [spinlock_duration, spinlock_power, f1]
-;@ decoupling: [nothing, nothing, f2]
-;@ acquisition_order: [3, 1, 2]
-;@ hard_pulse:
-;@ - {channel: f1, length: p1, power: pl1}
-;@ - {channel: f2, length: p3, power: pl2}
-;@ decoupling_pulse:
-;@ - {channel: f2, length: p4, power: pl12, program: cpdprg2}
-;@ spinlock: {channel: f1, power: <$VALIST>, duration: <$VPLIST>, offset: 0, alignment: hard pulse}
+;@ features: [relaxation_dispersion, on_resonance, temperature_compensation]
+;@ typical_nuclei: [19F]
+;@ dimensions: [r1rho.duration, r1rho.power, f1]
+;@ acquisition_order: [f1, r1rho.duration, r1rho.power]
+;@ reference_pulse:
+;@ - {channel: f1, pulse: p1, power: pl1}
+;@ r1rho: {channel: f1, power: powerlist, duration: taulist, offset: 0, alignment: hard_pulse}
 
 
 
@@ -177,8 +173,8 @@ define loopcounter FACTOR6
 ;$Id:$
 # 32 "/root/.topspin-BladeEpu/local_acqu/sophia_231027_R1p_lig2/105/lists/pp/19F_onresR1p.cw" 2
 
-define list<pulse> plength = <$VPLIST>
-define list<power> list1 = <$VALIST>
+define list<pulse> taulist = <$VPLIST>
+define list<power> powerlist = <$VALIST>
 
 "p2=p1*2"
 "d11=30m"

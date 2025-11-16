@@ -1,0 +1,23 @@
+##TITLE= Parameter file, TopSpin 3.6.2
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 10	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= waudbyc
+$$ 2023-12-02 18:45:36.257 +0000  waudbyc@cl-nmr-spec702
+$$ /home/waudbyc/nmr/kleopatra_231201_CRT_GSG_C163S/106/acqu2s
+$$ process /opt/topspin3.6.2/prog/mod/go4
+##$ACQT0= 0
+##$BF1= 70.95065
+##$FnMODE= 1
+##$NUC1= <15N>
+##$NusJSP= 0
+##$NusT2= 1
+##$NusTD= 8
+##$O1= 8372.1767
+##$ProjAngle= 0
+##$SFO1= 70.9590221767
+##$SW= 36.0057246913625
+##$SW_h= 2554.93101686254
+##$TD= 8
+##END=

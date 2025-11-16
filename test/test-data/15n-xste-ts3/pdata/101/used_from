@@ -1,0 +1,16 @@
+##TITLE= Parameter file, TopSpin 3.6.2
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 1	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= waudbyc
+$$ 2023-12-02 18:09:09.392 +0000  waudbyc@cl-nmr-spec702
+$$ /home/waudbyc/nmr/kleopatra_231201_CRT_GSG_C163S/106/pdata/101/used_from
+$$ process /opt/topspin3.6.2/prog/mod/proc1d
+##$CUREXP= <ser>
+##$DATPATH= </home/waudbyc/nmr>
+##$EXPNO= 106
+##$NAME= <kleopatra_231201_CRT_GSG_C163S>
+##$PROCNO= 1
+##$PROCNO2= 1
+##END=
