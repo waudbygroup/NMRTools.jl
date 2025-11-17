@@ -106,6 +106,7 @@ function parseacqus(acqusfilename::String, auxfiles=true)
         parsepulseprogramlists!(dic, dirname(acqusfilename))
 
         # check for referenced files like vclist, fq1list, and load these in place of filename
+        # (if not already loaded above)
         parseacqusauxfiles!(dic, dirname(acqusfilename))
     end
 
@@ -294,28 +295,28 @@ end
 
 function _parseacqusauxfiles_TS3!(dic, basedir)
     # filenames aren't actually used before TS4 - e.g. vclist is always stored as vclist
-    if get(dic, :vclist, "") != ""
+    if get(dic, :vclist, "") != "" && get(dic, :vclist, "") isa String
         filename = joinpath(basedir, "vclist")
         if isfile(filename)
             dic[:vclist] = parsevclist(readlines(filename))
         end
     end
 
-    if get(dic, :vdlist, "") != ""
+    if get(dic, :vdlist, "") != "" && get(dic, :vdlist, "") isa String
         filename = joinpath(basedir, "vdlist")
         if isfile(filename)
             dic[:vdlist] = parsevdlist(readlines(filename))
         end
     end
 
-    if get(dic, :vplist, "") != ""
+    if get(dic, :vplist, "") != "" && get(dic, :vplist, "") isa String
         filename = joinpath(basedir, "vplist")
         if isfile(filename)
             dic[:vplist] = parsevplist(readlines(filename))
         end
     end
 
-    if get(dic, :valist, "") != ""
+    if get(dic, :valist, "") != "" && get(dic, :valist, "") isa String
         filename = joinpath(basedir, "valist")
         if isfile(filename)
             dic[:valist] = parsevalist(readlines(filename))
@@ -325,6 +326,7 @@ function _parseacqusauxfiles_TS3!(dic, basedir)
     for k in
         (:fq1list, :fq2list, :fq3list, :fq4list, :fq5list, :fq6list, :fq7list, :fq8list)
         get(dic, k, "") == "" && continue
+        get(dic, k, "") isa String || continue
 
         filename = joinpath(basedir, string(k))
         isfile(filename) || continue
@@ -334,31 +336,42 @@ function _parseacqusauxfiles_TS3!(dic, basedir)
 end
 
 function _parseacqusauxfiles_TS4!(dic, basedir)
-    vclistfile = joinpath(basedir, "lists", "vc", get(dic, :vclist, ""))
-    if isfile(vclistfile)
-        dic[:vclist] = parsevclist(readlines(vclistfile))
+    if get(dic, :vclist, "") isa String
+        vclistfile = joinpath(basedir, "lists", "vc", get(dic, :vclist, ""))
+        if isfile(vclistfile)
+            dic[:vclist] = parsevclist(readlines(vclistfile))
+        end
     end
 
-    vdlistfile = joinpath(basedir, "lists", "vd", get(dic, :vdlist, ""))
-    if isfile(vdlistfile)
-        dic[:vdlist] = parsevdlist(readlines(vdlistfile))
+    if get(dic, :vdlist, "") isa String
+        vdlistfile = joinpath(basedir, "lists", "vd", get(dic, :vdlist, ""))
+        if isfile(vdlistfile)
+            dic[:vdlist] = parsevdlist(readlines(vdlistfile))
+        end
     end
 
-    vplistfile = joinpath(basedir, "lists", "vp", get(dic, :vplist, ""))
-    if isfile(vplistfile)
-        dic[:vplist] = parsevplist(readlines(vplistfile))
+    if get(dic, :vplist, "") isa String
+        vplistfile = joinpath(basedir, "lists", "vp", get(dic, :vplist, ""))
+        if isfile(vplistfile)
+            dic[:vplist] = parsevplist(readlines(vplistfile))
+        end
     end
 
-    valistfile = joinpath(basedir, "lists", "va", get(dic, :valist, ""))
-    if isfile(valistfile)
-        dic[:valist] = parsevalist(readlines(valistfile))
+    if get(dic, :valist, "") isa String
+        valistfile = joinpath(basedir, "lists", "va", get(dic, :valist, ""))
+        if isfile(valistfile)
+            dic[:valist] = parsevalist(readlines(valistfile))
+        end
     end
 
     for k in
         (:fq1list, :fq2list, :fq3list, :fq4list, :fq5list, :fq6list, :fq7list, :fq8list)
-        fqlistfile = joinpath(basedir, "lists", "f1", get(dic, k, ""))
-        isfile(fqlistfile) || continue
-        dic[k] = parsefqlist(readlines(fqlistfile))
+        if get(dic, k, "") isa String
+            fqlistfile = joinpath(basedir, "lists", "f1", get(dic, k, ""))
+            if isfile(fqlistfile)
+                dic[k] = parsefqlist(readlines(fqlistfile))
+            end
+        end
     end
 
     # lists/pp (pulseprogram)
