@@ -10,7 +10,7 @@ spec = exampledata(&quot;pseudo2D_XSTE&quot;)</code></pre><pre class="documenter
   <span class="sgr38_5" style="color:#ff875f">↓ F1Dim</span> Sampled{Float64} <span class="sgr38_5" style="color:#ff875f">LinRange{Float64}(14.69741, -5.298823244973492, 2048)</span> <span class="sgr38_5" style="color:#808080">ReverseOrdered</span> <span class="sgr38_5" style="color:#808080">Regular</span> <span class="sgr38_5" style="color:#808080">Points</span>,
   <span class="sgr38_5" style="color:#0087d7">→ X2Dim</span> Sampled{Int64} <span class="sgr38_5" style="color:#0087d7">1:10</span> <span class="sgr38_5" style="color:#808080">ForwardOrdered</span> <span class="sgr38_5" style="color:#808080">Regular</span> <span class="sgr38_5" style="color:#808080">Points</span>
 <span class="sgr90">├──────────────────────────────────────────────────────────────────── metadata ┤</span>
-  Dict{Symbol, Any} with 18 entries:
+  Dict{Symbol, Any} with 17 entries:
   :filename         =&gt; &quot;/home/runner/.julia/artifacts/ff9e57f22e47a400f959356c2…
   :label            =&gt; &quot;15N aSyn, 283 K - XSTE&quot;
   :ns               =&gt; 16
@@ -20,7 +20,6 @@ spec = exampledata(&quot;pseudo2D_XSTE&quot;)</code></pre><pre class="documenter
   :temperature      =&gt; 283.056
   :nuclei           =&gt; Set(Nucleus[H1])
   :experimentfolder =&gt; &quot;/home/runner/.julia/artifacts/ff9e57f22e47a400f959356c2…
-  :annotations      =&gt; Dict{String, Any}()
   :pulseprogram     =&gt; &quot;stebpgp1s19xn.jk&quot;
   :ndim             =&gt; 2
   :acqusfilename    =&gt; &quot;/home/runner/.julia/artifacts/ff9e57f22e47a400f959356c2…
@@ -38,13 +37,12 @@ spec = setgradientlist(spec, gradients, Gmax)</code></pre><pre class="documenter
   <span class="sgr38_5" style="color:#ff875f">↓ F1Dim</span> Sampled{Float64} <span class="sgr38_5" style="color:#ff875f">LinRange{Float64}(14.69741, -5.298823244973492, 2048)</span> <span class="sgr38_5" style="color:#808080">ReverseOrdered</span> <span class="sgr38_5" style="color:#808080">Regular</span> <span class="sgr38_5" style="color:#808080">Points</span>,
   <span class="sgr38_5" style="color:#0087d7">→ G2Dim</span> Sampled{Float64} <span class="sgr38_5" style="color:#0087d7">LinRange{Float64}(0.011000000000000001, 0.539, 10)</span> <span class="sgr38_5" style="color:#808080">ForwardOrdered</span> <span class="sgr38_5" style="color:#808080">Regular</span> <span class="sgr38_5" style="color:#808080">Points</span>
 <span class="sgr90">├──────────────────────────────────────────────────────────────────── metadata ┤</span>
-  Dict{Symbol, Any} with 18 entries:
+  Dict{Symbol, Any} with 17 entries:
   :filename         =&gt; &quot;/home/runner/.julia/artifacts/ff9e57f22e47a400f959356c2…
   :label            =&gt; &quot;15N aSyn, 283 K - XSTE&quot;
   :ns               =&gt; 16
   :temperature      =&gt; 283.056
   :experimentfolder =&gt; &quot;/home/runner/.julia/artifacts/ff9e57f22e47a400f959356c2…
-  :annotations      =&gt; Dict{String, Any}()
   :pulseprogram     =&gt; &quot;stebpgp1s19xn.jk&quot;
   :ndim             =&gt; 2
   :acqusfilename    =&gt; &quot;/home/runner/.julia/artifacts/ff9e57f22e47a400f959356c2…
@@ -140,4 +138,4 @@ plot(p1, p2, layout=(1,2))</code></pre><p><img src="../tutorial-diffusion-fit.sv
     return A * (DT + a*DT^2 + b*DT^3 + c*DT^4)^(-gamma)
 end
 η = viscosity(:h2o, T)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1.3102945185540058</code></pre><p>Finally, we can use the Stokes-Einstein equation to calculate the hydrodynamic radius:</p><pre><code class="language-julia hljs">k = 1.38e-23
-rH = k*T / (6π * η * 0.001 * D) * 1e9 # in nm</code></pre><p class="math-container">\[3.7 \pm 0.031\]</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial-relaxation/">« 1D relaxation analysis</a><a class="docs-footer-nextpage" href="../utilities/">Utilities »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Wednesday 1 October 2025 16:23">Wednesday 1 October 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+rH = k*T / (6π * η * 0.001 * D) * 1e9 # in nm</code></pre><p class="math-container">\[3.7 \pm 0.031\]</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorial-relaxation/">« 1D relaxation analysis</a><a class="docs-footer-nextpage" href="../utilities/">Utilities »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.0 on <span class="colophon-date" title="Monday 17 November 2025 00:13">Monday 17 November 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
