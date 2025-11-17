@@ -295,28 +295,28 @@ end
 
 function _parseacqusauxfiles_TS3!(dic, basedir)
     # filenames aren't actually used before TS4 - e.g. vclist is always stored as vclist
-    if get(dic, :vclist, "") != "" && get(dic, :vclist, "") isa String
+    if get(dic, :vclist, "") != "" && get(dic, :vclist, "") isa AbstractString
         filename = joinpath(basedir, "vclist")
         if isfile(filename)
             dic[:vclist] = parsevclist(readlines(filename))
         end
     end
 
-    if get(dic, :vdlist, "") != "" && get(dic, :vdlist, "") isa String
+    if get(dic, :vdlist, "") != "" && get(dic, :vdlist, "") isa AbstractString
         filename = joinpath(basedir, "vdlist")
         if isfile(filename)
             dic[:vdlist] = parsevdlist(readlines(filename))
         end
     end
 
-    if get(dic, :vplist, "") != "" && get(dic, :vplist, "") isa String
+    if get(dic, :vplist, "") != "" && get(dic, :vplist, "") isa AbstractString
         filename = joinpath(basedir, "vplist")
         if isfile(filename)
             dic[:vplist] = parsevplist(readlines(filename))
         end
     end
 
-    if get(dic, :valist, "") != "" && get(dic, :valist, "") isa String
+    if get(dic, :valist, "") != "" && get(dic, :valist, "") isa AbstractString
         filename = joinpath(basedir, "valist")
         if isfile(filename)
             dic[:valist] = parsevalist(readlines(filename))
@@ -326,7 +326,7 @@ function _parseacqusauxfiles_TS3!(dic, basedir)
     for k in
         (:fq1list, :fq2list, :fq3list, :fq4list, :fq5list, :fq6list, :fq7list, :fq8list)
         get(dic, k, "") == "" && continue
-        get(dic, k, "") isa String || continue
+        get(dic, k, "") isa AbstractString || continue
 
         filename = joinpath(basedir, string(k))
         isfile(filename) || continue
@@ -336,28 +336,28 @@ function _parseacqusauxfiles_TS3!(dic, basedir)
 end
 
 function _parseacqusauxfiles_TS4!(dic, basedir)
-    if get(dic, :vclist, "") isa String
+    if get(dic, :vclist, "") isa AbstractString
         vclistfile = joinpath(basedir, "lists", "vc", get(dic, :vclist, ""))
         if isfile(vclistfile)
             dic[:vclist] = parsevclist(readlines(vclistfile))
         end
     end
 
-    if get(dic, :vdlist, "") isa String
+    if get(dic, :vdlist, "") isa AbstractString
         vdlistfile = joinpath(basedir, "lists", "vd", get(dic, :vdlist, ""))
         if isfile(vdlistfile)
             dic[:vdlist] = parsevdlist(readlines(vdlistfile))
         end
     end
 
-    if get(dic, :vplist, "") isa String
+    if get(dic, :vplist, "") isa AbstractString
         vplistfile = joinpath(basedir, "lists", "vp", get(dic, :vplist, ""))
         if isfile(vplistfile)
             dic[:vplist] = parsevplist(readlines(vplistfile))
         end
     end
 
-    if get(dic, :valist, "") isa String
+    if get(dic, :valist, "") isa AbstractString
         valistfile = joinpath(basedir, "lists", "va", get(dic, :valist, ""))
         if isfile(valistfile)
             dic[:valist] = parsevalist(readlines(valistfile))
@@ -366,7 +366,7 @@ function _parseacqusauxfiles_TS4!(dic, basedir)
 
     for k in
         (:fq1list, :fq2list, :fq3list, :fq4list, :fq5list, :fq6list, :fq7list, :fq8list)
-        if get(dic, k, "") isa String
+        if get(dic, k, "") isa AbstractString
             fqlistfile = joinpath(basedir, "lists", "f1", get(dic, k, ""))
             if isfile(fqlistfile)
                 dic[k] = parsefqlist(readlines(fqlistfile))
