@@ -159,8 +159,8 @@ end
 
     # Test dimensions array
     dims_array = annotations(cest_data, "dimensions")
-    @test dims_array[1] == "cest.offset"
-    @test annotations(cest_data, "dimensions", 1) == "cest.offset"
+    @test dims_array[2] == "cest.offset"
+    @test annotations(cest_data, "dimensions", 2) == "cest.offset"
 
     # Test nested dictionary access
     spinlock = annotations(cest_data, "cest")
