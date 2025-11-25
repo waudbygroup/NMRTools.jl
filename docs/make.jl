@@ -18,6 +18,10 @@ makedocs(;
                                 "Diffusion analysis" => "tutorial-diffusion.md"
                                 # "2D phosphorylation kinetics" => "tutorial-phosphorylation.md",
                                 ],
+                "Metadata" => ["Overview" => "metadata.md",
+                               "Power levels" => "metadata-power.md",
+                               "Frequency lists" => "metadata-fqlists.md",
+                               "Window functions" => "metadata-windows.md"],
                 "Utilities" => "utilities.md",
                 "Reference guide" => [
                                       #     "Data" => "ref-data.md",

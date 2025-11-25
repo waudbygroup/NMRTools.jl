@@ -203,10 +203,10 @@ end
 Example lines to parse:
 define list<gradient> EA=<EA>
 define list<gradient> EA3 = { 1.0000 0.8750 }
-define list<pulse> taulist = <\$VPLIST>
-define list<power> powerlist = <\$VALIST>
+define list<pulse> taulist = <\\\$VPLIST>
+define list<power> powerlist = <\\\$VALIST>
 define list<gradient> diff=<Difframp>
-define list<frequency> F19sat = <\$FQ1LIST>
+define list<frequency> F19sat = <\\\$FQ1LIST>
 
 NB gradient files have weird syntax!!
 """

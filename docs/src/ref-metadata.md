@@ -39,23 +39,19 @@ acqus
 - `:vdlist`: variable delays, in seconds
 - `:valist`: variable amplitude, in dB (converted from Watts if necessary)
 - `:vplist`: variable pulse lengths, in seconds
-- `:fq1list` up to `:fq8list`: frequency lists – see [Frequency lists](@ref) for more information.
+- `:fq1list` up to `:fq8list`: frequency lists – see the [Frequency lists](metadata-fqlists.md) page for more information.
 
-## Frequency lists
+## Frequency list API
 
 Frequency lists can be specified on the spectrometer in a number of ways - in Hz, in ppm, and relative to the spectrometer frequency or the base frequency (0 ppm). Frequency lists are therefore stored in NMRTools as `FQList` structures which encode this additional information.
-
-```@docs; canonical=false
-FQList
-```
-
-Raw numerical data can be accessed using the `data()` function, but it is recommended to use `getppm` and `getoffset` functions to access frequency data safely.
 
 ```@docs; canonical=false
 FQList
 getppm
 getoffset
 ```
+
+Raw numerical data can be accessed using the `data()` function, but it is recommended to use `getppm` and `getoffset` functions to access frequency data safely. See the [Frequency lists](metadata-fqlists.md) page for detailed examples.
 
 
 ## Standard metadata: spectra
