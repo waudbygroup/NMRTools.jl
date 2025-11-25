@@ -64,7 +64,30 @@ function Power(value)
 end
 
 # Getters
+"""
+    db(p::Power)
+
+Get the power level in dB attenuation.
+
+# Example
+```julia
+p = Power(20.0, :dB)
+db(p)  # 20.0
+```
+"""
 db(p::Power) = p.db
+
+"""
+    watts(p::Power)
+
+Get the power level in Watts.
+
+# Example
+```julia
+p = Power(20.0, :dB)
+watts(p)  # 0.01
+```
+"""
 watts(p::Power) = 10^(-p.db / 10)
 
 # Pretty printing
