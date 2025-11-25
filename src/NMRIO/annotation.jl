@@ -24,6 +24,11 @@ function annotate!(spec::NMRData)
     # Resolve parameter references to actual values
     resolve_parameter_references!(annotations, spec)
 
+    # Reverse dimensions to match data order
+    if haskey(annotations, "dimensions")
+        annotations["dimensions"] = reverse(annotations["dimensions"])
+    end
+
     return spec[:annotations] = annotations
 end
 
