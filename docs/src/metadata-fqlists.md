@@ -66,6 +66,8 @@ where $v$ is the stored value, BF is the base frequency (MHz), and offset is the
 Construct `FQList` objects programmatically:
 
 ```@example fqlist
+using NMRTools
+
 # Frequency list in Hz, relative to carrier
 fq_rel = FQList([100.0, 200.0, 300.0], :Hz, true)
 
