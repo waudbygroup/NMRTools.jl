@@ -174,10 +174,10 @@ end
     @test refs isa Vector
     @test length(refs) == 1
     @test refs[1] isa Dict
-    @test refs[1]["duration"] ≈ 13.29
-    @test annotations(cest_data, :reference_pulse, 1)["duration"] ≈ 13.29
+    @test refs[1]["duration"] ≈ 13.29e-6
+    @test annotations(cest_data, :reference_pulse, 1)["duration"] ≈ 13.29e-6
     p, pl = reference_pulse(cest_data, "19F")
-    @test p ≈ 13.29
+    @test p ≈ 13.29e-6
     @test watts(pl) ≈ 8.0
 end
 
@@ -269,10 +269,10 @@ end
     @test length(apod(dat, 1)) == 2048
     @test apod(dat, 1)[10] == 0.9992377902866475
 
-    @test lineshape(dims(dat, 1), 8.0, 5)[1] == 1.1210822807171034e-8
-    @test lineshape(dims(dat, 1), 8.0, 5)[682] == -0.00011946940995147479
-    @test lineshape(dims(dat, 1), 8.0, 5)[686] == 0.02244850216794408
-    @test lineshape(dims(dat, 1), 8.0, 5, ComplexLineshape())[1] ==
+    @test lineshape(dims(dat, 1), 8.0, 5)[1] ≈ 1.1210822807171034e-8
+    @test lineshape(dims(dat, 1), 8.0, 5)[682] ≈ -0.00011946940995147479
+    @test lineshape(dims(dat, 1), 8.0, 5)[686] ≈ 0.02244850216794408
+    @test lineshape(dims(dat, 1), 8.0, 5, ComplexLineshape())[1] ≈
           1.1210822807171034e-8 + 4.754164488338695e-5im
 end
 

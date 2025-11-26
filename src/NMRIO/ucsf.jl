@@ -94,7 +94,7 @@ function parseucsfaxisheader(header)
     npoints = Int(ntoh(reinterpret(Int32, header[9:12])[1]))
     axissize = Int(ntoh(reinterpret(Int32, header[13:16])[1]))
     tilesize = Int(ntoh(reinterpret(Int32, header[17:20])[1]))
-    bf = Float64(ntoh(reinterpret(Float32, header[21:24])[1]))
+    bf = 1e6 * Float64(ntoh(reinterpret(Float32, header[21:24])[1]))
     swhz = Float64(ntoh(reinterpret(Float32, header[25:28])[1]))
     offsetppm = Float64(ntoh(reinterpret(Float32, header[29:32])[1]))
     zeroorder = Float64(ntoh(reinterpret(Float32, header[33:36])[1]))
@@ -114,8 +114,8 @@ function parseucsfaxisheader(header)
     md[:firstorder] = firstorder
     md[:firstpointscaling] = firstpointscaling
 
-    swppm = swhz / bf
-    md[:offsethz] = offsetppm * bf
+    swppm = 1e6 * swhz / bf
+    md[:offsethz] = 1e-6 * offsetppm * bf
     md[:sf] = (1 + offsetppm / 1e6) * bf
     md[:swppm] = swppm
     md[:window] = UnknownWindow()

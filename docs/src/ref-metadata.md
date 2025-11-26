@@ -80,14 +80,14 @@ Raw numerical data can be accessed using the `data()` function, but it is recomm
 | Key                  | Description                                                                |
 |:-------------------- |:-------------------------------------------------------------------------- |
 | `:aq`                | acquisition time, in seconds                                               |
-| `:bf`                | base frequency, in MHz                                                     |
+| `:bf`                | base frequency, in Hz                                                     |
 | `:label`             | short label                                                                |
 | `:npoints`           | final number of **real** data points in dimension (after extraction)       |
 | `:offsethz`          | carrier offset from bf, in Hz                                              |
 | `:offsetppm`         | carrier offset from bf, in ppm                                             |
 | `:pseudodim`         | flag indicating non-frequency domain data (`false` for frequency domain)   |
 | `:region`            | extracted region, expressed as a range in points, otherwise `missing`      |
-| `:sf`                | carrier frequency, in MHz                                                  |
+| `:sf`                | carrier frequency, in Hz                                                  |
 | `:swhz`              | spectrum width, in Hz                                                      |
 | `:swppm`             | spectrum width, in ppm                                                     |
 | `:td`                | number of **complex** points acquired, including LP                        |

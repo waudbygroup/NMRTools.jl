@@ -4,7 +4,7 @@ using LazyArtifacts
 using Test
 
 @testset "NMRIO: 1D 19F (nmrPipe)" begin
-    dat = loadnmr(joinpath(artifact"1D_19F","test.ft1"))
+    dat = loadnmr(joinpath(artifact"1D_19F", "test.ft1"))
 
     @test size(dat) == (8751,)
     @test length(dat) == 8751
@@ -27,8 +27,8 @@ using Test
     @test scale(dat) == 4865.28
 
     @test acqus(dat, :pulprog) == "zg"
-    @test acqus(dat, :p, 1) == 13.25
-    @test acqus(dat, "P", 2) == 22
+    @test acqus(dat, :p, 1) == 13.25e-6
+    @test acqus(dat, "P", 2) == 22e-6
     @test acqus(dat, :d, 1) == 4
     @test acqus(dat)[:te] == 318.1509
 
@@ -38,8 +38,8 @@ using Test
     @test dims(dat, 1)[2] == -120.00050820180846
     @test dims(dat, 1)[end] == -128.00029056823928
 
-    @test metadata(dat, 1, :sf) == 470.5224736346634
-    @test dat[1, :bf] == 470.5220031738281
+    @test metadata(dat, 1, :sf) == 470.4608353134155e6
+    @test dat[1, :bf] == 470.5220031738281e6
     @test label(dat, 1) == "19F"
     @test dat[1, :td] == 14097
     @test dat[1, :tdzf] == 32768
@@ -52,7 +52,7 @@ using Test
 end
 
 @testset "NMRIO: 2D HN (nmrPipe)" begin
-    dat = loadnmr(joinpath(artifact"2D_HN","test.ft2"))
+    dat = loadnmr(joinpath(artifact"2D_HN", "test.ft2"))
 
     @test size(dat) == (568, 256)
     @test length(dat) == 145408
@@ -102,8 +102,8 @@ end
     @test scale(dat) == 406
 
     @test acqus(dat, :pulprog) == "sfhmqcf3gpph.cw"
-    @test acqus(dat, :p, 1) == 9.2
-    @test acqus(dat, "P", 2) == 18.4
+    @test acqus(dat, :p, 1) ≈ 9.2e-6
+    @test acqus(dat, "P", 2) ≈ 18.4e-6
     @test acqus(dat, :d, 1) == 0.1
     @test acqus(dat)[:te] == 276.9988
 
@@ -113,8 +113,8 @@ end
     @test dims(dat, 1)[2] == 10.987407197534884
     @test dims(dat, 1)[end] == 6.004115225500486
 
-    @test metadata(dat, 1, :sf) == 600.2036031356758
-    @test dat[1, :bf] == 600.2030029296875
+    @test dat[1, :bf] == 600.2030029296875e6
+    @test metadata(dat, 1, :sf) == 600.2059883394103e6
     @test label(dat, 1) == "HN"
     @test dat[1, :td] == 1024
     @test dat[1, :tdzf] == 2048
@@ -125,8 +125,8 @@ end
     @test dat[1, :swppm] == 18.031416888209264
     @test dat[1, :pseudodim] == false
 
-    @test metadata(dat, 2, :sf) == 60.825061595134905
-    @test dat[2, :bf] == 60.82500076293945
+    @test dat[2, :bf] == 60.82500076293945e6
+    @test metadata(dat, 2, :sf) == 60.832195448377445e6
     @test label(dat, 2) == "15N"
     @test dat[2, :td] == 128
     @test dat[2, :tdzf] == 256
@@ -141,7 +141,7 @@ end
 end
 
 @testset "NMRIO: pseudo-2D XSTE (nmrPipe)" begin
-    dat = loadnmr(joinpath(artifact"pseudo2D_XSTE","test.ft1"))
+    dat = loadnmr(joinpath(artifact"pseudo2D_XSTE", "test.ft1"))
 
     @test size(dat) == (206, 10)
     @test length(dat) == 2060
@@ -182,8 +182,8 @@ end
     @test scale(dat) == 2048
 
     @test acqus(dat, :pulprog) == "stebpgp1s19xn.jk"
-    @test acqus(dat, :p, 1) == 9.25
-    @test acqus(dat, "P", 2) == 18.5
+    @test acqus(dat, :p, 1) == 9.25e-6
+    @test acqus(dat, "P", 2) == 18.5e-6
     @test acqus(dat, :d, 1) == 1
     @test acqus(dat)[:te] == 283.0556
 
@@ -193,8 +193,8 @@ end
     @test dims(dat, 1)[2] == 9.976091311209679
     @test dims(dat, 1)[end] == 5.990536505252104
 
-    @test metadata(dat, 1, :sf) == 499.85248960054076
-    @test dat[1, :bf] == 499.85198974609375
+    @test metadata(dat, 1, :sf) == 499.85444701842004e6
+    @test dat[1, :bf] == 499.85198974609375e6
     @test label(dat, 1) == "1H"
     @test dat[1, :td] == 512
     @test dat[1, :tdzf] == 1024
@@ -217,7 +217,7 @@ end
 
 @testset "NMRIO: 1D 19F (Bruker pdata)" begin
     dat = exampledata("1D_19F")
-    
+
     @test size(dat) == (5000,)
     @test length(dat) == 5000
 
@@ -239,8 +239,8 @@ end
     @test scale(dat) == 4865.28
 
     @test acqus(dat, :pulprog) == "zg"
-    @test acqus(dat, :p, 1) == 13.25
-    @test acqus(dat, "P", 2) == 22
+    @test acqus(dat, :p, 1) == 13.25e-6
+    @test acqus(dat, "P", 2) == 22e-6
     @test acqus(dat, :d, 1) == 4
     @test acqus(dat)[:te] == 318.1509
 
@@ -250,8 +250,8 @@ end
     @test dims(dat, 1)[2] == -119.59311424688988
     @test dims(dat, 1)[end] == -124.16252020246354
 
-    @test metadata(dat, 1, :sf) == 470.5217922204685
-    @test dat[1, :bf] == 470.582968
+    @test metadata(dat, 1, :sf) == 470.5217922204685e6
+    @test dat[1, :bf] == 470.582968e6
     @test label(dat, 1) == "19F"
     @test dat[1, :td] == 14097
     @test dat[1, :tdzf] == 32768
@@ -337,8 +337,8 @@ end
     @test scale(dat) == 406
 
     @test acqus(dat, :pulprog) == "sfhmqcf3gpph.cw"
-    @test acqus(dat, :p, 1) == 9.2
-    @test acqus(dat, "P", 2) == 18.4
+    @test acqus(dat, :p, 1) ≈ 9.2e-6
+    @test acqus(dat, "P", 2) ≈ 18.4e-6
     @test acqus(dat, :d, 1) == 0.1
     @test acqus(dat)[:te] == 276.9988
 
@@ -348,20 +348,20 @@ end
     @test dims(dat, 1)[2] == 11.066787776480712
     @test dims(dat, 1)[end] == 5.722488424064256
 
-    @test metadata(dat, 1, :sf) == 600.2028190015606
-    @test dat[1, :bf] == 600.2
+    @test metadata(dat, 1, :sf) == 600.2028190015606e6
+    @test dat[1, :bf] == 600.2e6
     @test label(dat, 1) == "1H"
     @test dat[1, :td] == 1024
     @test dat[1, :tdzf] == 4096
     @test dat[1, :region] == 600:1815
-    @test dat[1, :offsetppm] == 4.696770344069996
+    @test dat[1, :offsetppm] ≈ 4.696770344069996
     @test dat[1, :window] == Cos²Window(0.09461759999999972)
     @test dat[1, :swhz] == 10822.510822510854
-    @test dat[1, :swppm] == 18.03150753500642
+    @test dat[1, :swppm] ≈ 18.03150753500642
     @test dat[1, :pseudodim] == false
 
-    @test metadata(dat, 2, :sf) == 60.82491449022095
-    @test dat[2, :bf] == 60.817738
+    @test metadata(dat, 2, :sf) == 60.82491449022095e6
+    @test dat[2, :bf] == 60.817738e6
     @test label(dat, 2) == "15N"
     @test dat[2, :td] == 64
     @test dat[2, :tdzf] == 512
@@ -414,8 +414,8 @@ end
     @test dims(spec, 2)[end] == 107.84188874936109
     @test dims(spec, 3)[Near(45)] == 44.99702749174231
 
-    spec13 = loadnmr(joinpath(artifact"3D_HNCA","pdata","131"))
-    spec23 = loadnmr(joinpath(artifact"3D_HNCA","pdata","231"))
+    spec13 = loadnmr(joinpath(artifact"3D_HNCA", "pdata", "131"))
+    spec23 = loadnmr(joinpath(artifact"3D_HNCA", "pdata", "231"))
     @test size(spec13) == (512, 256)
     @test size(spec23) == (512, 128)
     @test spec23[Near(7.2), Near(122)] == 19735.930053710938
@@ -424,7 +424,7 @@ end
 end
 
 @testset "3D data (nmrPipe)" begin
-    spec = loadnmr(joinpath(artifact"3D_HNCA_pipe","smile","test%03d.ft3"))
+    spec = loadnmr(joinpath(artifact"3D_HNCA_pipe", "smile", "test%03d.ft3"))
     @test size(spec) == (384, 512, 128)
     @test label(spec) == "500 uM 13C,15N ubiquitin, 298 K, BEST-HNCA"
     @test dims(spec, 1)[1] == 9.703234081887576
@@ -438,7 +438,7 @@ end
 end
 
 @testset "NMRIO: 2D HN (ucsf)" begin
-    dat = loadnmr(joinpath(artifact"2D_HN","hmqc.ucsf"))
+    dat = loadnmr(joinpath(artifact"2D_HN", "hmqc.ucsf"))
 
     @test size(dat) == (568, 256)
     @test length(dat) == 145408
@@ -453,13 +453,12 @@ end
     @test dat[end] == -23958.6171875
     @test maximum(dat) == 7.984743e6
 
-    @test label(dat,1) == "1H"
-    @test label(dat,2) == "15N"
+    @test label(dat, 1) == "1H"
+    @test label(dat, 2) == "15N"
 end
 
-
 @testset "3D data (ucsf)" begin
-    spec = loadnmr(joinpath(artifact"3D_HNCA_ucsf","hnca.ucsf"))
+    spec = loadnmr(joinpath(artifact"3D_HNCA_ucsf", "hnca.ucsf"))
     @test size(spec) == (384, 512, 128)
     @test label(spec) == "500 uM 13C,15N ubiquitin, 298 K, BEST-HNCA"
     @test dims(spec, 1)[1] == 9.703234542832309

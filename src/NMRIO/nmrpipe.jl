@@ -160,13 +160,13 @@ function parsenmrpipeheader(header::Vector{Float32})
             dic[:pseudodim] = false
             dic[:td] = pipedic[:FDTDSIZE]
             dic[:tdzf] = pipedic[:FDFTSIZE]
-            dic[:bf] = pipedic[:FDOBS]
+            dic[:bf] = pipedic[:FDOBS] * 1e6  # in Hz
             dic[:swhz] = pipedic[:FDSW]
-            dic[:swppm] = dic[:swhz] / dic[:bf]
+            dic[:swppm] = dic[:swhz] / dic[:bf] * 1e6
             swregion = dic[:swppm]
             dic[:offsetppm] = pipedic[:FDCAR]
-            dic[:offsethz] = (dic[:offsetppm] * 1e-6 + 1) * dic[:bf]
-            dic[:sf] = dic[:offsethz] * 1e-6 + dic[:bf]
+            dic[:offsethz] = dic[:offsetppm] * 1e-6 * dic[:bf]
+            dic[:sf] = dic[:offsethz] + dic[:bf]
             if pipedic[:FDX1] == 0 && pipedic[:FDXN] == 0
                 dic[:region] = missing
                 dic[:npoints] = dic[:tdzf]
@@ -180,7 +180,7 @@ function parsenmrpipeheader(header::Vector{Float32})
 
             edge_frq = pipedic[:FDORIG]
             # calculate chemical shift values
-            cs_at_edge = edge_frq / dic[:bf]
+            cs_at_edge = 1e6 * edge_frq / dic[:bf]
             cs_at_other_edge = cs_at_edge + swregion
             x = range(cs_at_other_edge, cs_at_edge; length=dic[:npoints] + 1)
             dic[:val] = x[2:end]

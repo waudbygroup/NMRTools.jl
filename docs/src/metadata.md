@@ -124,8 +124,8 @@ See the [Frequency lists](metadata-fqlists.md) page for detailed documentation.
 | `:npoints`     | Final number of (real) data points in dimension (after extraction)    |
 | `:td`          | Number of complex points acquired                                     |
 | `:tdzf`        | Number of complex points when FT executed, including LP and ZF        |
-| `:bf`          | Base frequency, in MHz                                                |
-| `:sf`          | Carrier frequency, in MHz                                             |
+| `:bf`          | Base frequency, in Hz                                                |
+| `:sf`          | Carrier frequency, in Hz                                             |
 | `:offsethz`    | Carrier offset from bf, in Hz                                         |
 | `:offsetppm`   | Carrier offset from bf, in ppm                                        |
 | `:swhz`        | Spectrum width, in Hz                                                 |
@@ -153,7 +153,8 @@ NMRTools performs automatic unit conversion:
 
 ## Next steps
 
-- **[Power levels](metadata-power.md)**: Learn about power representation and RF field strength calculations
+- **[Times and frequencies](metadata-timeunits.md)**: Learn about units used for pulse lengths, delays and frequencies
+- **[Power levels](metadata-power.md)**: Representation of powers and RF field strength calculations
 - **[Frequency lists](metadata-fqlists.md)**: Understand frequency list handling and conversions
 - **[Window functions](metadata-windows.md)**: Explore apodization functions and lineshape effects
 - **[Tutorial: Metadata](tutorial-metadata.md)**: Step-by-step introduction to working with metadata (see Tutorials section)

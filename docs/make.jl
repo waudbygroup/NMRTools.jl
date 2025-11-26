@@ -19,6 +19,7 @@ makedocs(;
                                 # "2D phosphorylation kinetics" => "tutorial-phosphorylation.md",
                                 ],
                 "Metadata" => ["Overview" => "metadata.md",
+                               "Times and frequencies" => "metadata-timeunits.md",
                                "Power levels" => "metadata-power.md",
                                "Frequency lists" => "metadata-fqlists.md",
                                "Window functions" => "metadata-windows.md"],

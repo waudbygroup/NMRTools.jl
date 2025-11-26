@@ -36,7 +36,7 @@ function getppm(f::FQList, ax::FrequencyDimension)
     else
         # convert Hz to ppm
         bf = ax[:bf]
-        ppm = f.values ./ bf
+        ppm = 1e6 .* f.values ./ bf
     end
     return ppm .+ ppm0
 end
@@ -52,7 +52,7 @@ function getoffset(f::FQList, ax::FrequencyDimension)
     if f.relative
         if f.unit == :ppm
             # ppm, relative
-            return f.values * ax[:bf]
+            return f.values .* ax[:bf] .* 1e-6
         else
             # Hz, relative
             return f.values
@@ -60,7 +60,7 @@ function getoffset(f::FQList, ax::FrequencyDimension)
     else
         if f.unit == :ppm
             # ppm, absolute
-            return (f.values .- ax[:offsetppm]) * ax[:bf]
+            return (f.values .- ax[:offsetppm]) .* ax[:bf] .* 1e-6
         else
             # Hz, absolute
             return f.values .- ax[:offsethz]

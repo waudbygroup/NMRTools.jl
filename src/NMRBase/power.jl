@@ -133,6 +133,6 @@ Convert power to radiofrequency strength in Hz using reference pulse parameters.
 Radiofrequency strength in Hz for power `p`
 """
 function hz(p::Power, ref_p::Power, ref_pulselength, ref_pulseangle_deg)
-    ref_hz = ref_pulseangle_deg / (360 * ref_pulselength * 1e-6) # pulse length in us
+    ref_hz = ref_pulseangle_deg / (360 * ref_pulselength) # pulse length in s
     return hz(p, ref_p, ref_hz)
 end

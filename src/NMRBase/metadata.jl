@@ -29,8 +29,8 @@ Return the metadata for specified key, or `nothing` if not found. Keys are passe
 - `:npoints`: final number of (real) data points in dimension (after extraction)
 - `:td`: number of complex points acquired
 - `:tdzf`: number of complex points when FT executed, including LP and ZF
-- `:bf`: base frequency, in MHz
-- `:sf`: carrier frequency, in MHz
+- `:bf`: base frequency, in Hz
+- `:sf`: carrier frequency, in Hz
 - `:offsethz`: carrier offset from bf, in Hz
 - `:offsetppm`: carrier offset from bf, in ppm
 - `:swhz`: spectrum width, in Hz

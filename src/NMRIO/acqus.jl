@@ -93,8 +93,6 @@ function parseacqus(acqusfilename::String, auxfiles=true)
 
     dic = loadjdx(acqusfilename)
 
-    replacepowers!(dic)
-
     if auxfiles
         # add the topspin version to the dictionary
         dic[:topspin] = topspinversion(acqusfilename)
@@ -113,6 +111,11 @@ function parseacqus(acqusfilename::String, auxfiles=true)
     return dic
 end
 
+"""
+    replacepowers!(dic)
+
+Ensure all powers in the acqus dictionary are stored as Power types.
+"""
 function replacepowers!(dic)
     if haskey(dic, :plw)
         # convert Dict{Int64, Float64} to Dict{Int64, Power}
@@ -123,6 +126,42 @@ function replacepowers!(dic)
         # convert Dict{Int64, Float64} to Dict{Int64, Power}
         dic[:spw] = Dict(k => Power(v, :W) for (k, v) in dic[:spw])
         dic[:sp] = dic[:spw]  # sp is an alias for spw
+    end
+end
+
+"""
+    replacedurations!(dic)
+
+Ensure all durations in the acqus dictionary are in seconds.
+"""
+function replacedurations!(dic)
+    # ensure all durations are in seconds
+    # for dictionaries in us: p, in, inf, inp, pcpd
+    dics = [:in, :inf, :inp, :p, :pcpd]
+    for d in dics
+        if haskey(dic, d) # stored as microseconds
+            dic[d] = Dict(k => v * 1e-6 for (k, v) in dic[d])
+        end
+    end
+    # convert single parameters from us to s: DE
+    pars = [:de]
+    for p in pars
+        if haskey(dic, p)
+            dic[p] = dic[p] * 1e-6
+        end
+    end
+end
+
+function replacefrequencies!(dic)
+    # ensure all frequencies are in Hz
+
+    # convert single parameters from MHz to Hz
+    pars = [:bf1, :bf2, :bf3, :bf4, :bf5, :bf6, :bf7, :bf8, :sf,
+            :sfo1, :sfo2, :sfo3, :sfo4, :sfo5, :sfo6, :sfo7, :sfo8]
+    for p in pars
+        if haskey(dic, p)
+            dic[p] = dic[p] * 1e6
+        end
     end
 end
 
@@ -431,7 +470,8 @@ end
 
 "return vplist contents in seconds"
 function parsevplist(lines)
-    # default unit for vplist is seconds
+    # default unit for vplist in topspin is microseconds
+    # so convert everything to microseconds first
     lines = map(lines) do line
         line = replace(line, "u" => "")
         line = replace(line, "m" => "e3")
@@ -445,6 +485,7 @@ function parsevplist(lines)
         return lines
     end
 
+    # finally convert microseconds to seconds
     return xf * 1e-6  # return vplist in seconds
 end
 

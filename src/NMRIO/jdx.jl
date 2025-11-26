@@ -4,7 +4,7 @@ function loadjdx(filename::String)
 
     dat = open(filename) do f
         txt = read(f, String)
-        replace(txt, "\r\n" => "\n") # replace Windows line endings with Unix
+        return replace(txt, "\r\n" => "\n") # replace Windows line endings with Unix
     end
 
     fields = [strip(strip(x), '$') for x in split(dat, "##")]
@@ -18,6 +18,10 @@ function loadjdx(filename::String)
             dic[Symbol(lowercase(x[1]))] = parsejdxentry(x[2])
         end
     end
+
+    replacepowers!(dic)
+    replacedurations!(dic)
+    replacefrequencies!(dic)
 
     return dic
 end

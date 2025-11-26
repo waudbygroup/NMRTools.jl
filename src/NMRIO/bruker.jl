@@ -74,11 +74,11 @@ function loadpdata(filename, allcomponents=false)
 
             # extleftppm = procdic[:offset] # edge of extracted region, in ppm
             extswhz = procdic[:sw_p] # sw of extracted region, in Hz
-            extswppm = extswhz / dic[:bf]
+            extswppm = 1e6 * extswhz / dic[:bf]
 
             # full sw = ftsize / stsi * sw of extracted region
             dic[:swhz] = procdic[:ftsize] / procdic[:stsi] * procdic[:sw_p]
-            dic[:swppm] = dic[:swhz] / dic[:bf]
+            dic[:swppm] = 1e6 * dic[:swhz] / dic[:bf]
 
             # chemical shift at point STSR = offset ppm
             # ppm per point = full sw / ftsize
@@ -90,8 +90,8 @@ function loadpdata(filename, allcomponents=false)
             offsetppm = extoffset + (procdic[:stsr] - midpoint) * ppmperpoint
 
             dic[:offsetppm] = offsetppm #dic[:offsethz] / dic[:bf]
-            dic[:offsethz] = offsetppm * dic[:bf] #procdic[:offset]*dic[:bf] - dic[:swhz]/2
-            dic[:sf] = dic[:offsethz] * 1e-6 + dic[:bf]
+            dic[:offsethz] = 1e-6 * offsetppm * dic[:bf] #procdic[:offset]*dic[:bf] - dic[:swhz]/2
+            dic[:sf] = dic[:offsethz] + dic[:bf]
 
             # if procdic[:lpbin] == 0
             dic[:td] = procdic[:tdeff] ÷ 2  # number of COMPLEX points, after LP, before ZF

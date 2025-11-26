@@ -146,16 +146,14 @@ data(d::NMRDimension) = d.val.data
 
 Return the offsets (in rad/s) for points along a frequency axis.
 """
-getω(ax::FrequencyDimension) = 2π * ax[:bf] * (data(ax) .- ax[:offsetppm])
+getω(ax::FrequencyDimension) = 2π * ax[:bf] * (data(ax) .- ax[:offsetppm]) * 1e-6
 
 """
     getω(axis, δ)
 
 Return the offset (in rad/s) for a chemical shift (or list of shifts) on a frequency axis.
 """
-getω(ax::FrequencyDimension, δ) = 2π * ax[:bf] * (δ .- ax[:offsetppm])
-
-
+getω(ax::FrequencyDimension, δ) = 2π * ax[:bf] * (δ .- ax[:offsetppm]) * 1e-6
 
 """
     add_offset!(data::NMRData, dim_ref, offset)
@@ -179,14 +177,14 @@ function add_offset(spec, dim_ref, offsetppm)
     new_data = data(dim) .+ offsetppm
     md = deepcopy(metadata(dim))
     if dim_no == 1
-        newdim = F1Dim(new_data, metadata=md)
+        newdim = F1Dim(new_data; metadata=md)
     elseif dim_no == 2
-        newdim = F2Dim(new_data, metadata=md)
+        newdim = F2Dim(new_data; metadata=md)
     elseif dim_no == 3
-        newdim = F3Dim(new_data, metadata=md)
+        newdim = F3Dim(new_data; metadata=md)
     end
     new_spec = replacedimension(spec, dim_no, newdim)
-    
+
     if :referenceoffset ∉ keys(metadata(new_spec, dim_no))
         metadata(new_spec, dim_no)[:referenceoffset] = offsetppm
     else

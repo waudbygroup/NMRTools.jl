@@ -20,14 +20,14 @@ fqlist = acqus(spec, :fq1list)
 
 Use `getppm()` and `getoffset()` to safely extract frequency values. These functions handle all unit conversions automatically.
 
-### Get absolute chemical shifts (ppm)
+### Get chemical shifts (in ppm)
 
 ```julia
 dim = dims(spec, F2Dim)
 ppm_values = getppm(fqlist, dim)
 ```
 
-### Get offsets from carrier (Hz)
+### Get offsets from carrier (in Hz)
 
 ```julia
 dim = dims(spec, F2Dim)
@@ -36,30 +36,6 @@ offset_hz = getoffset(fqlist, dim)
 
 !!! tip
     Always use `getppm()` and `getoffset()` rather than accessing raw values directly. These functions handle all encoding schemes correctly.
-
-## Conversion formulas
-
-The conversion logic automatically handles all four encoding schemes:
-
-### getppm(): Convert to absolute ppm
-
-| Encoding | Formula |
-|:---------|:--------|
-| Hz, relative | ```math \mathrm{ppm} = \frac{v}{\mathrm{BF}} + \mathrm{offset_{ppm}} ``` |
-| Hz, absolute | ```math \mathrm{ppm} = \frac{v}{\mathrm{BF}} ``` |
-| ppm, relative | ```math \mathrm{ppm} = v + \mathrm{offset_{ppm}} ``` |
-| ppm, absolute | ```math \mathrm{ppm} = v ``` |
-
-### getoffset(): Convert to offset in Hz
-
-| Encoding | Formula |
-|:---------|:--------|
-| Hz, relative | ```math \mathrm{offset_{Hz}} = v ``` |
-| Hz, absolute | ```math \mathrm{offset_{Hz}} = v - \mathrm{offset_{Hz}} ``` |
-| ppm, relative | ```math \mathrm{offset_{Hz}} = v \times \mathrm{BF} ``` |
-| ppm, absolute | ```math \mathrm{offset_{Hz}} = (v - \mathrm{offset_{ppm}}) \times \mathrm{BF} ``` |
-
-where $v$ is the stored value, BF is the base frequency (MHz), and offset is the carrier offset.
 
 ## Creating frequency lists
 
