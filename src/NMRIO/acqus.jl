@@ -270,9 +270,12 @@ end
 
 function parselist!(dic, basedir, listtype, listname, listvalue)
     @debug "Parsing list definition: type='$listtype', name='$listname', value='$listvalue'"
-    if startswith(listvalue, "<\$") && endswith(listvalue, ">")
+
+    # Use regex to extract the actual value, handling comments and whitespace
+    # Match <$PARAMNAME>, <FILENAME>, or {...} patterns
+    if (m = match(r"^<\$(\w+)>", listvalue)) !== nothing
         # e.g. <$VCLIST> - dereference filename using vclist parameter
-        paramname = lowercase(listvalue[3:(end - 1)])
+        paramname = lowercase(m.captures[1])
         # if topspin 3, use this as filename directly, otherwise lookup and load from lists directory
         if dic[:topspin] < v"4.1.4"
             filename = joinpath(basedir, paramname)
@@ -282,9 +285,9 @@ function parselist!(dic, basedir, listtype, listname, listvalue)
         end
         isfile(filename) || return nothing
         lines = readlines(filename)
-    elseif startswith(listvalue, "<") && endswith(listvalue, ">")
+    elseif (m = match(r"^<([^>$]+)>", listvalue)) !== nothing
         # e.g. <EA> - direct filename reference
-        listfile = listvalue[2:(end - 1)]
+        listfile = m.captures[1]
         if dic[:topspin] < v"4.1.4"
             filename = joinpath(basedir, listfile)
         else
@@ -292,9 +295,9 @@ function parselist!(dic, basedir, listtype, listname, listvalue)
         end
         isfile(filename) || return nothing
         lines = readlines(filename)
-    elseif startswith(listvalue, "{") && endswith(listvalue, "}")
+    elseif (m = match(r"^\{([^}]*)\}", listvalue)) !== nothing
         # e.g. { 1.0000 0.8750 } or {0, 40, 20} - inline list
-        inner = strip(listvalue[2:(end - 1)])
+        inner = strip(m.captures[1])
         lines = split(inner, r"[,\s]+")
     else
         @warn "unsupported list value format '$listvalue' in pulseprogram"
