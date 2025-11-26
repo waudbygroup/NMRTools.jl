@@ -8,21 +8,19 @@
 
 ![NMRTools logo](logo.png)
 
-A Julia library for importing, processing, and plotting NMR spectroscopy data.
+NMRTools.jl is a Julia library for working with NMR spectroscopy data. It provides a simple interface for importing and handling 1D, 2D, and higher-dimensional datasets.
 
 ## Features
 
-- **Multi-format I/O**: Read Bruker, nmrPipe, UCSF/Sparky, and JCAMP-DX formats with automatic format detection
-- **Intuitive interface**: Index spectra by chemical shift values: `spec[8.0 .. 9.0]`
-- **Built-in plotting**: Publication-quality plots with Plots.jl recipes
-- **Metadata support**: Access and manipulate Bruker `acqus` parameters
-- **Processing tools**: Window functions, apodization, and spectral manipulation
-- **Flexible dimensions**: Support for frequency, time, and gradient dimensions
-- **DimensionalData.jl**: Powerful array operations with named dimensions
+- **Multi-format support**: Read Bruker, nmrPipe and UCSF/Sparky formatted data
+- **Intuitive data access**: Array-like indexing with chemical shift values using `spec[8.0 .. 9.0]` syntax
+- **Built-in plotting**: Publication-quality plots with sensible defaults via Plots.jl recipes
+- **Metadata handling**: Easily access acquisition parameters from Bruker `acqus` files
+- **DimensionalData.jl integration**: Leverage powerful array indexing with named dimensions to work seamlessly with frequency, time, and gradient dimensions
 
 ## Quick Start
 
-Install via the Julia package manager:
+Install NMRTools.jl through the Julia package manager:
 
 ```julia
 using Pkg
@@ -50,16 +48,9 @@ metadata(spec)
 
 ## Documentation
 
-Comprehensive documentation with tutorials and examples is available at:
-- [**Stable docs**](https://waudbygroup.github.io/NMRTools.jl/stable) - Latest release
-- [**Dev docs**](https://waudbygroup.github.io/NMRTools.jl/dev) - Development version
-
-Topics covered include:
-- Getting started guide with 1D and 2D examples
-- Relaxation and diffusion analysis workflows
-- Advanced plotting and customization
-- Metadata manipulation and window functions
-
+Documentation with tutorials and examples is available at:
+- [**Stable docs**](https://waudbylab.org/NMRTools.jl/stable) - Latest release
+- [**Dev docs**](https://waudbylab.org/NMRTools.jl/dev) - Development version
 
 ## Development Status
 

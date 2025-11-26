@@ -1,7 +1,5 @@
 module PlotsExt
 
-@info "Loading PlotsExt"
-
 """
 notes on testing:
 ]activate --temp
@@ -348,8 +346,6 @@ end
 
     normalize = get(plotattributes, :normalize, true)
     delete!(plotattributes, :normalize)
-
-    @info "plotting vector of 2D NMR data (normalize = $normalize)"
 
     h = 0.0
     # scaling calculations:

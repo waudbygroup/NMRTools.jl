@@ -128,7 +128,7 @@ savefig("plot-2D-purple.svg"); nothing # hide
 Spectra can also be plotted in other formats, e.g. heatmaps:
 
 ```@example 1
-heatmap(spec2d[8 .. 8.5, 120 .. 125], cbar=:right, cbtitle="SNR")
+heatmap(spec2d[8 .. 8.5, 120 .. 125] / spec2d[:noise], cbar=:right, cbtitle="SNR")
 savefig("plot-2D-heatmap.svg"); nothing # hide
 ```
 
@@ -167,9 +167,6 @@ savefig("plot-2D-titration.svg"); nothing # hide
 
 A gradient of colours will automatically be generated when spectra are plotted in this way, and a legend generated from spectrum labels.
 
-!!! note
-    It is recommended to plot a series of 2Ds by passing a list of spectra in a single `plot` call, rather than adding them to a plot one-by-one using the `plot!` command. This will ensure consistent normalisation between experiments. Otherwise, contour levels will be calculated independently as five times the noise level in each experiment.
-
 As usual, plot limits can be adjusted with the `xlims` and `ylims` options:
 
 ```@example 1
@@ -178,6 +175,39 @@ savefig("plot-2D-lims.svg"); nothing # hide
 ```
 
 ![](plot-2D-lims.svg)
+
+## Normalization
+
+Normalization controls how spectra are scaled when plotted, ensuring fair comparisons between experiments acquired with different parameters. Normalization primarily makes a difference when plotting **multiple spectra** together. For single spectra, the normalization factor only affects the absolute y-axis values, not the appearance of the plot.
+
+For 1D spectra, the `normalize` keyword argument controls automatic scaling:
+
+- **`plot(..., normalize=true)` (default)**: Spectra are normalized according to the number of scans and receiver gain, calculated internally via the `scale` command. If concentration metadata is available, it will also be included in the normalization.
+
+- **`plot(..., normalize=false)`**: Each spectrum is plotted with its raw intensity values, without any automatic scaling adjustments.
+
+
+For 2D spectra, normalization affects both the intensity scaling and the contour level calculation:
+
+- **`plot(..., normalize=true)` (default)**: Spectra are normalized by the `scale` factor (accounting for number of scans and receiver gain), and contour levels are set to 5× the noise level. When plotting multiple spectra together, contour levels will be set based on 5× the noise level of the first spectrum, ensuring consistent contour spacing across all spectra in the series.
+
+- **`plot(..., normalize=false)`**: Each spectrum is plotted individually with contour levels relative to its own noise level (5× noise). This can result in different contour spacing between spectra in a series.
+
+- **`plot(..., normalize=reference_spectrum)`**: All spectra are scaled to match the reference spectrum. Contour levels are set based on the reference spectrum's noise level. The reference spectrum does not need to be included in the plot itself, which can be useful for creating animations with consistent scaling across frames.
+
+!!! tip
+    It is usually easiest to plot a series of 2D spectra by passing a list of spectra in a single `plot` call, rather than adding them to a plot one-by-one using the `plot!` command. Alternatively, a reference spectrum should be specified to ensure consistent normalization.
+
+**Example: Using a reference spectrum for normalization**
+
+```julia
+# Load a series of 2D spectra
+spectra2d = exampledata("2D_HN_titration")
+
+# Plot spectra 2-5, but normalize to spectrum 1
+plot(spectra2d[2:5], normalize=spectra2d[1])
+```
+
 
 
 ## Plotting pseudo-2D data

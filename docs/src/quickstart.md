@@ -2,7 +2,12 @@
 
 ## Installing NMRTools
 
-The Distributions package is available through the Julia package system by running `Pkg.add("NMRTools")`. Throughout, we assume that you have installed the package.
+Install NMRTools.jl through the Julia package manager:
+
+```julia
+using Pkg
+Pkg.add("NMRTools")
+```
 
 The examples in this tutorial also using the `Plots` package, which can be obtained similarly.
 

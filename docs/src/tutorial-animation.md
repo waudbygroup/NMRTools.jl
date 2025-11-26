@@ -65,7 +65,7 @@ nothing # hide
 
 ![](titration.gif)
 
-!!! note Normalization
+!!! note
     The `normalize=refspec` parameter scales all spectra relative to the reference spectrum, defined on the first line
     as the first spectrum in the titration series. This ensures that contour levels are directly comparable across the
     different spectra. This normalization automatically compensates for differences in acquisition parameters such as
