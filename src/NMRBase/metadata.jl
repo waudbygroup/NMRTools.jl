@@ -173,7 +173,7 @@ julia> annotations(spec, "cest.duration")
 
 julia> annotations(spec, :reference_pulse)
 1-element Vector{Dict{String, Any}}:
- Dict("channel" => "f1", "pulse" => 9.2, "power" => -3.0)
+ Dict("channel" => "f1", "pulse" => 9.2e-6, "power" => -3.0)
 
 julia> annotations(spec, "calibration.duration.start")
 0.001
@@ -217,7 +217,17 @@ function annotations(A::AbstractNMRData, keys::Union{String,Symbol,Integer}...)
 end
 
 """
-    reference_pulse(spec, nucleus) -> (pulse_length, power)
+    hasannotations(nmrdata) -> Bool
+
+Check if the NMRData object has any annotations.
+"""
+function hasannotations(spec)
+    annot = annotations(spec)
+    return !isnothing(annot) && !isempty(annot)
+end
+
+"""
+    referencepulse(spec, nucleus) -> (pulse_length, power)
 
 Get the reference pulse calibration for a given nucleus from pulse programme annotations.
 Returns a tuple of (pulse_length, power) or `nothing` if not found.
@@ -235,16 +245,16 @@ calculations on that channel.
 
 # Examples
 ```julia-repl
-julia> reference_pulse(spec, "19F")
+julia> referencepulse(spec, "19F")
 (13.29, Power(-9.03 dB, 8.0 W))
 
-julia> reference_pulse(spec, :1H)
+julia> referencepulse(spec, :1H)
 (9.2, Power(-3.0 dB, 32.0 W))
 ```
 
 See also [`annotations`](@ref).
 """
-function reference_pulse(spec::AbstractNMRData, nucleus)
+function referencepulse(spec::AbstractNMRData, nucleus)
     ref_pulses = annotations(spec, "reference_pulse")
     isnothing(ref_pulses) && return nothing
 

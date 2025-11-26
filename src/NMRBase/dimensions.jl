@@ -156,12 +156,12 @@ Return the offset (in rad/s) for a chemical shift (or list of shifts) on a frequ
 getω(ax::FrequencyDimension, δ) = 2π * ax[:bf] * (δ .- ax[:offsetppm]) * 1e-6
 
 """
-    add_offset!(data::NMRData, dim_ref, offset)
+    shiftdim!(data::NMRData, dim_ref, offset)
 
 Add an offset to a frequency dimension in an NMRData object. The dimension can be specified as a numerical index or an object like `F1Dim`.
 The metadata is copied using `replacedimension`, and an entry is added or updated in the dimension metadata to record the offset change.
 """
-function add_offset(spec, dim_ref, offsetppm)
+function shiftdim(spec, dim_ref, offsetppm)
     dim_no = if dim_ref isa Int
         dim_ref
     else
@@ -169,7 +169,11 @@ function add_offset(spec, dim_ref, offsetppm)
     end
     # check that dim_no is valid (not nothing, and within the range of dims)
     if isnothing(dim_no) || dim_no > length(spec.dims) || dim_no < 1
-        throw(NMRToolsError("add_offset: Dimension $dim_ref not found in NMRData object"))
+        throw(NMRToolsError("shiftdim: Dimension $dim_ref not found in NMRData object"))
+    end
+    # check that the dimension is a FrequencyDimension
+    if !(dims(spec, dim_no) isa FrequencyDimension)
+        throw(NMRToolsError("shiftdim: Dimension $dim_ref is not a FrequencyDimension"))
     end
 
     dim = dims(spec, dim_no)
@@ -193,8 +197,9 @@ function add_offset(spec, dim_ref, offsetppm)
 
     # adjust other metadata
     metadata(new_spec, dim_no)[:offsetppm] += offsetppm
-    metadata(new_spec, dim_no)[:offsethz] += offsetppm * metadata(new_spec, dim_no, :bf)
-    metadata(new_spec, dim_no)[:sf] += offsetppm * metadata(new_spec, dim_no, :bf) / 1e6
+    metadata(new_spec, dim_no)[:offsethz] += 1e-6 * offsetppm *
+                                             metadata(new_spec, dim_no, :bf)
+    metadata(new_spec, dim_no)[:sf] += 1e-6 * offsetppm * metadata(new_spec, dim_no, :bf)
 
     return new_spec
 end

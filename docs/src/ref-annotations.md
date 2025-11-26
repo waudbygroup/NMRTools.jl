@@ -108,15 +108,15 @@ The `annotations()` function accepts both string and symbol keys, and returns `n
 
 ### Helper Functions
 
-#### `reference_pulse(spec, nucleus)`
+#### `referencepulse(spec, nucleus)`
 
 Get the reference pulse calibration for a given nucleus:
 ```julia
 # Get 19F reference pulse (returns tuple of pulse length and power)
-p1, pl1 = reference_pulse(spec, "19F")
+p1, pl1 = referencepulse(spec, "19F")
 
 # Get 1H reference pulse
-p3, pl2 = reference_pulse(spec, :1H)
+p3, pl2 = referencepulse(spec, :1H)
 ```
 
 Returns `nothing` if no reference pulse is found for the specified nucleus.
@@ -176,7 +176,7 @@ annotations(spec, "dimensions")       # ["r1rho.power", "r1rho.duration", "f1"]
 annotations(spec, "dimensions", 1)    # "r1rho.power"
 
 # Get reference pulse calibration
-p1, pl1 = reference_pulse(spec, "19F")
+p1, pl1 = referencepulse(spec, "19F")
 ```
 
 ### Additional Examples

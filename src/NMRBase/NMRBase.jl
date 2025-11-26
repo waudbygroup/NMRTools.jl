@@ -115,7 +115,7 @@ export replacedimension
 export setkinetictimes
 export setrelaxtimes
 export setgradientlist
-export add_offset
+export shiftdim
 
 # Metadata
 export AbstractMetadata, Metadata, NoMetadata
@@ -124,8 +124,8 @@ export defaultmetadata
 export metadatahelp
 export label, label!, units
 export acqus
-export annotations
-export reference_pulse
+export annotations, hasannotations
+export referencepulse
 
 # Window functions
 export WindowFunction

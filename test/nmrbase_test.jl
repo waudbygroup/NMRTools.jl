@@ -87,9 +87,9 @@ end
 
     # offsets
     spec = exampledata("1D_1H")
-    spec2 = add_offset(spec, 1, 0.5)
+    spec2 = shiftdim(spec, 1, 0.5)
     @test data(spec2, 1)[1] - data(spec, 1)[1] == 0.5
-    spec2 = add_offset(spec2, F1Dim, 0.5)
+    spec2 = shiftdim(spec2, F1Dim, 0.5)
     @test data(spec2, 1)[1] - data(spec, 1)[1] == 1
 end
 
@@ -176,7 +176,7 @@ end
     @test refs[1] isa Dict
     @test refs[1]["duration"] ≈ 13.29e-6
     @test annotations(cest_data, :reference_pulse, 1)["duration"] ≈ 13.29e-6
-    p, pl = reference_pulse(cest_data, "19F")
+    p, pl = referencepulse(cest_data, "19F")
     @test p ≈ 13.29e-6
     @test watts(pl) ≈ 8.0
 end
