@@ -28,7 +28,7 @@ spec = loadnmr("path/to/experiment")
 plot(spec)
 ```
 
-See the [Getting Started](@ref) guide for more examples, or explore the tutorial pages for detailed workflows including relaxation analysis, diffusion experiments, and advanced plotting techniques.
+See the [Getting started](@ref) guide for more examples, or explore the tutorial pages for detailed workflows including relaxation analysis, diffusion experiments, and advanced plotting techniques.
 
 !!! note
     This package is under active development and it may be a while before its features and syntax stabilises.
