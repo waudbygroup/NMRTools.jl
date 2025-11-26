@@ -2,8 +2,6 @@
 
 NMRTools.jl is a Julia library for working with NMR spectroscopy data. It provides a simple interface for importing and handling 1D, 2D, and higher-dimensional datasets.
 
-## Features
-
 - **Multi-format support**: Read Bruker, nmrPipe and UCSF/Sparky formatted data
 - **Intuitive data access**: Array-like indexing with chemical shift values using `spec[8.0 .. 9.0]` syntax
 - **Built-in plotting**: Publication-quality plots with sensible defaults via Plots.jl recipes
@@ -11,7 +9,7 @@ NMRTools.jl is a Julia library for working with NMR spectroscopy data. It provid
 - **Window functions**: Access and analyse apodization functions used for acquisition
 - **DimensionalData.jl integration**: Leverage powerful array indexing with named dimensions to work seamlessly with frequency, time, and gradient dimensions
 
-## Quick Start
+## Installation
 
 Install NMRTools.jl through the Julia package manager:
 
