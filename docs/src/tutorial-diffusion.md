@@ -25,7 +25,7 @@ spec = setgradientlist(spec, gradients, Gmax)
 
 Next, we extract or set other acquisition parameters required for analysis. In particular, we extract the diffusion pulse length, δ, and the diffusion delay, Δ, from the acqus file. We also specify the chemical shift ranges used for plotting, fitting, and for determination of the noise level.
 ```@example diff
-δ = acqus(spec, :p, 30) * 2e-6 # gradient pulse length = p30/2
+δ = acqus(spec, :p, 30) * 2    # gradient pulse length = p30/2
 Δ = acqus(spec, :d, 20)        # diffusion delay = d20
 σ = 0.9                        # gradient pulse shape factor (for SMSQ10)
 
