@@ -142,18 +142,25 @@ Return the numerical data associated with an NMR dimension.
 data(d::NMRDimension) = d.val.data
 
 """
-    getω(axis)
+    ppm(axis)
 
-Return the offsets (in rad/s) for points along a frequency axis.
+Return the ppm values for points along a frequency axis.
 """
-getω(ax::FrequencyDimension) = 2π * ax[:bf] * (data(ax) .- ax[:offsetppm]) * 1e-6
+ppm(ax::FrequencyDimension) = data(ax)
 
 """
-    getω(axis, δ)
+    hz(axis)
 
-Return the offset (in rad/s) for a chemical shift (or list of shifts) on a frequency axis.
+Return the offsets (in Hz) for points along a frequency axis.
 """
-getω(ax::FrequencyDimension, δ) = 2π * ax[:bf] * (δ .- ax[:offsetppm]) * 1e-6
+hz(ax::FrequencyDimension) = ax[:bf] * (data(ax) .- ax[:offsetppm]) * 1e-6
+
+"""
+    hz(δ, axis)
+
+Return the offset (in Hz) for a chemical shift (or list of shifts) on a frequency axis.
+"""
+hz(δ::Union{Number,AbstractArray{<:Number}}, ax::FrequencyDimension) = ax[:bf] * (δ .- ax[:offsetppm]) * 1e-6
 
 """
     shiftdim!(data::NMRData, dim_ref, offset)

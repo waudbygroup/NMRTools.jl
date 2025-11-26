@@ -5,10 +5,10 @@ Represents a frequency list. `unit` can be `:Hz` or `:ppm`, and `relative`
 indicates whether the frequency is given relative to SFO (true) or BF (false).
 
 Raw values can be extracted using the `data` function, or (better) as absolute
-chemical shifts (in ppm) or relative offsets (in Hz) using [`getppm`](@ref) and
-[`getoffset`](@ref) functions.
+chemical shifts (in ppm) or relative offsets (in Hz) using [`ppm`](@ref) and
+[`hz`](@ref) functions.
 
-See also: [`getppm`](@ref), [`getoffset`](@ref).
+See also: [`ppm`](@ref), [`hz`](@ref).
 """
 struct FQList{T}
     values::Vector{T}
@@ -19,13 +19,13 @@ end
 data(f::FQList) = f.values
 
 """
-    getppm(f::FQList, ax::FrequencyDimension)
+    ppm(f::FQList, ax::FrequencyDimension)
 
 Return frequency list values in ppm (in absolute terms, i.e. relative to 0 ppm).
 
-See also: [`getoffset`](@ref)
+See also: [`hz`](@ref)
 """
-function getppm(f::FQList, ax::FrequencyDimension)
+function NMRBase.ppm(f::FQList, ax::NMRBase.FrequencyDimension)
     if f.relative
         ppm0 = ax[:offsetppm]
     else
@@ -42,13 +42,13 @@ function getppm(f::FQList, ax::FrequencyDimension)
 end
 
 """
-    getoffset(f::FQList, ax::FrequencyDimension)
+    hz(f::FQList, ax::FrequencyDimension)
 
 Return frequency list values as offsets relative to the spectrometer frequency, in Hz.
 
-See also: [`getppm`](@ref)
+See also: [`ppm`](@ref)
 """
-function getoffset(f::FQList, ax::FrequencyDimension)
+function NMRBase.hz(f::FQList, ax::NMRBase.FrequencyDimension)
     if f.relative
         if f.unit == :ppm
             # ppm, relative

@@ -47,11 +47,11 @@ Frequency lists can be specified on the spectrometer in a number of ways - in Hz
 
 ```@docs; canonical=false
 FQList
-getppm
-getoffset
+ppm
+hz
 ```
 
-Raw numerical data can be accessed using the `data()` function, but it is recommended to use `getppm` and `getoffset` functions to access frequency data safely. See the [Frequency lists](metadata-fqlists.md) page for detailed examples.
+Raw numerical data can be accessed using the `data()` function, but it is recommended to use `ppm` and `hz` functions to access frequency data safely. See the [Frequency lists](metadata-fqlists.md) page for detailed examples.
 
 
 ## Standard metadata: spectra

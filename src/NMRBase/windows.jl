@@ -169,7 +169,7 @@ shift `δ` and relaxation rate `R2`, using the parameters and window function as
 with the specified axis.
 """
 function lineshape(ax, δ, R2, complexity::LineshapeComplexity)
-    return _lineshape(getω(ax, δ), R2, getω(ax), ax[:window], complexity)
+    return _lineshape(2π * hz(δ, ax), R2, 2π * hz(ax), ax[:window], complexity)
 end
 # default to a real return type
 lineshape(ax, δ, R2) = lineshape(ax, δ, R2, RealLineshape())

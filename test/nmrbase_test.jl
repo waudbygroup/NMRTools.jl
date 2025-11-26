@@ -91,6 +91,33 @@ end
     @test data(spec2, 1)[1] - data(spec, 1)[1] == 0.5
     spec2 = shiftdim(spec2, F1Dim, 0.5)
     @test data(spec2, 1)[1] - data(spec, 1)[1] == 1
+
+    # Test ppm() and hz() functions for FrequencyDimension
+    ax = dims(spec, 1)
+
+    # Test ppm(axis) - should return same as data(axis)
+    @test ppm(ax) == data(ax)
+    @test ppm(ax)[1] isa Float64
+
+    # Test hz(axis) - should convert ppm to Hz offsets
+    hz_offsets = hz(ax)
+    bf = ax[:bf]
+    offsetppm = ax[:offsetppm]
+    @test hz_offsets[1] ≈ bf * (data(ax)[1] - offsetppm) * 1e-6
+    @test hz_offsets[end] ≈ bf * (data(ax)[end] - offsetppm) * 1e-6
+
+    # Test hz(δ, axis) - should convert single ppm value to Hz
+    test_ppm = 7.5
+    hz_single = hz(test_ppm, ax)
+    @test hz_single ≈ bf * (test_ppm - offsetppm) * 1e-6
+
+    # Test hz(δ, axis) with array of values
+    test_ppms = [7.0, 7.5, 8.0]
+    hz_array = hz(test_ppms, ax)
+    @test length(hz_array) == 3
+    @test hz_array[1] ≈ bf * (7.0 - offsetppm) * 1e-6
+    @test hz_array[2] ≈ bf * (7.5 - offsetppm) * 1e-6
+    @test hz_array[3] ≈ bf * (8.0 - offsetppm) * 1e-6
 end
 
 @testset "NMRBase: metadata" begin
@@ -169,6 +196,25 @@ end
     @test annotations(cest_data, "cest", "duration") == 1
     @test annotations(cest_data, "cest.offset") isa FQList
 
+    # Test FQList conversion functions
+    fqlist = annotations(cest_data, "cest.offset")
+    dim = dims(cest_data, F1Dim)
+
+    # Test hz() for FQList (Hz, relative) - should return values as-is since they're already Hz relative
+    hz_values = hz(fqlist, dim)
+    @test hz_values[1] ≈ -2500.0  # First value
+    @test hz_values[51] ≈ 0.0     # Middle value (on-resonance)
+    @test hz_values[end] ≈ 2500.0 # Last value
+
+    # Test ppm() for FQList - should convert to absolute ppm
+    ppm_values = ppm(fqlist, dim)
+    bf = dim[:bf]
+    offsetppm = dim[:offsetppm]
+    # Expected: offsetppm + Hz/bf*1e6
+    @test ppm_values[1] ≈ offsetppm + (-2500.0 / bf * 1e6)
+    @test ppm_values[51] ≈ offsetppm  # On-resonance point
+    @test ppm_values[end] ≈ offsetppm + (2500.0 / bf * 1e6)
+
     # Test array of dictionaries (reference_pulse)
     refs = annotations(cest_data, "reference_pulse")
     @test refs isa Vector
@@ -179,6 +225,41 @@ end
     p, pl = referencepulse(cest_data, "19F")
     @test p ≈ 13.29e-6
     @test watts(pl) ≈ 8.0
+end
+
+@testset "NMRBase: FQList conversions" begin
+    # Create a test axis with known parameters
+    spec = exampledata("1D_1H")
+    ax = dims(spec, 1)
+    bf = ax[:bf]
+    offsetppm = ax[:offsetppm]
+
+    # Test 1: Hz, relative (most common case)
+    fq_hz_rel = FQList([-100.0, 0.0, 100.0], :Hz, true)
+    @test hz(fq_hz_rel, ax) ≈ [-100.0, 0.0, 100.0]
+    @test ppm(fq_hz_rel, ax) ≈ [offsetppm - 100.0 / bf * 1e6,
+                                offsetppm,
+                                offsetppm + 100.0 / bf * 1e6]
+
+    # Test 2: Hz, absolute
+    test_hz_abs = [bf * 7.0 * 1e-6,
+                   bf * 7.5 * 1e-6,
+                   bf * 8.0 * 1e-6]
+    fq_hz_abs = FQList(test_hz_abs, :Hz, false)
+    @test ppm(fq_hz_abs, ax) ≈ [7.0, 7.5, 8.0]
+    @test hz(fq_hz_abs, ax) ≈ test_hz_abs .- ax[:offsethz]
+
+    # Test 3: ppm, relative
+    fq_ppm_rel = FQList([0.1, 0.0, -0.1], :ppm, true)
+    @test ppm(fq_ppm_rel, ax) ≈ [offsetppm + 0.1, offsetppm, offsetppm - 0.1]
+    @test hz(fq_ppm_rel, ax) ≈ [0.1 * bf * 1e-6, 0.0, -0.1 * bf * 1e-6]
+
+    # Test 4: ppm, absolute (chemical shifts)
+    fq_ppm_abs = FQList([7.0, 7.5, 8.0], :ppm, false)
+    @test ppm(fq_ppm_abs, ax) ≈ [7.0, 7.5, 8.0]
+    @test hz(fq_ppm_abs, ax) ≈ [(7.0 - offsetppm) * bf * 1e-6,
+                                (7.5 - offsetppm) * bf * 1e-6,
+                                (8.0 - offsetppm) * bf * 1e-6]
 end
 
 @testset "NMRBase: nuclei and coherences" begin

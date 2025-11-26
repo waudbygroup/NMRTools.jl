@@ -18,24 +18,24 @@ fqlist = acqus(spec, :fq1list)
 
 ## Extracting frequency values
 
-Use `getppm()` and `getoffset()` to safely extract frequency values. These functions handle all unit conversions automatically.
+Use `ppm()` and `hz()` to safely extract frequency values. These functions handle all unit conversions automatically.
 
 ### Get chemical shifts (in ppm)
 
 ```julia
 dim = dims(spec, F2Dim)
-ppm_values = getppm(fqlist, dim)
+ppm_values = ppm(fqlist, dim)
 ```
 
 ### Get offsets from carrier (in Hz)
 
 ```julia
 dim = dims(spec, F2Dim)
-offset_hz = getoffset(fqlist, dim)
+offset_hz = hz(fqlist, dim)
 ```
 
 !!! tip
-    Always use `getppm()` and `getoffset()` rather than accessing raw values directly. These functions handle all encoding schemes correctly.
+    Always use `ppm()` and `hz()` rather than accessing raw values directly. These functions handle all encoding schemes correctly.
 
 ## Creating frequency lists
 

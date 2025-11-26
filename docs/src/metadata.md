@@ -89,8 +89,8 @@ Frequency lists (from `fq1list`, etc.) are stored as [`FQList`](@ref) objects th
 fqlist = acqus(spec, :fq1list)
 
 # Extract as ppm or Hz
-getppm(fqlist, dims(spec, F2Dim))
-getoffset(fqlist, dims(spec, F2Dim))
+ppm(fqlist, dims(spec, F2Dim))
+hz(fqlist, dims(spec, F2Dim))
 ```
 
 See the [Frequency lists](metadata-fqlists.md) page for detailed documentation.

@@ -110,7 +110,7 @@ export G1Dim, G2Dim, G3Dim, G4Dim
 export X1Dim, X2Dim, X3Dim, X4Dim
 # export GradientDim
 # export SpatialDim
-export getω
+export ppm, hz
 export replacedimension
 export setkinetictimes
 export setrelaxtimes

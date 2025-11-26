@@ -20,7 +20,7 @@ include("sumexpts.jl")
 
 export loadnmr
 export loadjdx
-export FQList, getppm, getoffset
+export FQList
 export sumexpts
 
 # examples
