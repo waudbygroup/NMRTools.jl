@@ -227,6 +227,77 @@ end
     @test watts(pl) ≈ 8.0
 end
 
+@testset "NMRBase: Programmatic list annotations" begin
+    # Create a mock NMRData object for testing
+    using NMRTools.NMRIO: resolve_programmatic_lists!
+
+    # Test 1: Linear spacing with start/step
+    spec1 = exampledata("pseudo2D_XSTE")  # 2k x 10
+    annotations1 = Dict{String,Any}("dimensions" => ["calibration.duration", "f1"],
+                                    "calibration" => Dict{String,Any}("duration" => Dict{String,
+                                                                                         Any}("type" => "linear",
+                                                                                              "start" => 0.001,
+                                                                                              "step" => 0.002)))
+    resolve_programmatic_lists!(annotations1, spec1)
+
+    # Should create a vector of length 206 (first dimension)
+    @test annotations1["calibration"]["duration"] isa Vector
+    @test length(annotations1["calibration"]["duration"]) == 10
+    @test annotations1["calibration"]["duration"][1] ≈ 0.001
+    @test annotations1["calibration"]["duration"][2] ≈ 0.003
+    @test annotations1["calibration"]["duration"][end] ≈ 0.019
+
+    # Test 2: Linear spacing with start/end
+    spec2 = exampledata("pseudo2D_XSTE")  # 2k x 10
+    annotations2 = Dict{String,Any}("dimensions" => ["calibration.duration", "f1"],
+                                    "calibration" => Dict{String,Any}("duration" => Dict{String,
+                                                                                         Any}("type" => "linear",
+                                                                                              "start" => 0.001,
+                                                                                              "end" => 0.1)))
+    resolve_programmatic_lists!(annotations2, spec2)
+
+    @test annotations2["calibration"]["duration"] isa Vector
+    @test length(annotations2["calibration"]["duration"]) == 10
+    @test annotations2["calibration"]["duration"][1] ≈ 0.001
+    @test annotations2["calibration"]["duration"][end] ≈ 0.1
+    # Check it's evenly spaced
+    spacing = (0.1 - 0.001) / (10 - 1)
+    @test annotations2["calibration"]["duration"][2] ≈ 0.001 + spacing
+
+    # Test 3: Logarithmic spacing with start/end
+    spec3 = exampledata("pseudo2D_XSTE")  # 2k x 10
+    annotations3 = Dict{String,Any}("dimensions" => ["calibration.duration", "f1"],
+                                    "calibration" => Dict{String,Any}("duration" => Dict{String,
+                                                                                         Any}("type" => "log",
+                                                                                              "start" => 0.001,
+                                                                                              "end" => 0.1)))
+    resolve_programmatic_lists!(annotations3, spec3)
+
+    @test annotations3["calibration"]["duration"] isa Vector
+    @test length(annotations3["calibration"]["duration"]) == 10
+    @test annotations3["calibration"]["duration"][1] ≈ 0.001
+    @test annotations3["calibration"]["duration"][end] ≈ 0.1
+    # Check it's logarithmically spaced
+    @test log(annotations3["calibration"]["duration"][2]) ≈
+          log(0.001) + (log(0.1) - log(0.001)) / (10 - 1)
+
+    # Test 4: Second dimension mapping
+    spec4 = exampledata("pseudo2D_XSTE")  # 2k x 10
+    annotations4 = Dict{String,Any}("dimensions" => ["gradient.strength", "f1"],
+                                    "gradient" => Dict{String,Any}("strength" => Dict{String,
+                                                                                      Any}("type" => "linear",
+                                                                                           "start" => 0.05,
+                                                                                           "step" => 0.1)))
+    resolve_programmatic_lists!(annotations4, spec4)
+
+    # Should create a vector of length 10 (second dimension)
+    @test annotations4["gradient"]["strength"] isa Vector
+    @test length(annotations4["gradient"]["strength"]) == 10
+    @test annotations4["gradient"]["strength"][1] ≈ 0.05
+    @test annotations4["gradient"]["strength"][2] ≈ 0.15
+    @test annotations4["gradient"]["strength"][end] ≈ 0.95
+end
+
 @testset "NMRBase: FQList conversions" begin
     # Create a test axis with known parameters
     spec = exampledata("1D_1H")
