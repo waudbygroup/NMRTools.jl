@@ -156,11 +156,22 @@ Return the offsets (in Hz) for points along a frequency axis.
 hz(ax::FrequencyDimension) = ax[:bf] * (data(ax) .- ax[:offsetppm]) * 1e-6
 
 """
+    ppm(offset, axis)
+
+Return the chemical shifts for a given offset or list of offsets along a frequency axis.
+"""
+function ppm(offset::Union{Number,AbstractArray{<:Number}}, ax::FrequencyDimension)
+    return (offset + ax[:offsethz]) * 1e6 / ax[:bf]
+end
+
+"""
     hz(δ, axis)
 
 Return the offset (in Hz) for a chemical shift (or list of shifts) on a frequency axis.
 """
-hz(δ::Union{Number,AbstractArray{<:Number}}, ax::FrequencyDimension) = ax[:bf] * (δ .- ax[:offsetppm]) * 1e-6
+hz(δ::Union{Number,AbstractArray{<:Number}}, ax::FrequencyDimension) = ax[:bf] *
+                                                                       (δ .- ax[:offsetppm]) *
+                                                                       1e-6
 
 """
     shiftdim!(data::NMRData, dim_ref, offset)
