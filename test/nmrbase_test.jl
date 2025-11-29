@@ -296,6 +296,37 @@ end
     @test annotations4["gradient"]["strength"][1] ≈ 0.05
     @test annotations4["gradient"]["strength"][2] ≈ 0.15
     @test annotations4["gradient"]["strength"][end] ≈ 0.95
+
+    # Test 5: Counter-based pattern with integer counter
+    spec5 = exampledata("pseudo2D_XSTE")
+    annotations5 = Dict{String,Any}("dimensions" => ["calibration.duration", "f1"],
+                                    "calibration" => Dict{String,Any}("duration" => Dict{String,
+                                                                                         Any}("counter" => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                                                                                              "scale" => 0.01)))
+    resolve_programmatic_lists!(annotations5, spec5)
+
+    @test annotations5["calibration"]["duration"] isa Vector
+    @test length(annotations5["calibration"]["duration"]) == 10
+    @test annotations5["calibration"]["duration"][1] ≈ 0.0
+    @test annotations5["calibration"]["duration"][2] ≈ 0.01
+    @test annotations5["calibration"]["duration"][5] ≈ 0.04
+    @test annotations5["calibration"]["duration"][end] ≈ 0.09
+
+    # Test 6: Counter-based pattern with non-uniform counter
+    spec6 = exampledata("pseudo2D_XSTE")
+    annotations6 = Dict{String,Any}("dimensions" => ["gradient.strength", "f1"],
+                                    "gradient" => Dict{String,Any}("strength" => Dict{String,
+                                                                                      Any}("counter" => [1, 2, 4, 8, 16],
+                                                                                           "scale" => 0.05)))
+    resolve_programmatic_lists!(annotations6, spec6)
+
+    @test annotations6["gradient"]["strength"] isa Vector
+    @test length(annotations6["gradient"]["strength"]) == 5
+    @test annotations6["gradient"]["strength"][1] ≈ 0.05
+    @test annotations6["gradient"]["strength"][2] ≈ 0.10
+    @test annotations6["gradient"]["strength"][3] ≈ 0.20
+    @test annotations6["gradient"]["strength"][4] ≈ 0.40
+    @test annotations6["gradient"]["strength"][5] ≈ 0.80
 end
 
 @testset "NMRBase: FQList conversions" begin

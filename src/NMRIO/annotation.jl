@@ -177,17 +177,27 @@ end
 
 Resolve programmatic list patterns in annotations to actual vectors.
 
-Programmatic lists are specified as dictionaries with:
+Programmatic lists are specified as dictionaries with one of two patterns:
+
+**Pattern 1: Type-based (linear/log)**
 - `type`: "linear" or "log" (logarithmic)
 - `start`: starting value
 - `step`: step size (for linear with start/step)
 - `end`: ending value (for linear or log with start/end)
 
-The function:
+**Pattern 2: Counter-based**
+- `counter`: array of values (typically integers from a loop counter)
+- `scale`: scale factor to multiply each counter element by
+
+For type-based patterns, the function:
 1. Identifies fields containing programmatic list patterns ({type, start, step/end})
 2. Finds the dimension number for that field from the dimensions annotation
 3. Gets the number of points in that dimension
 4. Replaces the pattern with a correctly sized vector
+
+For counter-based patterns, the function:
+1. Multiplies each element of the counter array by the scale value
+2. Returns the resulting vector
 
 # Examples
 ```julia
@@ -199,6 +209,9 @@ The function:
 
 # Logarithmic spacing with start/end
 # {type: log, start: 0.001, end: 0.1} with 10 points → [0.001, 0.0016, ..., 0.1]
+
+# Counter-based pattern
+# {counter: [0, 1, 2, 3], scale: 0.01} → [0.0, 0.01, 0.02, 0.03]
 ```
 """
 function resolve_programmatic_lists!(annotations::Dict, spec::NMRData)
@@ -253,20 +266,26 @@ end
     _is_programmatic_pattern(value) -> Bool
 
 Check if a value is a programmatic list pattern.
-Must be a Dict with "type" key and either "step" or "end" key.
+Must be a Dict with either:
+- "type" key and either "step" or "end" key (linear/log patterns)
+- "counter" and "scale" keys (counter-based pattern)
 """
 function _is_programmatic_pattern(value)
     if !(value isa Dict)
         return false
     end
 
-    # Must have a "type" key
+    # Pattern 1: type-based (linear/log) - must have "type" and either "step" or "end"
     has_type = haskey(value, "type")
-
-    # Must have either "step" or "end" key
     has_step_or_end = haskey(value, "step") || haskey(value, "end")
+    is_type_pattern = has_type && has_step_or_end
 
-    return has_type && has_step_or_end
+    # Pattern 2: counter-based - must have both "counter" and "scale"
+    has_counter = haskey(value, "counter")
+    has_scale = haskey(value, "scale")
+    is_counter_pattern = has_counter && has_scale
+
+    return is_type_pattern || is_counter_pattern
 end
 
 """
@@ -275,6 +294,32 @@ end
 Resolve a single programmatic list pattern to a vector.
 """
 function _resolve_programmatic_pattern(key::String, pattern::Dict, root_annotations::Dict, spec::NMRData, dimensions::Vector)
+    # Check if this is a counter-based pattern
+    if haskey(pattern, "counter") && haskey(pattern, "scale")
+        counter = get(pattern, "counter", nothing)
+        scale = get(pattern, "scale", nothing)
+
+        if isnothing(counter)
+            @warn "Counter-based pattern missing 'counter' value for: $key"
+            return nothing
+        end
+
+        if isnothing(scale)
+            @warn "Counter-based pattern missing 'scale' value for: $key"
+            return nothing
+        end
+
+        # Counter must be a vector or array
+        if !(counter isa AbstractVector)
+            @warn "Counter-based pattern 'counter' must be an array for: $key"
+            return nothing
+        end
+
+        # Generate list by multiplying each counter element by scale
+        return [c * scale for c in counter]
+    end
+
+    # Otherwise, handle type-based patterns (linear/log)
     # Find which dimension this key corresponds to
     dim_path = _find_dimension_path(key, root_annotations)
     if isnothing(dim_path)
