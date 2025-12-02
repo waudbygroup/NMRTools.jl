@@ -468,3 +468,9 @@ end
     @test spec[1, :window] isa UnknownWindow
     @test maximum(spec) / spec[:noise] ≈ 492.00351859142154
 end
+
+@testset "Samples" begin
+    using Dates
+    spec = loadnmr(joinpath("test-data", "samples", "2"))
+    @test spec[:date] == DateTime(2023, 10, 9, 10, 11, 34)
+end

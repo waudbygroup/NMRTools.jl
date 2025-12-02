@@ -105,6 +105,7 @@ See the [Frequency lists](metadata-fqlists.md) page for detailed documentation.
 | `:format`        | `:NMRPipe` or `:bruker`                    |
 | `:title`         | Contents of `pdata/1/title`                |
 | `:label`         | First line of title, used for captions     |
+| `:date`          | Experiment timestamp (completion time)     |
 | `:pulseprogram`  | Pulse program (PULPROG) from acqus file    |
 | `:ndim`          | Number of dimensions                       |
 | `:acqusfilename` | Path to associated acqus file              |

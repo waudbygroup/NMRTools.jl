@@ -56,6 +56,9 @@ function getacqusmetadata(format, filename, experimentfolder=nothing)
         md[:acqusfilename] = acqusfilename
         md[:temperature] = get(acqusmetadata, :te, nothing)
         md[:solvent] = get(acqusmetadata, :solvent, "unknown")
+        if haskey(acqusmetadata, :date)
+            md[:date] = unix2datetime(acqusmetadata[:date])
+        end
     else
         @warn "cannot locate acqus file for $(filename) - some metadata will be missing"
     end
