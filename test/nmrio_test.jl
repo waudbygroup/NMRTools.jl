@@ -2,6 +2,7 @@ using NMRTools
 using Artifacts
 using LazyArtifacts
 using Test
+using Dates
 
 @testset "NMRIO: 1D 19F (nmrPipe)" begin
     dat = loadnmr(joinpath(artifact"1D_19F", "test.ft1"))
@@ -470,7 +471,18 @@ end
 end
 
 @testset "Samples" begin
-    using Dates
     spec = loadnmr(joinpath("test-data", "samples", "2"))
     @test spec[:date] == DateTime(2023, 10, 9, 10, 11, 34)
+    @test basename(spec[:samplefile]) == "2025-08-23_163924_lysozyme.json"
+    @test spec[:sample]["sample"]["label"] == "lysozyme"
+    @test hassample(spec) == true
+    @test sample(spec, :sample, :label) == "lysozyme"
+
+    spec = loadnmr(joinpath("test-data", "samples", "12"))
+    @test spec[:sample]["sample"]["label"] == "lysozyme (1mM Gd)"
+    @test sample(spec, "sample", "label") == "lysozyme (1mM Gd)"
+
+    spec = loadnmr(joinpath("test-data", "samples", "22"))
+    @test isnothing(spec[:sample])
+    @test hassample(spec) == false
 end

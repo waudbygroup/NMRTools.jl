@@ -95,6 +95,23 @@ hz(fqlist, dims(spec, F2Dim))
 
 See the [Frequency lists](metadata-fqlists.md) page for detailed documentation.
 
+### Sample metadata
+
+Sample metadata describing the physical sample, buffer composition, and experimental details can be automatically loaded when present:
+
+```julia
+# Check if sample metadata is available
+hassample(spec)
+
+# Access sample metadata
+sample(spec)
+
+# Navigate nested metadata
+sample(spec, :sample, :label)
+```
+
+See the [Sample metadata](metadata-samples.md) page for detailed documentation.
+
 ## Standard metadata keys
 
 ### Spectrum metadata symbols
@@ -158,5 +175,6 @@ NMRTools performs automatic unit conversion:
 - **[Power levels](metadata-power.md)**: Representation of powers and RF field strength calculations
 - **[Frequency lists](metadata-fqlists.md)**: Understand frequency list handling and conversions
 - **[Window functions](metadata-windows.md)**: Explore apodization functions and lineshape effects
+- **[Sample metadata](metadata-samples.md)**: Working with sample metadata and the nmr-sample-schema
 - **[Tutorial: Metadata](tutorial-metadata.md)**: Step-by-step introduction to working with metadata (see Tutorials section)
 - **[Reference: Metadata](ref-metadata.md)**: Complete API reference for metadata functions (see Reference guide section)

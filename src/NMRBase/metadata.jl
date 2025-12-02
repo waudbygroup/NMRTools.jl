@@ -227,6 +227,74 @@ function hasannotations(spec)
 end
 
 """
+    sample(nmrdata)
+    sample(nmrdata, keys...)
+
+Return the sample metadata associated with the NMRData object, or `nothing` if not available.
+Sample metadata follows the schema defined at https://github.com/waudbygroup/nmr-sample-schema.
+
+When keys are provided, navigates nested dictionaries using the given keys. Keys can be strings
+or symbols and are automatically converted to lowercase strings for consistent access.
+
+# Examples
+```julia-repl
+julia> sample(spec)
+Dict{String, Any} with 6 entries:
+  "nmr_tube" => Dict{String, Any}("diameter"=>"5 mm", "type"=>"regular", "sample_volume_uL"=>600)
+  "buffer"   => Dict{String, Any}("solvent"=>"10% D2O", "reference_unit"=>"%w/v", "chemical_shift_reference"=>"none")
+  [...]
+
+julia> sample(spec, "notes")
+"here's a note!"
+
+julia> sample(spec, :people, :users)
+1-element Vector{Any}:
+ "Chris"
+
+julia> sample(spec, "sample", "components")
+2-element Vector{Any}:
+ Dict{String, Any}("name" => "HEWL", "isotopic_labelling" => "unlabelled", "unit" => "mM", "concentration" => 10)
+ Dict{String, Any}("name" => "gadodiamide", "isotopic_labelling" => "unlabelled", "unit" => "mM", "concentration" => 1)
+```
+
+See also [`metadata`](@ref), [`hassample`](@ref).
+"""
+function sample(spec)
+    return metadata(spec, :sample)
+end
+
+# Variadic version: handles any number of keys
+function sample(spec, keys::Union{String,Symbol}...)
+    sample_data = sample(spec)
+    isnothing(sample_data) && return nothing
+
+    # Navigate through nested dictionaries
+    current = sample_data
+    for key in keys
+        # Convert to lowercase string
+        key_str = lowercase(string(key))
+
+        if current isa AbstractDict
+            current = get(current, key_str, nothing)
+            isnothing(current) && return nothing
+        else
+            return nothing
+        end
+    end
+
+    return current
+end
+
+"""
+    hassample(nmrdata) -> Bool
+
+Check if the NMRData object has any associated sample metadata.
+"""
+function hassample(spec)
+    return !isnothing(spec[:sample]) && !isempty(spec[:sample])
+end
+
+"""
     referencepulse(spec, nucleus) -> (pulse_length, power)
 
 Get the reference pulse calibration for a given nucleus from pulse programme annotations.
