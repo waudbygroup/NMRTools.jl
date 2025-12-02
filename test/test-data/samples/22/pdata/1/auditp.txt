@@ -1,0 +1,27 @@
+##TITLE= Audit trail, TopSpin 3.5 pl 6
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= waudbyc
+$$ /home/waudbyc/nmr/chris_HEWL_231009/22/pdata/1/auditp.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2023-10-11 11:06:07.094 +0100>,<waudbyc>,<cl-nmr-spec701>,<go4>,<TopSpin 3.5.6>,
+      <created by zg
+	started at 2023-10-11 11:05:00.285 +0100,
+	POWCHK enabled, PULCHK disabled,
+       configuration hash MD5:
+       3D CC 58 16 BF 6D 1B CA B5 63 16 77 DE C7 E5 F3
+       data hash MD5: 32K
+       43 CC 89 9F 78 B1 D1 59 64 D9 77 EE 6D BD 0E BD>)
+(   2,<2023-10-11 11:10:40.867 +0100>,<waudbyc>,<cl-nmr-spec701>,<proc1d>,<TopSpin 3.5.6>,
+      <Start of raw data processing
+       qsin SSB = 2 SI = 32K 
+       data hash MD5: 32K
+       47 7C 3A 07 72 8C 22 38 62 3B D6 D7 C7 53 C6 EC>)
+(   3,<2023-10-11 11:10:40.899 +0100>,<waudbyc>,<cl-nmr-spec701>,<proc1d>,<TopSpin 3.5.6>,
+      <fp FT_mod = 6 PKNL = 1 SI = 32K PHC0 = 161.935 PHC1 = 0 
+       data hash MD5: 32K
+       F9 5B 5D 41 37 1B C6 DD E4 9F 85 52 24 E5 2F B3>)
+##END=
+
+$$ hash MD5
+$$ 0F 70 9F 32 7F EE FF 15 3A 98 C9 5F 14 E9 CD F9

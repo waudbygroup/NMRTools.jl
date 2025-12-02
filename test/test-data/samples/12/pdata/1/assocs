@@ -1,0 +1,11 @@
+##TITLE= Parameter file, TopSpin 3.5 pl 6
+##JCAMPDX= 5.0
+##DATATYPE= Parameter Values
+##NPOINTS= 1	$$ modification sequence number
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= waudbyc
+$$ 2023-10-10 12:41:08.920 +0100  waudbyc@cl-nmr-spec701
+$$ /home/waudbyc/nmr/chris_HEWL_231009/12/pdata/1/assocs
+$$ process /opt/topspin3.5pl6/prog/mod/dataserver
+##$MULTDISP= </home/waudbyc/nmr/chris_HEWL_231009/2/pdata/1>
+##END=
