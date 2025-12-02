@@ -66,6 +66,9 @@ function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
     # 6. parse and resolve pulse programme annotations
     annotate!(spectrum)
 
+    # 7. add sample information if available
+    addsampleinfo!(spectrum)
+
     return spectrum
 end
 

@@ -22,7 +22,8 @@ makedocs(;
                                "Times and frequencies" => "metadata-timeunits.md",
                                "Power levels" => "metadata-power.md",
                                "Frequency lists" => "metadata-fqlists.md",
-                               "Window functions" => "metadata-windows.md"],
+                               "Window functions" => "metadata-windows.md",
+                               "Sample metadata" => "metadata-samples.md"],
                 "Utilities" => "utilities.md",
                 "Reference guide" => [
                                       #     "Data" => "ref-data.md",

@@ -1,0 +1,44 @@
+{
+  "metadata": {
+    "created_timestamp": "2023-10-10T11:35:00.000Z",
+    "modified_timestamp": "2025-11-03T09:13:19.030Z",
+    "schema_version": "0.0.3",
+    "ejected_timestamp": "2023-10-11T09:30:00.000Z"
+  },
+  "notes": "here's a note!",
+  "sample": {
+    "components": [
+      {
+        "concentration": 10,
+        "unit": "mM",
+        "name": "HEWL",
+        "isotopic_labelling": "unlabelled"
+      },
+      {
+        "concentration": 1,
+        "unit": "mM",
+        "name": "gadodiamide",
+        "isotopic_labelling": "unlabelled"
+      }
+    ],
+    "label": "lysozyme (1mM Gd)"
+  },
+  "people": {
+    "groups": [
+      "Waudby"
+    ],
+    "users": [
+      "Chris"
+    ]
+  },
+  "nmr_tube": {
+    "type": "regular",
+    "diameter": "5 mm",
+    "sample_volume_uL": 600
+  },
+  "buffer": {
+    "chemical_shift_reference": "none",
+    "reference_unit": "%w/v",
+    "solvent": "10% D2O"
+  }
+}

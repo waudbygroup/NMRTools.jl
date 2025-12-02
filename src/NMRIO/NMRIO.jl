@@ -5,6 +5,7 @@ using Artifacts
 using ArtifactUtils
 using Dates
 using LazyArtifacts
+using JSON
 using YAML
 
 include("lists.jl")
@@ -14,6 +15,7 @@ include("acqus.jl")
 include("nmrpipe.jl")
 include("bruker.jl")
 include("annotation.jl")
+include("samples.jl")
 include("ucsf.jl")
 include("exampledata.jl")
 include("sumexpts.jl")
