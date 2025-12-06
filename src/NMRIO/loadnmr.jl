@@ -37,6 +37,17 @@ loadnmr("exampledata/1D_19F/1/pdata/1/");
 ```
 """
 function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
+    # 0. replace filename with absolute path
+    #    - necessary for checking samples that may be in a parent directory
+    if filename isa Number
+        # allow passing numbered experiment folders directly
+        filename = string(filename)
+    end
+    filename = abspath(filename)
+    if experimentfolder !== nothing
+        experimentfolder = abspath(experimentfolder)
+    end
+
     # 1. get format
     format, filename = getformat(filename)
 
@@ -50,7 +61,6 @@ function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
     elseif format == :ucsf
         spectrum = loaducsf(filename)
     elseif format == :pdata
-        # TODO bruker pdata import
         spectrum = loadpdata(filename, allcomponents)
     else
         # unknown format
