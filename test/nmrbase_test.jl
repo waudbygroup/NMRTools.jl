@@ -301,7 +301,16 @@ end
     spec5 = exampledata("pseudo2D_XSTE")
     annotations5 = Dict{String,Any}("dimensions" => ["calibration.duration", "f1"],
                                     "calibration" => Dict{String,Any}("duration" => Dict{String,
-                                                                                         Any}("counter" => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                                                                                         Any}("counter" => [0,
+                                                                                                            1,
+                                                                                                            2,
+                                                                                                            3,
+                                                                                                            4,
+                                                                                                            5,
+                                                                                                            6,
+                                                                                                            7,
+                                                                                                            8,
+                                                                                                            9],
                                                                                               "scale" => 0.01)))
     resolve_programmatic_lists!(annotations5, spec5)
 
@@ -316,7 +325,11 @@ end
     spec6 = exampledata("pseudo2D_XSTE")
     annotations6 = Dict{String,Any}("dimensions" => ["gradient.strength", "f1"],
                                     "gradient" => Dict{String,Any}("strength" => Dict{String,
-                                                                                      Any}("counter" => [1, 2, 4, 8, 16],
+                                                                                      Any}("counter" => [1,
+                                                                                                         2,
+                                                                                                         4,
+                                                                                                         8,
+                                                                                                         16],
                                                                                            "scale" => 0.05)))
     resolve_programmatic_lists!(annotations6, spec6)
 
@@ -531,4 +544,15 @@ end
     output = string(p7)
     @test occursin("dB", output)
     @test occursin("W", output)
+end
+
+@testset "NMRBase: Peak detection (1D)" begin
+    spec = exampledata("1D_19F")
+    pks = detectpeaks(spec)
+    @test length(pks) == 1
+    @test pks[1].δ ≈ -123.69808278240923
+    @test pks[1].intensity ≈ 23737.674377441406
+    @test pks[1].δfwhm ≈ 0.0626986378531874
+    @test length(detectpeaks(spec; snr_threshold=0.1)) == 65
+    @test length(detectpeaks(spec; snr_threshold=0)) == 0
 end

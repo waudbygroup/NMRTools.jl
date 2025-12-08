@@ -16,10 +16,11 @@ const DDarraydocs = joinpath(DDdocs, "#DimensionalData.AbstractDimensionalArray"
 # const DDtidocs = joinpath(DDdocs, "#DimensionalData.Ti")
 
 using LinearAlgebra
-using SimpleTraits
 using Optim
-using Statistics
+using Peaks
+using SimpleTraits
 using SpecialFunctions
+using Statistics
 
 # using Reexport: Reexport
 # Reexport.@reexport using DimensionalData
@@ -49,6 +50,7 @@ include("nmrdata.jl")
 include("windows.jl")
 include("metadata.jl")
 include("noise.jl")
+include("peaks.jl")
 include("pcls.jl")
 
 macro exportinstances(enum)
@@ -143,6 +145,10 @@ export apod
 export LineshapeComplexity
 export RealLineshape
 export ComplexLineshape
+
+# peaks and peak detection
+export AbstractPeak, SimplePeak
+export detectpeaks
 
 # phase-constrained least squares
 export pcls
