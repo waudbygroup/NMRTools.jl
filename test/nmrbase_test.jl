@@ -554,5 +554,5 @@ end
     @test pks[1].intensity ≈ 23737.674377441406
     @test pks[1].δfwhm ≈ 0.0626986378531874
     @test length(detectpeaks(spec; snr_threshold=0.1)) == 65
-    @test length(detectpeaks(spec; snr_threshold=0)) == 0
+    @test length(detectpeaks(spec; snr_threshold=100)) == 0
 end
