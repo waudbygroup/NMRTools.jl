@@ -90,11 +90,21 @@ savefig("plot-19F-titration.svg"); nothing # hide
 **Stacked views** can also be produced using the `vstack=true` option. By default, spectra are normalized according to the number of scans and receiver gain determined automatically from the spectrum metadata
 
 ```@example 1
-plot(spectra, xlims=(-125, -122), vstack=true, legend=:topright)
+plot(spectra, xlims=(-125, -122), legend=:topright, vstack=true)
 savefig("plot-19F-stack.svg"); nothing # hide
 ```
 
 ![](plot-19F-stack.svg)
+
+The **spacing** of stacked views can be adjusted by passing a scaling factor to the `vstack=X` option. By default, `vstack=true` uses a scaling factor of one. Use a larger number to increase the separation between spectra.
+
+```@example 1
+plot(spectra, xlims=(-125, -122), legend=:topright, vstack=5)
+savefig("plot-19F-stack-space.svg"); nothing # hide
+```
+
+![](plot-19F-stack-space.svg)
+
 
 
 ## Plotting 2D spectra

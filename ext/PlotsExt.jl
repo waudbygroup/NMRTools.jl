@@ -128,8 +128,22 @@ end
     delete!(plotattributes, :normalize)
 
     voffset = 0
-    vdelta = maximum([maximum(abs.(A)) / ((normalize !== false) ? scale(A) : 1)
-                      for A in v]) / length(v)
+    if vstack isa Bool
+        if vstack
+            vdelta = maximum([maximum(abs.(A)) / ((normalize !== false) ? scale(A) : 1)
+                              for A in v]) / length(v)
+            ordering = :back
+        else
+            vdelta = 0
+            ordering = :front
+        end
+    elseif vstack isa Number
+        vdelta = maximum([maximum(abs.(A)) / ((normalize !== false) ? scale(A) : 1)
+                          for A in v]) / length(v) * vstack
+        ordering = :back
+    else
+        error("vstack must be a Bool or Number")
+    end
 
     # TODO add guide lines
     # if vstack
@@ -138,19 +152,18 @@ end
     #     yticks --> [0,]
     # end
 
-    for A in v
+    for (i, A) in enumerate(v)
         scaling = (normalize !== false) ? scale(A) : 1
         @series begin
             seriestype --> :path
             markershape --> :none
+            z_order --> ordering
             Afwd = reorder(A, ForwardOrdered) # make sure data axes are in forwards order
             x = dims(Afwd, 1)
             label --> label(A)
             data(x), data(Afwd) ./ scaling .+ voffset
         end
-        if vstack
-            voffset += vdelta
-        end
+        voffset += vdelta
     end
 end
 
