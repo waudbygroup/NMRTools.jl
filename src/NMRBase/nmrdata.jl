@@ -36,8 +36,10 @@ missingval(A::AbstractNMRData) = A.missingval
 # DimensionalData methods ##########################################################################
 
 # Rebuild types of AbstractNMRData
+# Note: metadata is deep-copied by default to ensure sliced/copied data have independent metadata.
+# See GitHub issue #25: https://github.com/waudbygroup/NMRTools.jl/issues/25
 function DD.rebuild(X::A, data, dims::Tuple, refdims, name,
-                    metadata=metadata(X),
+                    metadata=deepcopy(metadata(X)),
                     missingval=missingval(X)) where {A<:AbstractNMRData}
     # HACK use A.name.wrapper to return the type (i.e. constructor) stripped of parameters.
     # This may not be a stable feature. See discussions:
@@ -48,7 +50,7 @@ end
 
 function DD.rebuild(A::AbstractNMRData;
                     data=parent(A), dims=dims(A), refdims=refdims(A), name=name(A),
-                    metadata=metadata(A), missingval=missingval(A))
+                    metadata=deepcopy(metadata(A)), missingval=missingval(A))
     return rebuild(A, data, dims, refdims, name, metadata, missingval)
 end
 
@@ -122,9 +124,11 @@ end
 
 NMRData(A::AbstractArray; dims, kw...) = NMRData(A, dims; kw...)
 
+# Note: metadata is deep-copied by default to ensure copied data have independent metadata.
+# See GitHub issue #25: https://github.com/waudbygroup/NMRTools.jl/issues/25
 function NMRData(A::AbstractDimArray;
                  data=parent(A), dims=dims(A), refdims=refdims(A),
-                 name=name(A), metadata=metadata(A), missingval=missingval(A), kw...)
+                 name=name(A), metadata=deepcopy(metadata(A)), missingval=missingval(A), kw...)
     return NMRData(data, dims; refdims, name, metadata, missingval, kw...)
 end
 

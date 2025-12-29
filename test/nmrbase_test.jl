@@ -556,3 +556,49 @@ end
     @test length(detectpeaks(spec; snr_threshold=0.1)) == 65
     @test length(detectpeaks(spec; snr_threshold=100)) == 0
 end
+
+@testset "NMRBase: Metadata independence after slicing (issue #25)" begin
+    # Test that sliced NMRData has independent metadata from the original
+    # See GitHub issue #25: https://github.com/waudbygroup/NMRTools.jl/issues/25
+
+    # 2D pseudo-data test
+    dat1a = exampledata("pseudo2D_XSTE")
+    dat3 = dat1a[:, 3]  # slice creates new NMRData
+
+    # Set label on the slice
+    label!(dat3, "sliced data")
+    # Original should NOT be affected
+    @test label(dat1a) != "sliced data"
+
+    # Set label on the original
+    label!(dat1a, "original data")
+    # Slice should NOT be affected
+    @test label(dat3) == "sliced data"
+
+    # Test metadata modification via setindex!
+    dat3[:noise] = 123.0
+    @test dat1a[:noise] != 123.0  # original should not change
+
+    # Test that NMRData constructor also creates independent copy
+    dat2 = exampledata("1D_19F")
+    dat2b = NMRData(dat2)
+    label!(dat2b, "copy label")
+    @test label(dat2) != "copy label"  # original should not change
+
+    # Test slicing via interval selector
+    dat1c = dat1a[7.0 .. 9.0, :]
+    label!(dat1c, "interval slice")
+    @test label(dat1a) != "interval slice"
+
+    # Test selectdim behavior (used by decimate)
+    dat1d = selectdim(dat1a, 2, 1:5)
+    label!(dat1d, "selectdim slice")
+    @test label(dat1a) != "selectdim slice"
+
+    # Test estimatenoise! doesn't affect original after slicing
+    dat_for_noise = exampledata("1D_1H")
+    dat_slice = dat_for_noise[7.0 .. 9.0]
+    estimatenoise!(dat_slice)
+    # The original should have different noise value (or nil if not yet estimated)
+    @test dat_for_noise[:noise] != dat_slice[:noise]
+end
