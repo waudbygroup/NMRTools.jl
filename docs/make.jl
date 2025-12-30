@@ -30,6 +30,7 @@ makedocs(;
                                       #     "Data" => "ref-data.md",
                                       #     "Dimensions" => "ref-dimensions.md",
                                       #     "File I/O" => "ref-io.md",
+                                      "Chemical shift referencing" => "ref-referencing.md",
                                       "Metadata" => "ref-metadata.md",
                                       "Annotations" => "ref-annotations.md",
                                       #     "Window functions" => "ref-windows.md",

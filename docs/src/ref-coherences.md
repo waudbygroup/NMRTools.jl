@@ -22,4 +22,5 @@ coherenceorder
 ```@docs; canonical=false
 spin
 gyromagneticratio
+xi
 ```
