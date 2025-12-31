@@ -1,45 +1,30 @@
 # Chemical shift referencing functions for NMR spectra
 
 # Common aqueous solvents for auto-detection
-const AQUEOUS_SOLVENTS = ["D2O", "d2o", "H2O", "h2o", "H2O+D2O", "h2o+d2o",
-                          "D2O+H2O", "d2o+h2o", "90% H2O/10% D2O", "90% H2O / 10% D2O",
-                          "95% H2O/5% D2O", "95% H2O / 5% D2O", "water"]
+const AQUEOUS_SOLVENTS = ["d2o", "h2o", "h2o+d2o", "water"]
 
 """
-    isaqueous(spec; aqueous=:auto) -> Bool
+    isaqueous(spec) -> Bool
 
 Determine whether a spectrum was acquired in an aqueous solvent.
 
 # Arguments
 - `spec`: NMRData object
-- `aqueous`: Can be `:auto` (detect from solvent metadata), `true`, or `false`
 
-When `aqueous=:auto`, checks the solvent metadata for common aqueous solvent names
-(D2O, H2O, H2O+D2O, etc.).
+Checks against the metadata field `:solvent`.
 """
-function isaqueous(spec; aqueous=:auto)
-    if aqueous === :auto
-        solvent = metadata(spec, :solvent)
-        if isnothing(solvent) || solvent == "unknown"
-            # Try acqus as fallback
-            solvent = acqus(spec, :solvent)
-        end
-        if isnothing(solvent) || solvent == "unknown"
-            @warn "Could not determine solvent from metadata, assuming organic (TMS reference)"
-            return false
-        end
-        # Check if solvent matches any aqueous pattern
-        solvent_lower = lowercase(string(solvent))
-        for aq_solvent in AQUEOUS_SOLVENTS
-            if occursin(lowercase(aq_solvent), solvent_lower) ||
-               solvent_lower == lowercase(aq_solvent)
-                return true
-            end
-        end
+function isaqueous(spec)
+    solvent = metadata(spec, :solvent)
+    if isnothing(solvent)
+        @warn "Could not determine solvent from metadata, assuming organic (TMS reference)"
         return false
-    else
-        return aqueous
     end
+    # Check if solvent matches any aqueous pattern
+    solvent_lower = lowercase(string(solvent))
+    if solvent_lower in AQUEOUS_SOLVENTS
+        return true
+    end
+    return false
 end
 
 """
@@ -74,7 +59,6 @@ to the Bruker default of 4.7 ppm.
 # Arguments
 - `spec`: NMRData object to reference
 - `indirect=true`: If true, also reference heteronuclear dimensions using Xi ratios
-- `aqueous=:auto`: Solvent type (`:auto`, `true`, or `false`)
 - `temperature=nothing`: Temperature in Kelvin. If `nothing`, reads from metadata.
 
 # Returns
@@ -84,9 +68,9 @@ Only works for aqueous solvents (D2O, H2O, H2O+D2O).
 
 See also [`reference(spec, dim, pair)`](@ref), [`xi`](@ref).
 """
-function reference(spec; indirect=true, aqueous=:auto, temperature=nothing)
+function reference(spec; indirect=true, temperature=nothing)
     # Check if aqueous
-    if !isaqueous(spec; aqueous=aqueous)
+    if !isaqueous(spec)
         throw(NMRToolsError("reference: Water referencing only available for aqueous solvents. " *
                             "Use reference(spec, dim, old => new) for explicit referencing."))
     end
@@ -115,7 +99,9 @@ function reference(spec; indirect=true, aqueous=:auto, temperature=nothing)
     # The offset to apply
     offset = expected_water - bruker_default
 
-    @info "Water referencing" temperature=temp expected_δ_water=round(expected_water; digits=3) correction_ppm=round(offset; digits=4)
+    @info "Water referencing" temperature = temp expected_δ_water = round(expected_water;
+                                                                          digits=3) correction_ppm = round(offset;
+                                                                                                           digits=4)
 
     # Apply referencing using the internal function
     return _reference_with_offset(spec, h1_dim, offset; indirect=indirect, aqueous=true)
@@ -136,12 +122,12 @@ Reference a spectrum dimension by specifying an old and new chemical shift.
 # Examples
 ```julia
 # Reference 1H dimension
-spec2 = reference(spec, 1, 4.7 => 4.8)
-spec2 = reference(spec, F1Dim, 4.7 => 4.8)
-spec2 = reference(spec, H1, 4.7 => 4.8)
+spec2 = reference(spec, 1, -0.12 => 0.0)
+spec2 = reference(spec, F1Dim, -0.12 => 0.0)
+spec2 = reference(spec, H1, -0.12 => 0.0)
 
 # Reference without indirect referencing of other dimensions
-spec2 = reference(spec, H1, 4.7 => 4.8; indirect=false)
+spec2 = reference(spec, H1, -0.12 => 0.0; indirect=false)
 ```
 
 See also [`reference!`](@ref), [`shiftdim`](@ref), [`xi`](@ref).
@@ -157,7 +143,8 @@ function reference(spec, dim, pair::Pair{<:Number,<:Number}; indirect=true, aque
     nuc = metadata(dim_obj, :nucleus)
     nuc_str = isnothing(nuc) ? "dim $dim_no" : string(nuc)
 
-    @info "Referencing $nuc_str" old_shift=old_shift new_shift=new_shift offset=round(offset; digits=4)
+    @info "Referencing $nuc_str" old_shift = old_shift new_shift = new_shift offset = round(offset;
+                                                                                            digits=4)
 
     return _reference_with_offset(spec, dim_no, offset; indirect=indirect, aqueous=aqueous)
 end
@@ -203,7 +190,8 @@ function reference(spec, dims_refs, pairs; indirect=true, aqueous=:auto)
         nuc = metadata(dim_obj, :nucleus)
         nuc_str = isnothing(nuc) ? "dim $dim_no" : string(nuc)
 
-        @info "Referencing $nuc_str" old_shift=old_shift new_shift=new_shift offset=round(offset; digits=4)
+        @info "Referencing $nuc_str" old_shift = old_shift new_shift = new_shift offset = round(offset;
+                                                                                                digits=4)
 
         result = shiftdim(result, dim_no, offset)
     end
@@ -242,7 +230,11 @@ The effective 1H frequency is back-calculated from the referenced dimension(s), 
 are used to calculate the expected frequencies for other nuclei.
 """
 function _apply_indirect_referencing(spec, referenced_dims; aqueous=:auto)
-    is_aqueous = isaqueous(spec; aqueous=aqueous)
+    if aqueous == :auto
+        is_aqueous = isaqueous(spec)
+    else
+        is_aqueous = aqueous
+    end
     ref_compound = is_aqueous ? "DSS" : "TMS"
 
     # Find all frequency dimensions
@@ -270,7 +262,7 @@ function _apply_indirect_referencing(spec, referenced_dims; aqueous=:auto)
         return spec
     end
 
-    ref_xi = xi(ref_nuc; aqueous=is_aqueous)
+    ref_xi = xi_ratio(ref_nuc; aqueous=is_aqueous)
     if isnothing(ref_xi)
         @warn "Cannot apply indirect referencing: Xi ratio not defined for $(string(ref_nuc))"
         return spec
@@ -285,7 +277,9 @@ function _apply_indirect_referencing(spec, referenced_dims; aqueous=:auto)
     # Xi = ν(X) / ν(1H), so ν(1H) = ν(X) / Xi
     effective_h1_bf = ref_bf / ref_xi
 
-    @info "Indirect referencing using $ref_compound Xi ratios" reference_nucleus=string(ref_nuc) effective_1H_bf_MHz=round(effective_h1_bf / 1e6; digits=3)
+    @info "Indirect referencing using $ref_compound Xi ratios" reference_nucleus = string(ref_nuc) effective_1H_bf_MHz = round(effective_h1_bf /
+                                                                                                                               1e6;
+                                                                                                                               digits=3)
 
     result = spec
 
@@ -299,7 +293,7 @@ function _apply_indirect_referencing(spec, referenced_dims; aqueous=:auto)
             continue
         end
 
-        target_xi = xi(target_nuc; aqueous=is_aqueous)
+        target_xi = xi_ratio(target_nuc; aqueous=is_aqueous)
         if isnothing(target_xi)
             @warn "Skipping $(string(target_nuc)): Xi ratio not defined"
             continue
@@ -318,7 +312,12 @@ function _apply_indirect_referencing(spec, referenced_dims; aqueous=:auto)
         offset_ppm = freq_diff / current_bf * 1e6
 
         if abs(offset_ppm) > 0.0001  # Only apply if offset is significant
-            @info "  Indirect referencing $(string(target_nuc))" expected_bf_MHz=round(expected_bf / 1e6; digits=6) current_bf_MHz=round(current_bf / 1e6; digits=6) offset_ppm=round(offset_ppm; digits=4)
+            @info "  Indirect referencing $(string(target_nuc))" expected_bf_MHz = round(expected_bf /
+                                                                                         1e6;
+                                                                                         digits=6) current_bf_MHz = round(current_bf /
+                                                                                                                          1e6;
+                                                                                                                          digits=6) offset_ppm = round(offset_ppm;
+                                                                                                                                                       digits=4)
             result = shiftdim(result, dim_no, offset_ppm)
         else
             @info "  $(string(target_nuc)) already correctly referenced (offset < 0.0001 ppm)"
@@ -327,49 +326,3 @@ function _apply_indirect_referencing(spec, referenced_dims; aqueous=:auto)
 
     return result
 end
-
-# In-place versions
-# Note: Due to the immutable nature of DimensionalData dimension structures,
-# these functions return a new NMRData object. Use as: spec = reference!(spec, ...)
-
-"""
-    reference!(spec; indirect=true, aqueous=:auto, temperature=nothing)
-
-Reference a spectrum to water. Returns the referenced spectrum.
-
-Note: Due to DimensionalData's immutable dimension structures, use as:
-```julia
-spec = reference!(spec)
-```
-
-See [`reference`](@ref) for details.
-"""
-reference!(spec; kwargs...) = reference(spec; kwargs...)
-
-"""
-    reference!(spec, dim, pair::Pair; indirect=true, aqueous=:auto)
-
-Reference a spectrum dimension. Returns the referenced spectrum.
-
-Note: Due to DimensionalData's immutable dimension structures, use as:
-```julia
-spec = reference!(spec, H1, 4.7 => 4.8)
-```
-
-See [`reference`](@ref) for details.
-"""
-reference!(spec, dim, pair::Pair; kwargs...) = reference(spec, dim, pair; kwargs...)
-
-"""
-    reference!(spec, dims, pairs; indirect=true, aqueous=:auto)
-
-Reference multiple spectrum dimensions. Returns the referenced spectrum.
-
-Note: Due to DimensionalData's immutable dimension structures, use as:
-```julia
-spec = reference!(spec, [H1, N15], [4.7 => 4.8, 120.0 => 119.5])
-```
-
-See [`reference`](@ref) for details.
-"""
-reference!(spec, dims_refs, pairs; kwargs...) = reference(spec, dims_refs, pairs; kwargs...)

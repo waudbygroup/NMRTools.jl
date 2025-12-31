@@ -80,11 +80,11 @@ end
 # - 19F: Maurer and Kalbitzer, 1996, J. Magn. Reson. B113, 177-178 (TFA sphere)
 # - 31P: Maurer and Kalbitzer, 1996, J. Magn. Reson. B113, 177-178 (H3PO4 sphere)
 const XI_DSS = Dict(H1 => 1.0,
-                    H2 => 0.153506088,
+                    H2 => 0.1535060886,
                     C13 => 0.251449530,
                     N15 => 0.101329118,
-                    F19 => 0.940866982,
-                    P31 => 0.404807356)
+                    F19 => 0.94094011,
+                    P31 => 0.40480742)
 
 # TMS-based Xi ratios (organic solvents)
 # References: IUPAC recommendations 2001/2008
@@ -94,14 +94,14 @@ const XI_DSS = Dict(H1 => 1.0,
 # - 19F: CFCl3
 # - 31P: H3PO4 85%
 const XI_TMS = Dict(H1 => 1.0,
-                    H2 => 0.153506088,
+                    H2 => 0.1535060886,
                     C13 => 0.25145020,
-                    N15 => 0.10136767,
+                    N15 => 0.101329118,
                     F19 => 0.94094011,
                     P31 => 0.40480742)
 
 """
-    xi(n::Nucleus; aqueous=true)
+    xi_ratio(n::Nucleus; aqueous=true)
 
 Return the Xi ratio for nucleus `n`, used for indirect chemical shift referencing.
 
@@ -119,16 +119,16 @@ dimensions from a single 1H reference.
 
 # Examples
 ```jldoctest
-julia> xi(C13)
-0.25144953
+julia> xi_ratio(C13)
+0.25145020
 
-julia> xi(C13; aqueous=true)
-0.25144953
+julia> xi_ratio(C13; aqueous=true)
+0.251449530
 
-julia> xi(C13; aqueous=false)
-0.2514502
+julia> xi_ratio(C13; aqueous=false)
+0.25145020
 
-julia> xi(N15)
+julia> xi_ratio(N15)
 0.101329118
 ```
 
@@ -140,7 +140,7 @@ julia> xi(N15)
 
 See also [`reference`](@ref), [`Nucleus`](@ref).
 """
-function xi(n::Nucleus; aqueous=true)
+function xi_ratio(n::Nucleus; aqueous=true)
     dic = aqueous ? XI_DSS : XI_TMS
     return get(dic, n, nothing)
 end

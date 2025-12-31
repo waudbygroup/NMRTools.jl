@@ -123,7 +123,7 @@ export shiftdim
 export finddim, resolvedim
 
 # Chemical shift referencing
-export reference, reference!
+export reference
 export isaqueous, watershift
 
 # Metadata

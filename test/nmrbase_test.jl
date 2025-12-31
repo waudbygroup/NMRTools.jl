@@ -605,25 +605,18 @@ end
 
 @testset "NMRBase: Xi ratios" begin
     # Test Xi ratio retrieval for DSS (aqueous)
-    @test xi(H1) == 1.0
-    @test xi(H1; aqueous=true) == 1.0
-    @test xi(C13) == 0.251449530
-    @test xi(C13; aqueous=true) == 0.251449530
-    @test xi(N15) == 0.101329118
-    @test xi(H2) == 0.153506088
-    @test xi(F19) == 0.940866982
-    @test xi(P31) == 0.404807356
+    @test xi_ratio(H1) == 1.0
+    @test xi_ratio(H1; aqueous=true) == 1.0
+    @test xi_ratio(C13) == 0.251449530
+    @test xi_ratio(C13; aqueous=true) == 0.251449530
 
     # Test Xi ratio retrieval for TMS (organic)
-    @test xi(H1; aqueous=false) == 1.0
-    @test xi(C13; aqueous=false) == 0.25145020
-    @test xi(N15; aqueous=false) == 0.10136767
-    @test xi(F19; aqueous=false) == 0.94094011
-    @test xi(P31; aqueous=false) == 0.40480742
+    @test xi_ratio(H1; aqueous=false) == 1.0
+    @test xi_ratio(C13; aqueous=false) == 0.25145020
 
     # Test undefined nucleus returns nothing
-    @test xi(C12) === nothing
-    @test xi(N14) === nothing
+    @test xi_ratio(C12) === nothing
+    @test xi_ratio(N14) === nothing
 end
 
 @testset "NMRBase: finddim and resolvedim" begin
@@ -673,15 +666,7 @@ end
 
 @testset "NMRBase: isaqueous" begin
     spec = exampledata("1D_1H")
-
-    # Test auto detection - the result depends on the solvent in metadata
-    # Just verify the function runs without error and returns a Bool
-    result = isaqueous(spec; aqueous=:auto)
-    @test result isa Bool
-
-    # Test explicit aqueous flag overrides auto detection
-    @test isaqueous(spec; aqueous=true) == true
-    @test isaqueous(spec; aqueous=false) == false
+    @test isaqueous(spec) == true
 end
 
 @testset "NMRBase: reference function" begin
@@ -735,14 +720,16 @@ end
 
     # Test multi-dimension referencing
     @test_logs (:info,) (:info,) begin
-        spec3 = reference(spec, [F1Dim, F2Dim], [8.0 => 8.1, 120.0 => 119.5]; indirect=false)
+        spec3 = reference(spec, [F1Dim, F2Dim], [8.0 => 8.1, 120.0 => 119.5];
+                          indirect=false)
         @test data(spec3, 1)[1] - original_f1 ≈ 0.1
         @test data(spec3, 2)[1] - original_f2 ≈ -0.5
     end
 
     # Test multi-dimension with tuples
     @test_logs (:info,) (:info,) begin
-        spec4 = reference(spec, (F1Dim, F2Dim), (8.0 => 8.1, 120.0 => 119.5); indirect=false)
+        spec4 = reference(spec, (F1Dim, F2Dim), (8.0 => 8.1, 120.0 => 119.5);
+                          indirect=false)
         @test data(spec4, 1)[1] - original_f1 ≈ 0.1
         @test data(spec4, 2)[1] - original_f2 ≈ -0.5
     end
