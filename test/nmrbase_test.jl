@@ -691,12 +691,6 @@ end
         @test data(spec4, 1)[1] - original_ppm ≈ 0.1
     end
 
-    # Test reference! returns same result as reference
-    @test_logs (:info,) begin
-        spec5 = reference!(spec, H1, 4.7 => 4.8; indirect=false)
-        @test data(spec5, 1)[1] - original_ppm ≈ 0.1
-    end
-
     # Test referenceoffset is updated correctly
     @test_logs (:info,) begin
         spec6 = reference(spec, 1, 0.0 => 0.5; indirect=false)

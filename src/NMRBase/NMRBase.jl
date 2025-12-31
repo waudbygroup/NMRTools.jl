@@ -68,7 +68,7 @@ export Nucleus
 export nucleus
 export spin
 export gyromagneticratio
-export xi
+export xi_ratio
 
 # coherences
 export Coherence
