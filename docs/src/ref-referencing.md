@@ -16,13 +16,13 @@ using NMRTools
 spec = loadnmr("hsqc.ft2")
 
 # Reference the 1H dimension
-spec = reference(spec, H1, 4.7 => 4.75)
+spec = reference(spec, H1, -0.12 => 0)
 
 # Or use dimension types
-spec = reference(spec, F1Dim, 4.7 => 4.75)
+spec = reference(spec, F1Dim, -0.12 => 0)
 
 # Or use dimension indices
-spec = reference(spec, 1, 4.7 => 4.75)
+spec = reference(spec, 1, -0.12 => 0)
 ```
 
 ## Indirect Referencing
@@ -31,10 +31,10 @@ By default, when you reference one dimension, NMRTools will automatically apply 
 
 ```julia
 # Reference 1H - 15N dimension will be automatically referenced too
-spec = reference(spec, H1, 4.7 => 4.75)
+spec = reference(spec, H1, -0.12 => 0)
 
 # Disable indirect referencing if needed
-spec = reference(spec, H1, 4.7 => 4.75; indirect=false)
+spec = reference(spec, H1, -0.12 => 0; indirect=false)
 ```
 
 The Xi ratios used depend on whether the solvent is aqueous (DSS-based) or organic (TMS-based):
@@ -52,10 +52,10 @@ NMRTools automatically detects aqueous solvents from the spectrum metadata, or y
 
 ```julia
 # Force DSS (aqueous) Xi ratios
-spec = reference(spec, H1, 4.7 => 4.75; aqueous=true)
+spec = reference(spec, H1, -0.12 => 0; aqueous=true)
 
 # Force TMS (organic) Xi ratios
-spec = reference(spec, H1, 4.7 => 4.75; aqueous=false)
+spec = reference(spec, H1, -0.12 => 0; aqueous=false)
 ```
 
 ## Multi-Dimension Referencing
@@ -64,10 +64,10 @@ Reference multiple dimensions at once:
 
 ```julia
 # Reference both 1H and 15N dimensions
-spec = reference(spec, [H1, N15], [4.7 => 4.75, 120.0 => 118.5])
+spec = reference(spec, [H1, N15], [-0.12 => 0, 120.0 => 118.5])
 
 # Or using dimension types
-spec = reference(spec, [F1Dim, F2Dim], [4.7 => 4.75, 120.0 => 118.5])
+spec = reference(spec, [F1Dim, F2Dim], [-0.12 => 0, 120.0 => 118.5])
 ```
 
 ## Water Referencing
@@ -88,13 +88,3 @@ The water chemical shift is calculated using the empirical formula:
 
 where T is the temperature in Kelvin. Bruker spectrometers typically set the water reference to 4.7 ppm when locking, so the correction is applied relative to this default.
 
-## API Reference
-
-```@docs; canonical=false
-reference
-reference!
-isaqueous
-watershift
-finddim
-resolvedim
-```
