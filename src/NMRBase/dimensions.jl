@@ -59,6 +59,24 @@ use in creating objects.
 """
 abstract type GradientDimension{T} <: NonFrequencyDimension{T} end
 
+"""
+    OffsetDimension <: NonFrequencyDimension <: NMRDimension
+
+Abstract supertype for frequency offset dimensions used in NMRData objects.
+Used for CEST saturation offsets, R1rho off-resonance offsets, etc.
+Concrete type `OffsetDim` is generated for use in creating objects.
+"""
+abstract type OffsetDimension{T} <: NonFrequencyDimension{T} end
+
+"""
+    FieldDimension <: NonFrequencyDimension <: NMRDimension
+
+Abstract supertype for RF field strength dimensions used in NMRData objects.
+Used for spinlock power in R1rho dispersion experiments.
+Concrete type `SpinlockDim` is generated for use in creating objects.
+"""
+abstract type FieldDimension{T} <: NonFrequencyDimension{T} end
+
 # override DimensionalData.Dimensions macro to generate default metadata
 macro NMRdim(typ::Symbol, supertyp::Symbol, args...)
     return NMRdimmacro(typ, supertyp, args...)
@@ -131,6 +149,8 @@ end
 @NMRdim G2Dim GradientDimension
 @NMRdim G3Dim GradientDimension
 @NMRdim G4Dim GradientDimension
+@NMRdim OffsetDim OffsetDimension
+@NMRdim SpinlockDim FieldDimension
 # @NMRdim SpatialDim NMRDimension
 
 # Getters ########

@@ -1,15 +1,19 @@
 # Plan: Automatic Axis and Value Application from Pulse Program Annotations
 
+## Status: IMPLEMENTED ✓
+
+All phases complete. Run `Pkg.test()` to verify.
+
 ## Overview
 
-Extend the `annotate!` function to automatically apply semantic axes and values to NMRData dimensions based on parsed pulse program annotations. This will eliminate the need for manual calls to `setrelaxtimes()`, `setgradientlist()`, etc.
+Extend the `annotate` function to automatically apply semantic axes and values to NMRData dimensions based on parsed pulse program annotations. This eliminates the need for manual calls to `setrelaxtimes()`, `setgradientlist()`, etc.
 
 ## Current State
 
 ### What already exists:
 
 1. **Annotation parsing** (`src/NMRIO/annotation.jl`):
-   - `annotate!()` parses YAML annotations from pulse programs (`;@ ` lines)
+   - `annotate()` parses YAML annotations from pulse programs (`;@ ` lines)
    - Resolves parameter references (p1, pl1, d20 → actual values)
    - Resolves programmatic lists (linear/log spacing, counter-based)
    - Stores annotations in `spec[:annotations]`
