@@ -181,25 +181,25 @@ end
 
 **Note**: Unlike `setrelaxtimes()` which has a convenience overload that guesses the dimension, these setters require explicit dimension numbers. The annotation system provides explicit dimension ordering via the `dimensions` array, so guessing is unnecessary.
 
-### Phase 4: Extend annotate! Function
+### Phase 4: Rename annotate! to annotate
 
-Modify `annotate!` in `src/NMRIO/annotation.jl`:
+Rename and modify in `src/NMRIO/annotation.jl`:
 
 ```julia
-function annotate!(spec::NMRData)
+function annotate(spec::NMRData)
     pp = pulseprogram(spec)
     if isnothing(pp) || ismissing(pp) || length(pp) == 0
-        return nothing
+        return spec  # Return unchanged
     end
     annotations = parse_annotations(pp)
 
     # Check schema version
     schema_version = get(annotations, "schema_version", nothing)
     if isnothing(schema_version)
-        return nothing
+        return spec  # Return unchanged
     elseif schema_version != "0.0.2"
         @warn "Pulse programme uses unsupported schema version $schema_version..."
-        return nothing
+        return spec  # Return unchanged
     end
 
     # Resolve parameter references to actual values
@@ -213,13 +213,14 @@ function annotate!(spec::NMRData)
         annotations["dimensions"] = reverse(annotations["dimensions"])
     end
 
-    # Store annotations
+    # Store annotations in metadata
     spec[:annotations] = annotations
 
     # Apply dimension transformations based on annotations
-    _apply_dimension_annotations!(spec, annotations)
+    # Returns new spec with updated dimensions
+    spec = _apply_dimension_annotations(spec, annotations)
 
-    return annotations
+    return spec
 end
 ```
 
@@ -235,58 +236,63 @@ Add to `src/NMRIO/annotation.jl`:
 
 ```julia
 """
-    _apply_dimension_annotations!(spec::NMRData, ann::Dict)
+    _apply_dimension_annotations(spec::NMRData, ann::Dict) -> NMRData
 
 Apply semantic dimension types based on the dimensions array in annotations.
 The dimensions array provides explicit ordering - index i in the array
-corresponds to dimension i in the data.
+corresponds to dimension i in the data. Returns new NMRData with updated dimensions.
 """
-function _apply_dimension_annotations!(spec::NMRData, ann::Dict)
+function _apply_dimension_annotations(spec::NMRData, ann::Dict)
     dimensions = get(ann, "dimensions", nothing)
-    isnothing(dimensions) && return
+    isnothing(dimensions) && return spec
 
     # dimensions[i] specifies what dimension i represents
     for (dim_index, dim_spec) in enumerate(dimensions)
-        _apply_single_dimension!(spec, dim_index, dim_spec, ann)
+        spec = _apply_single_dimension(spec, dim_index, dim_spec, ann)
     end
+
+    return spec
 end
 
-function _apply_single_dimension!(spec, dim_index, dim_spec::String, ann)
+function _apply_single_dimension(spec, dim_index, dim_spec::String, ann)
     parts = split(dim_spec, ".")
 
     # Skip simple dimensions like "f1", "f2" - already correct
-    length(parts) == 1 && return
+    length(parts) == 1 && return spec
 
     block_name = parts[1]  # e.g., "relaxation", "diffusion", "cest", "r1rho"
     param_name = parts[2]  # e.g., "duration", "offset", "g", "power"
 
     # Get the parameter block from annotations
     block = get(ann, block_name, nothing)
-    isnothing(block) && return
+    isnothing(block) && return spec
 
     # Get the actual values (already resolved)
     values = get(block, param_name, nothing)
-    isnothing(values) && return
+    isnothing(values) && return spec
 
     # Dispatch to specific handler based on block and parameter
     if param_name == "duration"
-        _apply_duration!(spec, dim_index, values, block_name)
+        return _apply_duration(spec, dim_index, values, block_name)
     elseif param_name == "g"
-        _apply_gradient!(spec, dim_index, values, block)
+        return _apply_gradient(spec, dim_index, values, block)
     elseif param_name == "offset"
-        _apply_offset!(spec, dim_index, values, block)
+        return _apply_offset(spec, dim_index, values, block)
     elseif param_name == "power"
-        _apply_power!(spec, dim_index, values, block)
+        return _apply_power(spec, dim_index, values, block)
     end
+
+    return spec
 end
 ```
 
 ### Phase 6: Specific Dimension Handlers
 
+All handlers return a new NMRData with the dimension replaced:
+
 ```julia
-function _apply_duration!(spec, dim_index, values, block_name)
+function _apply_duration(spec, dim_index, values, block_name)
     # All duration arrays use TrelaxDim
-    # Set appropriate label based on experiment type
     label = if block_name == "relaxation"
         "Relaxation delay"
     elseif block_name == "r1rho"
@@ -298,42 +304,38 @@ function _apply_duration!(spec, dim_index, values, block_name)
     end
 
     newdim = TrelaxDim(values)
-    newspec = replacedimension(spec, dim_index, newdim)
-    label!(newspec, newdim, label)
-    newspec[newdim, :units] = "s"
-    newspec[newdim, :delay_type] = Symbol(block_name)
-
-    # Copy back to original spec (in-place modification)
-    _update_dimension!(spec, dim_index, dims(newspec, dim_index))
+    spec = replacedimension(spec, dim_index, newdim)
+    label!(spec, newdim, label)
+    spec[newdim, :units] = "s"
+    spec[newdim, :delay_type] = Symbol(block_name)
+    return spec
 end
 
-function _apply_gradient!(spec, dim_index, values, block)
+function _apply_gradient(spec, dim_index, values, block)
     gmax = get(block, "gmax", nothing)
-    # Use existing setgradientlist logic
     if isnothing(gmax)
         @warn "No gmax specified for diffusion gradient axis"
         gmax = 0.55  # Default assumption
     end
     gvals = gmax * values
 
-    if dim_index == 1
-        newdim = G1Dim(gvals)
+    newdim = if dim_index == 1
+        G1Dim(gvals)
     elseif dim_index == 2
-        newdim = G2Dim(gvals)
+        G2Dim(gvals)
     else
-        newdim = G3Dim(gvals)
+        G3Dim(gvals)
     end
 
-    newspec = replacedimension(spec, dim_index, newdim)
-    label!(newspec, newdim, "Gradient strength")
-    newspec[newdim, :units] = "T m⁻¹"
-
-    _update_dimension!(spec, dim_index, dims(newspec, dim_index))
+    spec = replacedimension(spec, dim_index, newdim)
+    label!(spec, newdim, "Gradient strength")
+    spec[newdim, :units] = "T m⁻¹"
+    return spec
 end
 
-function _apply_offset!(spec, dim_index, values, block)
+function _apply_offset(spec, dim_index, values, block)
     channel = get(block, "channel", nothing)
-    isnothing(channel) && return
+    isnothing(channel) && return spec
 
     # Convert FQList to ppm if needed
     if values isa FQList
@@ -349,23 +351,22 @@ function _apply_offset!(spec, dim_index, values, block)
     end
 
     newdim = OffsetDim(offset_values)
-    newspec = replacedimension(spec, dim_index, newdim)
-    label!(newspec, newdim, "Saturation offset")
-    newspec[newdim, :units] = "ppm"
-    newspec[newdim, :nucleus] = channel
-
-    _update_dimension!(spec, dim_index, dims(newspec, dim_index))
+    spec = replacedimension(spec, dim_index, newdim)
+    label!(spec, newdim, "Saturation offset")
+    spec[newdim, :units] = "ppm"
+    spec[newdim, :nucleus] = channel
+    return spec
 end
 
-function _apply_power!(spec, dim_index, values, block)
+function _apply_power(spec, dim_index, values, block)
     channel = get(block, "channel", nothing)
-    isnothing(channel) && return
+    isnothing(channel) && return spec
 
     # Convert Power values to Hz using reference pulse
     ref_pulse = referencepulse(spec, channel)
     if isnothing(ref_pulse)
         @warn "No reference pulse found for channel $channel, cannot convert power to Hz"
-        return
+        return spec
     end
     ref_duration, ref_power = ref_pulse
 
@@ -377,21 +378,10 @@ function _apply_power!(spec, dim_index, values, block)
     end
 
     newdim = SpinlockDim(field_hz)
-    newspec = replacedimension(spec, dim_index, newdim)
-    label!(newspec, newdim, "Spinlock field")
-    newspec[newdim, :units] = "Hz"
-
-    _update_dimension!(spec, dim_index, dims(newspec, dim_index))
-end
-
-"""
-Update a dimension in-place by modifying the spec's dims tuple.
-"""
-function _update_dimension!(spec, dim_index, newdim)
-    # Replace dimension in the dims tuple
-    current_dims = collect(dims(spec))
-    current_dims[dim_index] = newdim
-    # Note: This requires rebuilding the NMRData - see implementation details
+    spec = replacedimension(spec, dim_index, newdim)
+    label!(spec, newdim, "Spinlock field")
+    spec[newdim, :units] = "Hz"
+    return spec
 end
 
 function _find_frequency_dim_for_channel(spec, channel::String)
@@ -422,7 +412,10 @@ end
 
 1. **Explicit dimension indices**: The `dimensions` array in annotations provides explicit ordering. After reversal, `dimensions[i]` maps directly to data dimension `i`. No guessing required.
 
-2. **Integrate into annotate!**: Extend existing `annotate!` to apply dimensions, keeping the API simple.
+2. **Consistent return-value API**: All functions that transform NMRData return a new object (no `!` suffix). This applies to:
+   - `annotate!` → `annotate`
+   - `estimatenoise!` → `estimatenoise`
+   - `addsampleinfo!` → `addsampleinfo`
 
 3. **Leverage existing functions**:
    - `hz(Power, ref_Power, ref_pulselength, 90.0)` for spinlock power → Hz
@@ -436,7 +429,7 @@ end
 ## Implementation Order
 
 1. **Enrich TrelaxDim metadata** in `metadata.jl`:
-   - Add `:delay_type` and `:nucleus` fields
+   - Add `:delay_type` field
 
 2. **New dimension types** in `dimensions.jl`:
    - `OffsetDimension` and `OffsetDim`
@@ -447,17 +440,27 @@ end
    - `setoffsets(spec, dim, values)` - explicit dimension required
    - `setspinlockfield(spec, dim, values)` - explicit dimension required
 
-4. **Dimension application logic** in `annotation.jl`:
-   - `_apply_dimension_annotations!()` - iterates over explicit `dimensions` array
-   - `_apply_duration!()` - uses existing `TrelaxDim`
-   - `_apply_gradient!()` - uses existing `GxDim`
-   - `_apply_offset!()` - uses new `OffsetDim`
-   - `_apply_power!()` - uses new `SpinlockDim`
+4. **Rename functions to return new objects** (no `!`):
+   - `annotate!` → `annotate` in `annotation.jl`
+   - `estimatenoise!` → `estimatenoise` in `noise.jl` (or wherever it lives)
+   - `addsampleinfo!` → `addsampleinfo` in `samples.jl`
+
+5. **Dimension application logic** in `annotation.jl`:
+   - `_apply_dimension_annotations()` - iterates over explicit `dimensions` array
+   - `_apply_duration()` - uses existing `TrelaxDim`
+   - `_apply_gradient()` - uses existing `GxDim`
+   - `_apply_offset()` - uses new `OffsetDim`
+   - `_apply_power()` - uses new `SpinlockDim`
    - Helper: `_find_frequency_dim_for_channel()`
 
-5. **Extend annotate!** to call `_apply_dimension_annotations!()`
+6. **Update loadnmr.jl** to use new function names:
+   ```julia
+   spectrum = estimatenoise(spectrum)
+   spectrum = annotate(spectrum)
+   spectrum = addsampleinfo(spectrum)
+   ```
 
-6. **Exports** in `NMRBase.jl`
+7. **Update exports** in `NMRBase.jl` and `NMRIO.jl`
 
 ## Summary of New Types
 
