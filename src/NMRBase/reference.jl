@@ -66,7 +66,7 @@ to the Bruker default of 4.7 ppm.
 
 Only works for aqueous solvents (D2O, H2O, H2O+D2O).
 
-See also [`reference(spec, dim, pair)`](@ref), [`xi`](@ref).
+See also [`reference(spec, dim, pair)`](@ref), [`xi_ratio`](@ref).
 """
 function reference(spec; indirect=true, temperature=nothing)
     # Check if aqueous
@@ -130,7 +130,7 @@ spec2 = reference(spec, H1, -0.12 => 0.0)
 spec2 = reference(spec, H1, -0.12 => 0.0; indirect=false)
 ```
 
-See also [`reference!`](@ref), [`shiftdim`](@ref), [`xi`](@ref).
+See also [`shiftdim`](@ref), [`xi_ratio`](@ref).
 """
 function reference(spec, dim, pair::Pair{<:Number,<:Number}; indirect=true, aqueous=:auto)
     old_shift, new_shift = pair
@@ -168,7 +168,7 @@ spec2 = reference(spec, [F1Dim, F2Dim], [4.7 => 4.8, 120.0 => 119.5])
 spec2 = reference(spec, (H1, N15), (4.7 => 4.8, 120.0 => 119.5))
 ```
 
-See also [`reference`](@ref), [`xi`](@ref).
+See also [`xi_ratio`](@ref).
 """
 function reference(spec, dims_refs, pairs; indirect=true, aqueous=:auto)
     if length(dims_refs) != length(pairs)
