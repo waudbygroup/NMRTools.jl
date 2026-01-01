@@ -151,9 +151,10 @@ Add to `src/NMRBase/nmrdata.jl`:
 
 ```julia
 """
-    setoffsets(A::NMRData, [dimnumber], offsets, units="ppm")
+    setoffsets(A::NMRData, dimnumber, offsets, units="ppm")
 
 Return a new NMRData with an offset axis (for CEST, R1rho off-resonance, etc.).
+Dimension number must be specified explicitly.
 """
 function setoffsets(A::NMRData, dimnumber::Integer, offsets::AbstractVector, units="ppm")
     newdim = OffsetDim(offsets)
@@ -163,21 +164,11 @@ function setoffsets(A::NMRData, dimnumber::Integer, offsets::AbstractVector, uni
     return newA
 end
 
-function setoffsets(A::NMRData, offsets::AbstractVector, units="ppm")
-    # Find unique non-frequency dimension (same pattern as setrelaxtimes)
-    hasnonfrequencydimension(A) ||
-        throw(NMRToolsError("cannot set offset values: no non-frequency dimension"))
-    nonfreqdims = isa.(dims(A), NonFrequencyDimension)
-    sum(nonfreqdims) == 1 ||
-        throw(NMRToolsError("multiple non-frequency dimensions - specify dimension number"))
-    olddimnumber = findfirst(nonfreqdims)
-    return setoffsets(A, olddimnumber, offsets, units)
-end
-
 """
-    setspinlockfield(A::NMRData, [dimnumber], fields, units="Hz")
+    setspinlockfield(A::NMRData, dimnumber, fields, units="Hz")
 
 Return a new NMRData with a spinlock field strength axis.
+Dimension number must be specified explicitly.
 """
 function setspinlockfield(A::NMRData, dimnumber::Integer, fields::AbstractVector, units="Hz")
     newdim = SpinlockDim(fields)
@@ -186,17 +177,9 @@ function setspinlockfield(A::NMRData, dimnumber::Integer, fields::AbstractVector
     newA[newdim, :units] = units
     return newA
 end
-
-function setspinlockfield(A::NMRData, fields::AbstractVector, units="Hz")
-    hasnonfrequencydimension(A) ||
-        throw(NMRToolsError("cannot set spinlock field: no non-frequency dimension"))
-    nonfreqdims = isa.(dims(A), NonFrequencyDimension)
-    sum(nonfreqdims) == 1 ||
-        throw(NMRToolsError("multiple non-frequency dimensions - specify dimension number"))
-    olddimnumber = findfirst(nonfreqdims)
-    return setspinlockfield(A, olddimnumber, fields, units)
-end
 ```
+
+**Note**: Unlike `setrelaxtimes()` which has a convenience overload that guesses the dimension, these setters require explicit dimension numbers. The annotation system provides explicit dimension ordering via the `dimensions` array, so guessing is unnecessary.
 
 ### Phase 4: Extend annotate! Function
 
@@ -242,6 +225,12 @@ end
 
 ### Phase 5: Dimension Application Logic
 
+The `dimensions` array in annotations provides **explicit ordering**:
+```yaml
+;@ dimensions: [r1rho.duration, r1rho.power, f1]
+```
+After reversal (to match Julia's column-major order), this becomes `[f1, r1rho.power, r1rho.duration]` mapping directly to dimension indices 1, 2, 3. No guessing required.
+
 Add to `src/NMRIO/annotation.jl`:
 
 ```julia
@@ -249,14 +238,16 @@ Add to `src/NMRIO/annotation.jl`:
     _apply_dimension_annotations!(spec::NMRData, ann::Dict)
 
 Apply semantic dimension types based on the dimensions array in annotations.
-Modifies the spectrum in-place by replacing dimensions.
+The dimensions array provides explicit ordering - index i in the array
+corresponds to dimension i in the data.
 """
 function _apply_dimension_annotations!(spec::NMRData, ann::Dict)
     dimensions = get(ann, "dimensions", nothing)
     isnothing(dimensions) && return
 
-    for (i, dim_spec) in enumerate(dimensions)
-        _apply_single_dimension!(spec, i, dim_spec, ann)
+    # dimensions[i] specifies what dimension i represents
+    for (dim_index, dim_spec) in enumerate(dimensions)
+        _apply_single_dimension!(spec, dim_index, dim_spec, ann)
     end
 end
 
@@ -427,6 +418,21 @@ function _find_frequency_dim_for_channel(spec, channel::String)
 end
 ```
 
+## Key Design Decisions
+
+1. **Explicit dimension indices**: The `dimensions` array in annotations provides explicit ordering. After reversal, `dimensions[i]` maps directly to data dimension `i`. No guessing required.
+
+2. **Integrate into annotate!**: Extend existing `annotate!` to apply dimensions, keeping the API simple.
+
+3. **Leverage existing functions**:
+   - `hz(Power, ref_Power, ref_pulselength, 90.0)` for spinlock power → Hz
+   - `ppm(FQList, FrequencyDimension)` for offset → ppm
+   - `referencepulse(spec, nucleus)` for reference pulse parameters
+
+4. **Minimal new types**: Only `OffsetDim` and `SpinlockDim` - reuse `TrelaxDim` for all delay types.
+
+5. **Graceful degradation**: If annotations incomplete, dimensions unchanged.
+
 ## Implementation Order
 
 1. **Enrich TrelaxDim metadata** in `metadata.jl`:
@@ -438,11 +444,11 @@ end
    - Default metadata for each
 
 3. **New setter functions** in `nmrdata.jl`:
-   - `setoffsets()` for offset dimensions
-   - `setspinlockfield()` for field strength dimensions
+   - `setoffsets(spec, dim, values)` - explicit dimension required
+   - `setspinlockfield(spec, dim, values)` - explicit dimension required
 
 4. **Dimension application logic** in `annotation.jl`:
-   - `_apply_dimension_annotations!()` main entry point
+   - `_apply_dimension_annotations!()` - iterates over explicit `dimensions` array
    - `_apply_duration!()` - uses existing `TrelaxDim`
    - `_apply_gradient!()` - uses existing `GxDim`
    - `_apply_offset!()` - uses new `OffsetDim`
