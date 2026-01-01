@@ -585,7 +585,8 @@ end
 Find the frequency dimension index that corresponds to the given channel.
 Channel can be "f1", "f2", etc. or a nucleus string like "1H", "19F".
 """
-function _find_frequency_dim_for_channel(spec, channel::String)
+function _find_frequency_dim_for_channel(spec, channel::AbstractString)
+    channel = String(channel)  # Convert SubString to String
     # If channel is "f1", "f2", look up the nucleus
     m = match(r"^f(\d+)$", channel)
     if !isnothing(m)
