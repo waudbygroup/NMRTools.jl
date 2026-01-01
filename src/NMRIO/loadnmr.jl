@@ -71,13 +71,13 @@ function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
     merge!(metadata(spectrum), aqdic)
 
     # 5. estimate the spectrum noise level
-    estimatenoise(spectrum)
+    spectrum = estimatenoise(spectrum)
 
     # 6. parse and resolve pulse programme annotations
-    annotate(spectrum)
+    spectrum = annotate(spectrum)
 
     # 7. add sample information if available
-    addsampleinfo(spectrum)
+    spectrum = addsampleinfo(spectrum)
 
     return spectrum
 end
