@@ -6,91 +6,186 @@ Extend the `annotate!` function to automatically apply semantic axes and values 
 
 ## Current State
 
-### What exists:
+### What already exists:
+
 1. **Annotation parsing** (`src/NMRIO/annotation.jl`):
-   - Parses YAML annotations from pulse programs (`;@ ` lines)
+   - `annotate!()` parses YAML annotations from pulse programs (`;@ ` lines)
    - Resolves parameter references (p1, pl1, d20 → actual values)
    - Resolves programmatic lists (linear/log spacing, counter-based)
    - Stores annotations in `spec[:annotations]`
 
-2. **Dimension types** (`src/NMRBase/dimensions.jl`):
+2. **Power handling** (`src/NMRBase/power.jl`):
+   - `Power` type with dB/Watts conversion
+   - **`hz(p::Power, ref_p::Power, ref_pulselength, ref_pulseangle_deg)`** - converts power to RF field strength in Hz using reference pulse
+
+3. **Reference pulse access** (`src/NMRBase/metadata.jl:325-343`):
+   - **`referencepulse(spec, nucleus)`** - returns `(pulse_length, power)` tuple from annotations
+
+4. **FQList handling** (`src/NMRIO/lists.jl`):
+   - `FQList` type for frequency lists with unit/relativity tracking
+   - **`ppm(f::FQList, ax::FrequencyDimension)`** - converts to absolute ppm
+   - **`hz(f::FQList, ax::FrequencyDimension)`** - converts to offset Hz
+
+5. **Dimension types** (`src/NMRBase/dimensions.jl`):
    - `FrequencyDimension`: F1Dim-F4Dim
    - `TimeDimension`: T1Dim-T4Dim, **TrelaxDim**, **TkinDim**
    - `GradientDimension`: G1Dim-G4Dim
    - `UnknownDimension`: X1Dim-X4Dim
 
-3. **Dimension setters** (`src/NMRBase/nmrdata.jl`):
+6. **Dimension setters** (`src/NMRBase/nmrdata.jl`):
    - `setrelaxtimes(spec, [dim], values, units)` → TrelaxDim
    - `setkinetictimes(spec, [dim], values, units)` → TkinDim
    - `setgradientlist(spec, [dim], values, Gmax)` → GxDim
-
-4. **Annotation schema** (`ANNOTATIONS.md`):
-   - `dimensions`: array specifying what each dimension represents
-   - `relaxation`: {model, channel, duration}
-   - `diffusion`: {type, coherence, big_delta, little_delta, g, gmax, shape}
-   - `r1rho`: {channel, power, duration, offset}
-   - `cest`: {channel, power, duration, offset}
-   - `calibration.nutation`: {channel, power, duration, model, offset}
 
 ### Example annotation in pulse program:
 ```yaml
 ;@ experiment_type: [r1rho, 1d]
 ;@ dimensions: [r1rho.duration, r1rho.power, f1]
+;@ reference_pulse:
+;@ - {channel: f1, duration: p1, power: pl1}
 ;@ r1rho: {channel: f1, power: powerlist, duration: taulist, offset: 0}
 ```
 
 ## Proposed Changes
 
-### Phase 1: Core Infrastructure
+### Phase 1: New Dimension Types
 
-#### 1.1 New function: `applyannotations!`
+Add to `src/NMRBase/dimensions.jl`:
 
-Create a new function in `annotation.jl` that applies semantic meaning from annotations to NMRData dimensions:
+```julia
+# Offset dimensions (for CEST, R1rho off-resonance)
+abstract type OffsetDimension{T} <: NonFrequencyDimension{T} end
+@NMRdim OffsetDim OffsetDimension "Offset"
+
+# Power/field strength dimension (for R1rho dispersion, nutation)
+abstract type FieldDimension{T} <: NonFrequencyDimension{T} end
+@NMRdim SpinlockDim FieldDimension "Spinlock field"
+@NMRdim NutationDim FieldDimension "Nutation field"
+```
+
+Add default metadata for these:
+
+```julia
+function defaultmetadata(::Type{<:OffsetDimension})
+    defaults = Dict{Symbol,Any}(:label => "Offset",
+                                :units => "ppm",
+                                :nucleus => nothing)
+    return Metadata{OffsetDimension}(defaults)
+end
+
+function defaultmetadata(::Type{<:FieldDimension})
+    defaults = Dict{Symbol,Any}(:label => "Field strength",
+                                :units => "Hz")
+    return Metadata{FieldDimension}(defaults)
+end
+```
+
+### Phase 2: New Dimension Setters
+
+Add to `src/NMRBase/nmrdata.jl`:
 
 ```julia
 """
-    applyannotations!(spec::NMRData)
+    setoffsets(A::NMRData, [dimnumber], offsets, units="ppm")
 
-Apply semantic axis types and values from annotations to NMRData dimensions.
-Automatically converts UnknownDimension axes to appropriate types based on
-the experiment_type and dimension declarations.
-
-Called automatically by loadnmr() after annotate!().
+Return a new NMRData with an offset axis (for CEST, R1rho, etc.).
 """
-function applyannotations!(spec::NMRData)
-    hasannotations(spec) || return spec
+function setoffsets(A::NMRData, dimnumber::Integer, offsets::AbstractVector, units="ppm")
+    newdim = OffsetDim(offsets)
+    newA = replacedimension(A, dimnumber, newdim)
+    label!(newA, newdim, "Offset")
+    newA[newdim, :units] = units
+    return newA
+end
 
-    ann = annotations(spec)
+# Single non-frequency dimension version
+function setoffsets(A::NMRData, offsets::AbstractVector, units="ppm")
+    # ... similar to setrelaxtimes pattern ...
+end
+
+"""
+    setspinlockfield(A::NMRData, [dimnumber], fields, units="Hz")
+
+Return a new NMRData with a spinlock field strength axis.
+"""
+function setspinlockfield(A::NMRData, dimnumber::Integer, fields::AbstractVector, units="Hz")
+    newdim = SpinlockDim(fields)
+    newA = replacedimension(A, dimnumber, newdim)
+    label!(newA, newdim, "Spinlock field")
+    newA[newdim, :units] = units
+    return newA
+end
+```
+
+### Phase 3: Extend annotate! Function
+
+Modify `annotate!` in `src/NMRIO/annotation.jl` to apply dimensions after resolving annotations:
+
+```julia
+function annotate!(spec::NMRData)
+    pp = pulseprogram(spec)
+    if isnothing(pp) || ismissing(pp) || length(pp) == 0
+        return nothing
+    end
+    annotations = parse_annotations(pp)
+
+    # Check schema version
+    schema_version = get(annotations, "schema_version", nothing)
+    if isnothing(schema_version)
+        return nothing
+    elseif schema_version != "0.0.2"
+        @warn "Pulse programme uses unsupported schema version $schema_version..."
+        return nothing
+    end
+
+    # Resolve parameter references to actual values
+    resolve_parameter_references!(annotations, spec)
+
+    # Resolve programmatic list patterns
+    resolve_programmatic_lists!(annotations, spec)
+
+    # Reverse dimensions to match data order
+    if haskey(annotations, "dimensions")
+        annotations["dimensions"] = reverse(annotations["dimensions"])
+    end
+
+    # Store annotations
+    spec[:annotations] = annotations
+
+    # NEW: Apply dimension transformations based on annotations
+    spec = _apply_dimension_annotations!(spec, annotations)
+
+    return annotations
+end
+```
+
+### Phase 4: Dimension Application Logic
+
+Add to `src/NMRIO/annotation.jl`:
+
+```julia
+"""
+    _apply_dimension_annotations!(spec::NMRData, ann::Dict)
+
+Apply semantic dimension types based on the dimensions array in annotations.
+Modifies dimensions in-place where appropriate.
+"""
+function _apply_dimension_annotations!(spec::NMRData, ann::Dict)
     dimensions = get(ann, "dimensions", nothing)
     isnothing(dimensions) && return spec
 
-    # Apply dimension-specific transformations
     for (i, dim_spec) in enumerate(dimensions)
-        spec = _apply_dimension_annotation!(spec, i, dim_spec, ann)
+        spec = _apply_single_dimension!(spec, i, dim_spec, ann)
     end
 
     return spec
 end
-```
 
-#### 1.2 Dimension mapping logic
-
-```julia
-function _apply_dimension_annotation!(spec, dim_index, dim_spec, ann)
-    # Parse dimension specification (e.g., "relaxation.duration", "cest.offset", "f1")
-    # dim_spec can be:
-    #   - "f1", "f2", etc. (frequency dimension - already correct)
-    #   - "relaxation.duration" (relaxation time axis)
-    #   - "diffusion.g" (gradient strength axis)
-    #   - "cest.offset" (saturation offset axis)
-    #   - "r1rho.duration", "r1rho.power" (R1rho parameters)
-
+function _apply_single_dimension!(spec, dim_index, dim_spec::String, ann)
     parts = split(dim_spec, ".")
 
-    if length(parts) == 1
-        # Simple dimension like "f1" - skip
-        return spec
-    end
+    # Skip simple dimensions like "f1", "f2" - already correct
+    length(parts) == 1 && return spec
 
     block_name = parts[1]  # e.g., "relaxation", "diffusion", "cest", "r1rho"
     param_name = parts[2]  # e.g., "duration", "offset", "g", "power"
@@ -99,256 +194,178 @@ function _apply_dimension_annotation!(spec, dim_index, dim_spec, ann)
     block = get(ann, block_name, nothing)
     isnothing(block) && return spec
 
-    # Get the actual values
+    # Get the actual values (already resolved)
     values = get(block, param_name, nothing)
     isnothing(values) && return spec
 
-    # Apply based on block type and parameter
-    return _convert_dimension!(spec, dim_index, block_name, param_name, values, ann)
+    # Dispatch to specific handler
+    if block_name == "relaxation" && param_name == "duration"
+        return _apply_relaxation_duration!(spec, dim_index, values)
+
+    elseif block_name == "diffusion" && param_name == "g"
+        return _apply_diffusion_gradient!(spec, dim_index, values, block)
+
+    elseif block_name in ("cest", "r1rho") && param_name == "offset"
+        return _apply_offset!(spec, dim_index, values, block, ann)
+
+    elseif block_name in ("cest", "r1rho") && param_name == "power"
+        return _apply_spinlock_power!(spec, dim_index, values, block, ann)
+
+    elseif block_name == "r1rho" && param_name == "duration"
+        return _apply_relaxation_duration!(spec, dim_index, values)
+
+    elseif block_name == "calibration" && param_name == "duration"
+        return _apply_nutation_duration!(spec, dim_index, values, block)
+    end
+
+    return spec
 end
 ```
 
-### Phase 2: Experiment-Specific Handlers
-
-#### 2.1 Relaxation experiments (R1, R2, etc.)
+### Phase 5: Specific Dimension Handlers
 
 ```julia
-function _convert_relaxation_dimension!(spec, dim_index, values)
-    # values should be an array of relaxation delays (in seconds)
-    # Convert to TrelaxDim
+function _apply_relaxation_duration!(spec, dim_index, values)
+    # values is array of delay times in seconds
+    return setrelaxtimes(spec, dim_index, values, "s")
+end
+
+function _apply_diffusion_gradient!(spec, dim_index, values, block)
+    # values is array of relative gradient strengths (0-1)
+    gmax = get(block, "gmax", nothing)
+    return setgradientlist(spec, dim_index, values, gmax)
+end
+
+function _apply_offset!(spec, dim_index, values, block, ann)
+    channel = get(block, "channel", nothing)
+    isnothing(channel) && return spec
+
+    # Find the frequency dimension for this channel
+    freq_dim_index = _find_frequency_dim_for_channel(spec, channel, ann)
+    isnothing(freq_dim_index) && return spec
+
+    # Convert FQList to ppm if needed
+    if values isa FQList
+        freq_dim = dims(spec, freq_dim_index)
+        offset_ppm = ppm(values, freq_dim)
+    else
+        offset_ppm = values
+    end
+
+    return setoffsets(spec, dim_index, offset_ppm, "ppm")
+end
+
+function _apply_spinlock_power!(spec, dim_index, values, block, ann)
+    channel = get(block, "channel", nothing)
+    isnothing(channel) && return spec
+
+    # Get reference pulse for this channel to convert Power → Hz
+    ref_pulse = referencepulse(spec, channel)
+    isnothing(ref_pulse) && return spec
+    ref_duration, ref_power = ref_pulse
+
+    # Convert Power values to Hz using existing hz() function
+    if values isa AbstractVector && eltype(values) <: Power
+        # Use hz(p::Power, ref_p::Power, ref_pulselength, ref_pulseangle_deg)
+        # Reference pulse is 90° by convention
+        field_hz = [hz(p, ref_power, ref_duration, 90.0) for p in values]
+    elseif values isa AbstractVector
+        # Already numeric (Hz assumed)
+        field_hz = values
+    else
+        return spec
+    end
+
+    return setspinlockfield(spec, dim_index, field_hz, "Hz")
+end
+
+function _apply_nutation_duration!(spec, dim_index, values, block)
+    # Nutation calibration: array of pulse durations
+    # Just use TrelaxDim for now, could make a dedicated type
     return setrelaxtimes(spec, dim_index, values, "s")
 end
 ```
 
-#### 2.2 Diffusion experiments (DOSY, STE)
+### Phase 6: Helper Function for Channel Resolution
 
 ```julia
-function _convert_diffusion_dimension!(spec, dim_index, param, values, ann)
-    if param == "g"
-        # Gradient strength array
-        gmax = get(ann["diffusion"], "gmax", nothing)
-        return setgradientlist(spec, dim_index, values, gmax)
-    end
-    # Other diffusion parameters could be handled here
-    return spec
-end
-```
+"""
+    _find_frequency_dim_for_channel(spec, channel, ann)
 
-#### 2.3 CEST experiments
-
-Need a new dimension type for saturation offsets:
-
-```julia
-# In dimensions.jl - new dimension type
-abstract type OffsetDimension{T} <: NonFrequencyDimension{T} end
-@NMRdim CestOffsetDim OffsetDimension
-@NMRdim R1rhoOffsetDim OffsetDimension
-```
-
-```julia
-function _convert_cest_dimension!(spec, dim_index, param, values, ann)
-    if param == "offset"
-        # Convert FQList to ppm values relative to a frequency axis
-        # Need to find the correct frequency axis based on channel
-        channel = get(ann["cest"], "channel", "f1")
-        freq_dim = _resolve_channel_to_dim(spec, channel)
-
-        if values isa FQList
-            offset_ppm = ppm(values, dims(spec, freq_dim))
-        else
-            offset_ppm = values
+Find the frequency dimension index corresponding to a channel specification.
+Channel can be "f1", "19F", "1H", etc.
+"""
+function _find_frequency_dim_for_channel(spec, channel::String, ann)
+    # If channel is "f1", "f2", etc., look up the nucleus
+    m = match(r"^f(\d+)$", channel)
+    if !isnothing(m)
+        nuc_index = parse(Int, m.captures[1])
+        nuc_str = acqus(spec, Symbol("nuc$nuc_index"))
+        if !isnothing(nuc_str) && !ismissing(nuc_str)
+            channel = nuc_str  # e.g., "19F"
         end
-
-        return setcestoffsets(spec, dim_index, offset_ppm)
     end
-    return spec
-end
-```
 
-#### 2.4 R1rho experiments
-
-```julia
-function _convert_r1rho_dimension!(spec, dim_index, param, values, ann)
-    if param == "duration"
-        return setrelaxtimes(spec, dim_index, values, "s")
-    elseif param == "power"
-        # New dimension type for spinlock power
-        return setspinlockpower(spec, dim_index, values)
-    elseif param == "offset"
-        # Similar to CEST offset handling
-        return setr1rhooffsets(spec, dim_index, values)
-    end
-    return spec
-end
-```
-
-### Phase 3: New Dimension Types and Setters
-
-#### 3.1 New dimension types (in `dimensions.jl`)
-
-```julia
-# Offset dimensions (for CEST, R1rho off-resonance)
-abstract type OffsetDimension{T} <: NonFrequencyDimension{T} end
-@NMRdim CestOffsetDim OffsetDimension "CEST offset"
-@NMRdim R1rhoOffsetDim OffsetDimension "R1rho offset"
-
-# Power dimension (for R1rho dispersion)
-abstract type PowerDimension{T} <: NonFrequencyDimension{T} end
-@NMRdim SpinlockPowerDim PowerDimension "Spinlock power"
-```
-
-#### 3.2 New setter functions (in `nmrdata.jl`)
-
-```julia
-"""
-    setcestoffsets(A::NMRData, [dimnumber], offsets, units="ppm")
-
-Return a new NMRData with a CEST offset axis containing the passed values.
-"""
-function setcestoffsets(A::NMRData, dimnumber::Integer, offsets::AbstractVector, units="ppm")
-    newdim = CestOffsetDim(offsets)
-    newA = replacedimension(A, dimnumber, newdim)
-    label!(newA, newdim, "CEST offset")
-    newA[newdim, :units] = units
-    return newA
-end
-
-"""
-    setspinlockpower(A::NMRData, [dimnumber], powers, units="Hz")
-
-Return a new NMRData with a spinlock power axis.
-"""
-function setspinlockpower(A::NMRData, dimnumber::Integer, powers::AbstractVector, units="Hz")
-    newdim = SpinlockPowerDim(powers)
-    newA = replacedimension(A, dimnumber, newdim)
-    label!(newA, newdim, "Spinlock power")
-    newA[newdim, :units] = units
-    return newA
-end
-```
-
-### Phase 4: Integration with loadnmr
-
-Update `loadnmr()` in `src/NMRIO/loadnmr.jl`:
-
-```julia
-function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
-    # ... existing code ...
-
-    # 6. parse and resolve pulse programme annotations
-    annotate!(spectrum)
-
-    # 7. NEW: apply annotations to convert dimensions
-    applyannotations!(spectrum)
-
-    # 8. add sample information if available
-    addsampleinfo!(spectrum)
-
-    return spectrum
-end
-```
-
-### Phase 5: Helper Functions
-
-#### 5.1 Channel-to-dimension resolution
-
-```julia
-"""
-    _resolve_channel_to_dim(spec, channel)
-
-Resolve a channel specification (e.g., "f1", "f2") to a dimension index.
-"""
-function _resolve_channel_to_dim(spec, channel::String)
-    # channel is typically "f1", "f2", etc.
-    m = match(r"f(\d+)", channel)
-    isnothing(m) && return nothing
-
-    # f1 = first nucleus = look for matching frequency dimension
-    nuc_index = parse(Int, m.captures[1])
-    nuc_symbol = Symbol("nuc$nuc_index")
-    target_nuc = acqus(spec, nuc_symbol)
-
-    # Find frequency dimension with this nucleus
+    # Now find dimension with matching nucleus
     for (i, d) in enumerate(dims(spec))
         if d isa FrequencyDimension
             dim_nuc = metadata(d, :nucleus)
-            if dim_nuc == nucleus(target_nuc)
+            if !isnothing(dim_nuc) && string(dim_nuc) == channel
                 return i
             end
         end
     end
+
     return nothing
-end
-```
-
-#### 5.2 Power unit conversion
-
-```julia
-"""
-Convert power values to Hz (B1 field strength).
-"""
-function _power_to_hz(power::Power, pulse_duration)
-    # B1 = 1 / (4 * p90)
-    # For a pulse at the given power level, calculate the effective field
-    # This is approximate and depends on pulse calibration
-    return 1 / (4 * pulse_duration)
 end
 ```
 
 ## Implementation Order
 
-1. **Phase 1**: Core `applyannotations!` infrastructure
-   - Create `_apply_dimension_annotation!` dispatcher
-   - Add call in `loadnmr()`
+1. **New dimension types** in `dimensions.jl`:
+   - `OffsetDimension` abstract type and `OffsetDim` concrete type
+   - `FieldDimension` abstract type with `SpinlockDim`, `NutationDim`
+   - Default metadata for each
 
-2. **Phase 2**: Relaxation experiments (simplest case)
-   - Map `relaxation.duration` → `TrelaxDim`
-   - Test with R1/R2 datasets
+2. **New setter functions** in `nmrdata.jl`:
+   - `setoffsets()` for offset dimensions
+   - `setspinlockfield()` for field strength dimensions
 
-3. **Phase 3**: Diffusion experiments
-   - Map `diffusion.g` → `GxDim`
-   - Handle `gmax` parameter
+3. **Dimension application logic** in `annotation.jl`:
+   - `_apply_dimension_annotations!()` dispatcher
+   - Individual handlers using existing `setrelaxtimes()`, `setgradientlist()`
+   - New handlers for offsets and power using new setters
 
-4. **Phase 4**: New dimension types
-   - Add `CestOffsetDim`, `R1rhoOffsetDim`, `SpinlockPowerDim`
-   - Add corresponding setter functions
+4. **Extend annotate!** to call `_apply_dimension_annotations!()`
 
-5. **Phase 5**: CEST and R1rho experiments
-   - Map `cest.offset` → `CestOffsetDim`
-   - Map `r1rho.duration` → `TrelaxDim`
-   - Map `r1rho.power` → `SpinlockPowerDim`
-   - Handle FQList → ppm conversion
+5. **Exports** in `NMRBase.jl` and `NMRIO.jl`
 
-6. **Phase 6**: Calibration experiments
-   - Map `calibration.nutation.duration` → appropriate type
+## Key Design Decisions
+
+1. **Integrate into annotate!**: Rather than creating a separate function, extend the existing `annotate!` to apply dimensions. This keeps the API simple.
+
+2. **Leverage existing functions**:
+   - Use `hz(Power, ref_Power, ref_pulselength, 90.0)` for spinlock power → Hz conversion
+   - Use `ppm(FQList, FrequencyDimension)` for offset → ppm conversion
+   - Use `referencepulse(spec, nucleus)` to get reference pulse parameters
+
+3. **Minimal new types**: Only add truly new dimension types (`OffsetDim`, `SpinlockDim`) - don't duplicate functionality that exists in `TrelaxDim` or `GradientDimension`.
+
+4. **Graceful degradation**: If annotations are incomplete, leave dimensions unchanged. Existing manual workflow still works.
 
 ## Testing Strategy
 
-1. **Unit tests** for each dimension mapping function
+1. **Unit tests** for new dimension types and setters
 2. **Integration tests** using existing test data:
-   - `test/test-data/19f-r1rho-onres-ts4/` (R1rho with duration + power)
-   - `test/test-data/19f-cest-ts3/` (CEST with offset)
-   - `test/test-data/15n-xste-ts3/` (diffusion)
-3. **Round-trip tests**: Load data, verify dimension types and values
+   - `test/test-data/19f-cest-ts3/` - verify CEST offset → OffsetDim with ppm values
+   - `test/test-data/19f-r1rho-onres-ts4/` - verify R1rho duration → TrelaxDim, power → SpinlockDim
+3. **Backwards compatibility**: All existing tests must pass
 
 ## Export Additions
 
-Add to `NMRBase.jl` exports:
+`NMRBase.jl`:
 ```julia
-export CestOffsetDim, R1rhoOffsetDim, SpinlockPowerDim
-export setcestoffsets, setspinlockpower, setr1rhooffsets
-export applyannotations!  # If users need manual control
+export OffsetDim, OffsetDimension
+export SpinlockDim, NutationDim, FieldDimension
+export setoffsets, setspinlockfield
 ```
-
-## Backwards Compatibility
-
-- `applyannotations!` is called automatically but is non-destructive if no annotations exist
-- Manual `setrelaxtimes()`, etc. still work for data without annotations
-- Existing tests should continue to pass
-
-## Future Extensions
-
-1. **Nutation calibration**: Map pulse duration arrays
-2. **Multiple relaxation channels**: Support R1/R2 on different nuclei
-3. **Coherence order tracking**: Store and display coherence pathways
-4. **Automatic plotting labels**: Use dimension metadata for plot annotations
