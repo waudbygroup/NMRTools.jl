@@ -120,13 +120,13 @@ dimensions from a single 1H reference.
 # Examples
 ```jldoctest
 julia> xi_ratio(C13)
-0.25145020
+0.25144953
 
 julia> xi_ratio(C13; aqueous=true)
-0.251449530
+0.25144953
 
 julia> xi_ratio(C13; aqueous=false)
-0.25145020
+0.2514502
 
 julia> xi_ratio(N15)
 0.101329118
