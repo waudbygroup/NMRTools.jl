@@ -372,6 +372,13 @@ end
     @test dat[2, :swhz] == 1337.97163500134
     @test dat[2, :swppm] == 21.999694151751253
     @test dat[2, :pseudodim] == false
+
+    # load multicomplex spectrum (bicomplex for 2D)
+    datMC = loadnmr(artifact"2D_HN"; allcomponents=true)
+    @test size(datMC) == (1216, 512)
+    @test parent(datMC) isa Matrix{<:Multicomplex}
+    @test order(datMC[1, 1]) == 2  # bicomplex
+    @test realest(datMC[1, 100]) == dat[1, 100]  # real-real component matches real-only import
 end
 
 @testset "NMRIO: pseudo-2D (Bruker pdata)" begin

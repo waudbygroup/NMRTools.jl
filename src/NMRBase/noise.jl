@@ -36,9 +36,10 @@ function estimatenoise!(d::NMRData)
 
     if isreal(data(d))
         vd = vec(data(d))
+    elseif eltype(data(d)) <: Multicomplex
+        vd = vec(realest.(data(d)))
     else
-        # TODO consider multicomplex
-        @warn "estimatenoise! doesn't handle multicomplex numbers correctly. Working with real values only."
+        # complex data
         vd = vec(real(data(d)))
     end
     y = sort(vd[1:step:end])

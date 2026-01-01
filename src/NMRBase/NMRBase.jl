@@ -16,6 +16,7 @@ const DDarraydocs = joinpath(DDdocs, "#DimensionalData.AbstractDimensionalArray"
 # const DDtidocs = joinpath(DDdocs, "#DimensionalData.Ti")
 
 using LinearAlgebra
+using MulticomplexNumbers
 using Optim
 using Peaks
 using SimpleTraits

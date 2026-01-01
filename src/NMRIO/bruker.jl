@@ -1,7 +1,13 @@
 """
     loadpdata(filename, allcomponents=false)
 
-Filename will be a reference to a pdata folder.
+Load processed Bruker NMR data from a pdata folder.
+
+# Arguments
+- `filename`: Path to a pdata directory or a file within it
+- `allcomponents`: If `true`, returns complex (1D) or multicomplex (2D) data with all
+  components. For 2D data, returns `Multicomplex` numbers with components ordered as
+  `rr + ri*im1 + ir*im2 + ii*im1*im2`. Default is `false` (returns real data only).
 """
 function loadpdata(filename, allcomponents=false)
     # 1. get reference to pdata/X directory
@@ -186,9 +192,8 @@ function loadpdata(filename, allcomponents=false)
             # (see https://rdrr.io/github/ssokolen/rnmrfit/man/read_processed_2d.html for similar approach)
             y = dat[1] + 1im .* dat[2]
         else
-            # TODO
-            @warn "import of multicomplex data not yet implemented - returning real values only"
-            y = dat
+            # 4 components for 2D bicomplex: rr + ri*im1 + ir*im2 + ii*im1*im2
+            y = Multicomplex.(dat[1], dat[2], dat[3], dat[4])
         end
     end
 

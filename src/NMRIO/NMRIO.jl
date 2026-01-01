@@ -6,6 +6,7 @@ using ArtifactUtils
 using Dates
 using LazyArtifacts
 using JSON
+using MulticomplexNumbers
 using YAML
 
 include("lists.jl")
