@@ -602,3 +602,129 @@ end
     # The original should have different noise value (or nil if not yet estimated)
     @test dat_for_noise[:noise] != dat_slice[:noise]
 end
+
+@testset "NMRBase: Xi ratios" begin
+    # Test Xi ratio retrieval for DSS (aqueous)
+    @test xi_ratio(H1) == 1.0
+    @test xi_ratio(H1; aqueous=true) == 1.0
+    @test xi_ratio(C13) == 0.251449530
+    @test xi_ratio(C13; aqueous=true) == 0.251449530
+
+    # Test Xi ratio retrieval for TMS (organic)
+    @test xi_ratio(H1; aqueous=false) == 1.0
+    @test xi_ratio(C13; aqueous=false) == 0.25145020
+
+    # Test undefined nucleus returns nothing
+    @test xi_ratio(C12) === nothing
+    @test xi_ratio(N14) === nothing
+end
+
+@testset "NMRBase: finddim and resolvedim" begin
+    spec = exampledata("1D_1H")
+
+    # Test finddim with Nucleus
+    @test finddim(spec, H1) == 1
+    @test finddim(spec, C13) === nothing  # No C13 dimension
+
+    # Test resolvedim with different input types
+    @test resolvedim(spec, 1) == 1
+    @test resolvedim(spec, F1Dim) == 1
+    @test resolvedim(spec, H1) == 1
+
+    # Test resolvedim error for non-existent nucleus
+    @test_throws NMRToolsError resolvedim(spec, C13)
+end
+
+@testset "NMRBase: shiftdim with nucleus" begin
+    spec = exampledata("1D_1H")
+    original_ppm = data(spec, 1)[1]
+
+    # Test shiftdim with nucleus
+    spec2 = shiftdim(spec, H1, 0.5)
+    @test data(spec2, 1)[1] - original_ppm ≈ 0.5
+
+    # Verify referenceoffset metadata is updated
+    @test metadata(spec2, 1, :referenceoffset) ≈ 0.5
+end
+
+@testset "NMRBase: watershift" begin
+    # Test water shift calculation at various temperatures
+    # Formula: δ(H2O) = 7.83 − T / 96.9
+
+    # At 300 K (approx 27°C)
+    @test watershift(300.0) ≈ 7.83 - 300.0 / 96.9
+
+    # At 273.15 K (0°C)
+    @test watershift(273.15) ≈ 7.83 - 273.15 / 96.9
+
+    # At 298.15 K (25°C)
+    @test watershift(298.15) ≈ 7.83 - 298.15 / 96.9
+
+    # Verify the shift is around 4.7 ppm at physiological temperature
+    @test watershift(310.0) ≈ 4.630958 atol = 0.01
+end
+
+@testset "NMRBase: isaqueous" begin
+    spec = exampledata("1D_1H")
+    @test isaqueous(spec) == true
+end
+
+@testset "NMRBase: reference function" begin
+    spec = exampledata("1D_1H")
+    original_ppm = data(spec, 1)[1]
+
+    # Test basic referencing with explicit shift pair
+    @test_logs (:info,) begin
+        spec2 = reference(spec, 1, 4.7 => 4.8; indirect=false)
+        @test data(spec2, 1)[1] - original_ppm ≈ 0.1
+    end
+
+    # Test referencing with F1Dim
+    @test_logs (:info,) begin
+        spec3 = reference(spec, F1Dim, 4.7 => 4.8; indirect=false)
+        @test data(spec3, 1)[1] - original_ppm ≈ 0.1
+    end
+
+    # Test referencing with nucleus
+    @test_logs (:info,) begin
+        spec4 = reference(spec, H1, 4.7 => 4.8; indirect=false)
+        @test data(spec4, 1)[1] - original_ppm ≈ 0.1
+    end
+
+    # Test referenceoffset is updated correctly
+    @test_logs (:info,) begin
+        spec6 = reference(spec, 1, 0.0 => 0.5; indirect=false)
+        @test metadata(spec6, 1, :referenceoffset) ≈ 0.5
+    end
+end
+
+@testset "NMRBase: reference with 2D data" begin
+    spec = exampledata("2D_HN")
+
+    # Get original ppm values
+    original_f1 = data(spec, 1)[1]
+    original_f2 = data(spec, 2)[1]
+
+    # Test referencing single dimension without indirect
+    @test_logs (:info,) begin
+        spec2 = reference(spec, 1, 8.0 => 8.1; indirect=false)
+        @test data(spec2, 1)[1] - original_f1 ≈ 0.1
+        @test data(spec2, 2)[1] == original_f2  # F2 unchanged
+    end
+
+    # Test multi-dimension referencing
+    @test_logs (:info,) (:info,) begin
+        spec3 = reference(spec, [F1Dim, F2Dim], [8.0 => 8.1, 120.0 => 119.5];
+                          indirect=false)
+        @test data(spec3, 1)[1] - original_f1 ≈ 0.1
+        @test data(spec3, 2)[1] - original_f2 ≈ -0.5
+    end
+
+    # Test multi-dimension with tuples
+    @test_logs (:info,) (:info,) begin
+        spec4 = reference(spec, (F1Dim, F2Dim), (8.0 => 8.1, 120.0 => 119.5);
+                          indirect=false)
+        @test data(spec4, 1)[1] - original_f1 ≈ 0.1
+        @test data(spec4, 2)[1] - original_f2 ≈ -0.5
+    end
+end

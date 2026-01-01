@@ -174,20 +174,89 @@ hz(δ::Union{Number,AbstractArray{<:Number}}, ax::FrequencyDimension) = ax[:bf] 
                                                                        1e-6
 
 """
-    shiftdim!(data::NMRData, dim_ref, offset)
+    finddim(spec, nucleus::Nucleus)
 
-Add an offset to a frequency dimension in an NMRData object. The dimension can be specified as a numerical index or an object like `F1Dim`.
-The metadata is copied using `replacedimension`, and an entry is added or updated in the dimension metadata to record the offset change.
+Find the dimension index in an NMRData object that corresponds to the given nucleus.
+Returns the dimension index (1-based) or `nothing` if not found.
+
+# Examples
+```julia
+spec = loadnmr("hsqc.ft2")
+finddim(spec, H1)   # Returns 1 for a 1H-15N HSQC
+finddim(spec, N15)  # Returns 2 for a 1H-15N HSQC
+```
+
+See also [`shiftdim`](@ref), [`reference`](@ref).
+"""
+function finddim(spec, nuc::Nucleus)
+    for (i, d) in enumerate(dims(spec))
+        if d isa FrequencyDimension
+            dim_nuc = metadata(d, :nucleus)
+            if dim_nuc == nuc
+                return i
+            end
+        end
+    end
+    return nothing
+end
+
+"""
+    resolvedim(spec, dim_ref) -> Int
+
+Resolve a dimension reference to a dimension index. Accepts:
+- `Int`: dimension index (returned as-is)
+- Dimension type (e.g., `F1Dim`): finds first matching dimension
+- `Nucleus` (e.g., `H1`, `C13`): finds dimension with matching nucleus
+
+Returns the dimension index or throws an error if not found.
+"""
+function resolvedim(spec, dim_ref)
+    if dim_ref isa Int
+        return dim_ref
+    elseif dim_ref isa Nucleus
+        dim_no = finddim(spec, dim_ref)
+        if isnothing(dim_no)
+            throw(NMRToolsError("resolvedim: No dimension found for nucleus $dim_ref"))
+        end
+        return dim_no
+    else
+        # Assume it's a dimension type like F1Dim
+        dim_no = findfirst(d -> d isa dim_ref, dims(spec))
+        if isnothing(dim_no)
+            throw(NMRToolsError("resolvedim: Dimension $dim_ref not found in NMRData object"))
+        end
+        return dim_no
+    end
+end
+
+# Mapping from dimension index to FrequencyDimension constructor
+const FDIM_CONSTRUCTORS = Dict(1 => F1Dim, 2 => F2Dim, 3 => F3Dim, 4 => F4Dim)
+
+"""
+    shiftdim(data::NMRData, dim_ref, offset)
+
+Add an offset to a frequency dimension in an NMRData object. The dimension can be
+specified as a numerical index, a dimension type like `F1Dim`, or a `Nucleus` enum
+(e.g., `H1`, `C13`).
+
+The metadata is copied using `replacedimension`, and an entry is added or updated
+in the dimension metadata to record the offset change.
+
+# Examples
+```julia
+spec2 = shiftdim(spec, 1, 0.5)       # Using dimension index
+spec2 = shiftdim(spec, F1Dim, 0.5)   # Using dimension type
+spec2 = shiftdim(spec, H1, 0.5)      # Using nucleus
+```
+
+See also [`reference`](@ref), [`finddim`](@ref).
 """
 function shiftdim(spec, dim_ref, offsetppm)
-    dim_no = if dim_ref isa Int
-        dim_ref
-    else
-        findfirst(d -> d isa dim_ref, dims(spec))
-    end
-    # check that dim_no is valid (not nothing, and within the range of dims)
-    if isnothing(dim_no) || dim_no > length(spec.dims) || dim_no < 1
-        throw(NMRToolsError("shiftdim: Dimension $dim_ref not found in NMRData object"))
+    dim_no = resolvedim(spec, dim_ref)
+
+    # check that dim_no is valid (within the range of dims)
+    if dim_no > length(spec.dims) || dim_no < 1
+        throw(NMRToolsError("shiftdim: Dimension index $dim_no is out of range"))
     end
     # check that the dimension is a FrequencyDimension
     if !(dims(spec, dim_no) isa FrequencyDimension)
@@ -198,13 +267,14 @@ function shiftdim(spec, dim_ref, offsetppm)
 
     new_data = data(dim) .+ offsetppm
     md = deepcopy(metadata(dim))
-    if dim_no == 1
-        newdim = F1Dim(new_data; metadata=md)
-    elseif dim_no == 2
-        newdim = F2Dim(new_data; metadata=md)
-    elseif dim_no == 3
-        newdim = F3Dim(new_data; metadata=md)
+
+    # Get the appropriate FrequencyDimension constructor
+    DimConstructor = get(FDIM_CONSTRUCTORS, dim_no, nothing)
+    if isnothing(DimConstructor)
+        throw(NMRToolsError("shiftdim: Unsupported dimension index $dim_no (max 4)"))
     end
+    newdim = DimConstructor(new_data; metadata=md)
+
     new_spec = replacedimension(spec, dim_no, newdim)
 
     if :referenceoffset ∉ keys(metadata(new_spec, dim_no))

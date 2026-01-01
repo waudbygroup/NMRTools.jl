@@ -53,6 +53,7 @@ include("metadata.jl")
 include("noise.jl")
 include("peaks.jl")
 include("pcls.jl")
+include("reference.jl")
 
 macro exportinstances(enum)
     eval = GlobalRef(Core, :eval)
@@ -68,6 +69,7 @@ export Nucleus
 export nucleus
 export spin
 export gyromagneticratio
+export xi_ratio
 
 # coherences
 export Coherence
@@ -119,6 +121,11 @@ export setkinetictimes
 export setrelaxtimes
 export setgradientlist
 export shiftdim
+export finddim, resolvedim
+
+# Chemical shift referencing
+export reference
+export isaqueous, watershift
 
 # Metadata
 export AbstractMetadata, Metadata, NoMetadata
