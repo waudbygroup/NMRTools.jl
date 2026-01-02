@@ -33,6 +33,9 @@ spec[:noise]  # Access the noise estimate
 See also [`correlationlength`](@ref).
 """
 function estimatenoise(d::NMRData; sigma=4.0, maxiter=10)
+    # minimum samples required after subsampling and differencing
+    min_samples = 10
+
     # identify frequency dimensions and calculate subsampling steps
     freqdims = Int[]
     steps = ones(Int, ndims(d))
@@ -42,7 +45,10 @@ function estimatenoise(d::NMRData; sigma=4.0, maxiter=10)
             push!(freqdims, i)
             window = get(metadata(ax), :window, NullWindow())
             sw = get(metadata(ax), :swhz, 1.0)
-            steps[i] = max(1, ceil(Int, correlationlength(window, sw)))
+            corr_len = correlationlength(window, sw)
+            # limit step to ensure at least 2 points remain after diff (need n >= 2 for diff)
+            max_step = max(1, (size(d, i) - 1) ÷ 2)
+            steps[i] = clamp(ceil(Int, corr_len), 1, max_step)
         end
     end
     nfreqdims = length(freqdims)
@@ -57,18 +63,30 @@ function estimatenoise(d::NMRData; sigma=4.0, maxiter=10)
     end
     y = vec(y)
 
+    # check we have enough samples
+    if length(y) < min_samples
+        # fall back to simple MAD on original data without differencing
+        y = vec(realest.(data(d)))
+        nfreqdims = 0  # no scaling needed since we didn't difference
+    end
+
     # iterative sigma clipping with MAD
     for _ in 1:maxiter
+        length(y) < min_samples && break  # stop if too few samples
         med = median(y)
         mad = median(abs.(y .- med))
+        mad == 0 && break  # all values identical
         threshold = sigma * 1.4826 * mad
         mask = abs.(y .- med) .< threshold
         sum(mask) == length(y) && break  # converged
+        sum(mask) < min_samples && break  # don't clip below minimum
         y = y[mask]
     end
 
     # final noise estimate with scaling for differencing
-    d[:noise] = 1.4826 * median(abs.(y .- median(y))) / sqrt(2.0^nfreqdims)
+    med = median(y)
+    mad = median(abs.(y .- med))
+    d[:noise] = 1.4826 * mad / sqrt(2.0^nfreqdims)
 
     return d
 end
