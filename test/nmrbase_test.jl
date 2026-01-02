@@ -225,6 +225,42 @@ end
     p, pl = referencepulse(cest_data, "19F")
     @test p ≈ 13.29e-6
     @test watts(pl) ≈ 8.0
+
+    # Test automatic dimension annotation - CEST data should get OffsetDim
+    @test dims(cest_data, 2) isa OffsetDim
+    @test cest_data[2, :units] == "ppm"
+    @test cest_data[2, :nucleus] == "19F"
+    # Verify offset values are in ppm (converted from FQList Hz)
+    offset_axis = dims(cest_data, 2) |> collect
+    @test length(offset_axis) == 101  # 101 offset points
+    # Values should be in ppm, not Hz (original was -2500 to +2500 Hz)
+    @test all(abs.(offset_axis) .< 100)  # ppm values are much smaller than Hz
+
+    # Test R1rho data - should get SpinlockDim and TrelaxDim
+    r1rho_data = loadnmr(joinpath("test-data", "19f-r1rho-onres-ts4"))
+
+    # Check dimensions array in annotations (should be reversed to match Julia order)
+    dims_array = annotations(r1rho_data, "dimensions")
+    @test dims_array[1] == "19F"
+    @test dims_array[2] == "r1rho.power"
+    @test dims_array[3] == "r1rho.duration"
+
+    # Dimension 2 should be SpinlockDim with Hz values
+    @test dims(r1rho_data, 2) isa SpinlockDim
+    @test r1rho_data[2, :units] == "Hz"
+    power_axis = dims(r1rho_data, 2) |> collect
+    @test length(power_axis) == 18  # 18 power levels
+    @test all(power_axis .> 0)  # All positive Hz values
+    @test power_axis[1] < power_axis[end]  # Increasing field strength
+
+    # Dimension 3 should be TrelaxDim with seconds values
+    @test dims(r1rho_data, 3) isa TrelaxDim
+    @test r1rho_data[3, :units] == "s"
+    @test r1rho_data[3, :delay_type] == :r1rho
+    duration_axis = dims(r1rho_data, 3) |> collect
+    @test length(duration_axis) == 11  # 11 duration points
+    @test duration_axis[1] ≈ 1e-4 atol = 1e-5  # First duration ~100 µs
+    @test duration_axis[end] ≈ 0.08 atol = 0.01  # Last duration ~80 ms
 end
 
 @testset "NMRBase: Programmatic list annotations" begin
