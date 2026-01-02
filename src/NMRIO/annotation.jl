@@ -5,34 +5,57 @@
     Supports schema ≥ v0.0.2.
 """
 
-function annotate!(spec::NMRData)
+"""
+    annotate(spec::NMRData) -> NMRData
+
+Parse pulse programme annotations and store them in the spectrum metadata.
+Returns the NMRData object with annotations added to metadata.
+
+Annotations are embedded within pulse programme comments marked with `;@ ` at the start
+of lines, following YAML format with schema version 0.0.2.
+
+# Examples
+```julia
+spec = loadnmr("experiment/1/pdata/1")
+spec = annotate(spec)  # Parse and store annotations
+annotations(spec, "title")  # Access parsed annotations
+```
+
+See also [`annotations`](@ref), [`hasannotations`](@ref).
+"""
+function annotate(spec::NMRData)
     pp = pulseprogram(spec)
     if isnothing(pp) || ismissing(pp) || length(pp) == 0
-        return nothing
+        return spec
     end
-    annotations = parse_annotations(pp)
+    parsed_annotations = parse_annotations(pp)
 
     # Check schema version
-    schema_version = get(annotations, "schema_version", nothing)
+    schema_version = get(parsed_annotations, "schema_version", nothing)
     if isnothing(schema_version)
-        return nothing
+        return spec
     elseif schema_version != "0.0.2"
         @warn "Pulse programme uses unsupported schema version $schema_version. Only v0.0.2 is currently supported. Annotations may not parse correctly."
-        return nothing
+        return spec
     end
 
     # Resolve parameter references to actual values
-    resolve_parameter_references!(annotations, spec)
+    resolve_parameter_references!(parsed_annotations, spec)
 
     # Resolve programmatic list patterns
-    resolve_programmatic_lists!(annotations, spec)
+    resolve_programmatic_lists!(parsed_annotations, spec)
 
     # Reverse dimensions to match data order
-    if haskey(annotations, "dimensions")
-        annotations["dimensions"] = reverse(annotations["dimensions"])
+    if haskey(parsed_annotations, "dimensions")
+        parsed_annotations["dimensions"] = reverse(parsed_annotations["dimensions"])
     end
 
-    return spec[:annotations] = annotations
+    spec[:annotations] = parsed_annotations
+
+    # Apply dimension transformations based on annotations
+    spec = _apply_dimension_annotations(spec, parsed_annotations)
+
+    return spec
 end
 
 """
@@ -399,3 +422,191 @@ function _find_dimension_path(key::String, annotations::Dict, prefix::String="")
 
     return nothing
 end
+
+# Dimension application logic ################################################################
+
+"""
+    _apply_dimension_annotations(spec::NMRData, ann::Dict) -> NMRData
+
+Apply semantic dimension types based on the dimensions array in annotations.
+The dimensions array provides explicit ordering - index i in the array
+corresponds to dimension i in the data. Returns new NMRData with updated dimensions.
+"""
+function _apply_dimension_annotations(spec::NMRData, ann::Dict)
+    dimensions = get(ann, "dimensions", nothing)
+    isnothing(dimensions) && return spec
+
+    # dimensions[i] specifies what dimension i represents
+    for (dim_index, dim_spec) in enumerate(dimensions)
+        spec = _apply_single_dimension(spec, dim_index, dim_spec, ann)
+    end
+
+    return spec
+end
+
+function _apply_single_dimension(spec, dim_index, dim_spec::String, ann)
+    parts = split(dim_spec, ".")
+
+    # Skip simple dimensions like "f1", "f2" - already correct
+    length(parts) == 1 && return spec
+
+    block_name = parts[1]  # e.g., "relaxation", "diffusion", "cest", "r1rho"
+    param_name = parts[2]  # e.g., "duration", "offset", "g", "power"
+
+    # Get the parameter block from annotations
+    block = get(ann, block_name, nothing)
+    isnothing(block) && return spec
+
+    # Get the actual values (already resolved)
+    values = get(block, param_name, nothing)
+    isnothing(values) && return spec
+
+    # Dispatch to specific handler based on parameter type
+    if param_name == "duration"
+        return _apply_duration(spec, dim_index, values, block_name)
+    elseif param_name == "g"
+        return _apply_gradient(spec, dim_index, values, block)
+    elseif param_name == "offset"
+        return _apply_offset(spec, dim_index, values, block)
+    elseif param_name == "power"
+        return _apply_power(spec, dim_index, values, block)
+    end
+
+    return spec
+end
+
+# Fallback for non-string dim_spec (shouldn't happen normally)
+_apply_single_dimension(spec, dim_index, dim_spec, ann) = spec
+
+function _apply_duration(spec, dim_index, values, block_name)
+    # All duration arrays use TrelaxDim
+    label_text = if block_name == "relaxation"
+        "Relaxation delay"
+    elseif block_name == "r1rho"
+        "Spinlock duration"
+    elseif block_name == "calibration"
+        "Pulse duration"
+    else
+        "Delay"
+    end
+
+    newdim = TrelaxDim(values)
+    spec = replacedimension(spec, dim_index, newdim)
+    label!(spec, dim_index, label_text)
+    spec[dim_index, :units] = "s"
+    spec[dim_index, :delay_type] = Symbol(block_name)
+    return spec
+end
+
+function _apply_gradient(spec, dim_index, values, block)
+    gmax = get(block, "gmax", nothing)
+    if isnothing(gmax)
+        @warn "No gmax specified for diffusion gradient axis"
+        gmax = 0.55  # Default assumption
+    end
+    gvals = gmax .* values
+
+    # Select appropriate gradient dimension type based on index
+    DimConstructor = if dim_index == 1
+        G1Dim
+    elseif dim_index == 2
+        G2Dim
+    elseif dim_index == 3
+        G3Dim
+    else
+        G4Dim
+    end
+
+    newdim = DimConstructor(gvals)
+    spec = replacedimension(spec, dim_index, newdim)
+    label!(spec, dim_index, "Gradient strength")
+    spec[dim_index, :units] = "T m⁻¹"
+    return spec
+end
+
+function _apply_offset(spec, dim_index, values, block)
+    channel = get(block, "channel", nothing)
+
+    # Convert FQList to ppm if needed
+    if values isa FQList
+        freq_dim_index = _find_frequency_dim_for_channel(spec, channel)
+        if !isnothing(freq_dim_index)
+            freq_dim = dims(spec, freq_dim_index)
+            offset_values = ppm(values, freq_dim)
+        else
+            offset_values = data(values)  # Fall back to raw values
+        end
+    else
+        offset_values = values
+    end
+
+    newdim = OffsetDim(offset_values)
+    spec = replacedimension(spec, dim_index, newdim)
+    label!(spec, dim_index, "Saturation offset")
+    spec[dim_index, :units] = "ppm"
+    if !isnothing(channel)
+        spec[dim_index, :nucleus] = channel
+    end
+    return spec
+end
+
+function _apply_power(spec, dim_index, values, block)
+    channel = get(block, "channel", nothing)
+
+    # Convert Power values to Hz using reference pulse
+    if !isnothing(channel)
+        ref_pulse = referencepulse(spec, channel)
+        if isnothing(ref_pulse)
+            @warn "No reference pulse found for channel $channel, cannot convert power to Hz"
+            return spec
+        end
+        ref_duration, ref_power = ref_pulse
+
+        # Convert Power array to Hz
+        if !isempty(values) && first(values) isa Power
+            field_hz = [hz(p, ref_power, ref_duration, 90.0) for p in values]
+        else
+            field_hz = values  # Assume already in Hz
+        end
+    else
+        field_hz = values
+    end
+
+    newdim = SpinlockDim(field_hz)
+    spec = replacedimension(spec, dim_index, newdim)
+    label!(spec, dim_index, "Spinlock field")
+    spec[dim_index, :units] = "Hz"
+    return spec
+end
+
+"""
+    _find_frequency_dim_for_channel(spec, channel) -> Union{Int, Nothing}
+
+Find the frequency dimension index that corresponds to the given channel.
+Channel can be "f1", "f2", etc. or a nucleus string like "1H", "19F".
+"""
+function _find_frequency_dim_for_channel(spec, channel::AbstractString)
+    channel = String(channel)  # Convert SubString to String
+    # If channel is "f1", "f2", look up the nucleus
+    m = match(r"^f(\d+)$", channel)
+    if !isnothing(m)
+        nuc_index = parse(Int, m.captures[1])
+        nuc_str = acqus(spec, Symbol("nuc$nuc_index"))
+        if !isnothing(nuc_str) && !ismissing(nuc_str)
+            channel = nuc_str
+        end
+    end
+
+    # Find dimension with matching nucleus
+    for (i, d) in enumerate(dims(spec))
+        if d isa FrequencyDimension
+            dim_nuc = metadata(d, :nucleus)
+            if !isnothing(dim_nuc) && string(dim_nuc) == channel
+                return i
+            end
+        end
+    end
+    return nothing
+end
+
+_find_frequency_dim_for_channel(spec, channel::Nothing) = nothing

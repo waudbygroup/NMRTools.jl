@@ -98,7 +98,7 @@ export refdims_title
 export set, rebuild, reorder, modify, broadcast_dims, broadcast_dims!, ForwardOrdered
 # NMR properties
 export scale
-export estimatenoise!
+export estimatenoise
 export decimate
 
 # Dimensions
@@ -108,11 +108,14 @@ export NonFrequencyDimension
 export TimeDimension
 export GradientDimension
 export UnknownDimension
+export OffsetDimension
+export FieldDimension
 export F1Dim, F2Dim, F3Dim, F4Dim
 export T1Dim, T2Dim, T3Dim, T4Dim
 export TrelaxDim, TkinDim
 export G1Dim, G2Dim, G3Dim, G4Dim
 export X1Dim, X2Dim, X3Dim, X4Dim
+export OffsetDim, SpinlockDim
 # export GradientDim
 # export SpatialDim
 export ppm, hz
@@ -120,6 +123,8 @@ export replacedimension
 export setkinetictimes
 export setrelaxtimes
 export setgradientlist
+export setoffsets
+export setspinlockfield
 export shiftdim
 export finddim, resolvedim
 

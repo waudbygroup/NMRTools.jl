@@ -293,6 +293,34 @@ function setgradientlist(A::NMRData, relativegradientlist::AbstractVector, Gmax=
 end
 
 """
+    setoffsets(A::NMRData, dimnumber, offsets, units="ppm")
+
+Return a new NMRData with an offset axis (for CEST, R1rho off-resonance, etc.).
+Dimension number must be specified explicitly.
+"""
+function setoffsets(A::NMRData, dimnumber::Integer, offsets::AbstractVector, units="ppm")
+    newdim = OffsetDim(offsets)
+    newA = replacedimension(A, dimnumber, newdim)
+    label!(newA, newdim, "Offset")
+    newA[newdim, :units] = units
+    return newA
+end
+
+"""
+    setspinlockfield(A::NMRData, dimnumber, fields, units="Hz")
+
+Return a new NMRData with a spinlock field strength axis.
+Dimension number must be specified explicitly.
+"""
+function setspinlockfield(A::NMRData, dimnumber::Integer, fields::AbstractVector, units="Hz")
+    newdim = SpinlockDim(fields)
+    newA = replacedimension(A, dimnumber, newdim)
+    label!(newA, newdim, "Spinlock field")
+    newA[newdim, :units] = units
+    return newA
+end
+
+"""
     replacedimension(nmrdata, olddimnumber, newdim)
 
 Return a new NMRData, in which the numbered axis is replaced by a new `Dimension`.

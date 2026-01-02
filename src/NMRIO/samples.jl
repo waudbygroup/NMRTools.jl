@@ -1,9 +1,27 @@
-function addsampleinfo!(expt::NMRData)
+"""
+    addsampleinfo(expt::NMRData) -> NMRData
+
+Search for and load sample metadata from JSON files in the experiment folder.
+Returns the NMRData object with sample information added to metadata.
+
+Sample files are JSON files following the schema at https://github.com/waudbygroup/nmr-sample-schema.
+The function matches samples based on creation/ejection timestamps against the experiment date.
+
+# Examples
+```julia
+spec = loadnmr("experiment/1/pdata/1")
+spec = addsampleinfo(spec)  # Load matching sample metadata
+sample(spec, "notes")  # Access sample information
+```
+
+See also [`sample`](@ref), [`hassample`](@ref).
+"""
+function addsampleinfo(expt::NMRData)
     samplelist = findsamples(expt[:experimentfolder])
-    length(samplelist) == 0 && return # no samples found
+    length(samplelist) == 0 && return expt # no samples found
 
     sampledate = expt[:date]
-    isnothing(sampledate) && return # no date in spectrum metadata
+    isnothing(sampledate) && return expt # no date in spectrum metadata
 
     # search sample list for sampledate between creation and ejection times, and get the filename if found
     for (samplefile, tcreation, tejection) in samplelist
@@ -13,10 +31,11 @@ function addsampleinfo!(expt::NMRData)
             break
         end
     end
-    isnothing(expt[:samplefile]) && return # no matching sample found
+    isnothing(expt[:samplefile]) && return expt # no matching sample found
 
     # load sample metadata from json file
-    return expt[:sample] = JSON.parsefile(expt[:samplefile]; dicttype=Dict{String,Any})
+    expt[:sample] = JSON.parsefile(expt[:samplefile]; dicttype=Dict{String,Any})
+    return expt
 end
 
 function findsamples(experimentfolder)

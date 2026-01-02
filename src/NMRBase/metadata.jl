@@ -39,7 +39,7 @@ Return the metadata for specified key, or `nothing` if not found. Keys are passe
 - `:window`: `WindowFunction` indicating applied apodization
 - `:referenceoffset`: referencing (in ppm) applied to the dimension
 
-See also [`estimatenoise!`](@ref).
+See also [`estimatenoise`](@ref).
 """
 function metadata end
 
@@ -395,7 +395,8 @@ end
 
 function defaultmetadata(::Type{<:TrelaxDim})
     defaults = Dict{Symbol,Any}(:label => "Relaxation time",
-                                :units => nothing)
+                                :units => nothing,
+                                :delay_type => nothing)
     return Metadata{TrelaxDim}(defaults)
 end
 
@@ -409,6 +410,19 @@ function defaultmetadata(::Type{<:UnknownDimension})
     defaults = Dict{Symbol,Any}(:label => "",
                                 :units => nothing)
     return Metadata{UnknownDimension}(defaults)
+end
+
+function defaultmetadata(::Type{<:OffsetDimension})
+    defaults = Dict{Symbol,Any}(:label => "Offset",
+                                :units => "ppm",
+                                :nucleus => nothing)
+    return Metadata{OffsetDimension}(defaults)
+end
+
+function defaultmetadata(::Type{<:FieldDimension})
+    defaults = Dict{Symbol,Any}(:label => "Field strength",
+                                :units => "Hz")
+    return Metadata{FieldDimension}(defaults)
 end
 
 # Metadata entry definitions and help ##############################################################

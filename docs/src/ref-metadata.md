@@ -66,7 +66,7 @@ Raw numerical data can be accessed using the `data()` function, but it is recomm
 | `:format`            | input file format (`:nmrpipe` or `:pdata`)          |
 | `:label`             | short label (first line of title pdata file)        |
 | `:ndim`              | number of dimensions                                |
-| `:noise`             | RMS noise level (see [`estimatenoise!`](@ref))      |
+| `:noise`             | RMS noise level (see [`estimatenoise`](@ref))       |
 | `:ns`                | number of scans                                     |
 | `:pulseprogram`      | pulse program title                                 |
 | `:rg`                | receiver gain                                       |

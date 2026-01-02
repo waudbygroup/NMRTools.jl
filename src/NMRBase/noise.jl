@@ -1,7 +1,8 @@
 """
-    estimatenoise!(nmrdata)
+    estimatenoise(nmrdata) -> NMRData
 
 Estimate the rms noise level in the data and update `:noise` metadata.
+Returns the NMRData object with noise estimate stored in metadata.
 
 If called on an `Array` of data, each item will be updated.
 
@@ -26,8 +27,15 @@ where the likelihood of an individual data point is:
 ```
 
 and ``\\phi(x)`` and ``\\Phi(x)`` are the standard normal pdf and cdf functions.
+
+# Examples
+```julia
+spec = loadnmr("experiment/1/pdata/1")
+spec = estimatenoise(spec)  # Estimate and store noise level
+spec[:noise]  # Access the noise estimate
+```
 """
-function estimatenoise!(d::NMRData)
+function estimatenoise(d::NMRData)
     α = 0.25 # fraction of data to discard for noise estimation
 
     nsamples = 1000
@@ -65,7 +73,8 @@ function estimatenoise!(d::NMRData)
     p0 = [μ0, σ0]
     res = optimize(ℒ, p0)
     p = Optim.minimizer(res)
-    return d[:noise] = abs(p[2])
+    d[:noise] = abs(p[2])
+    return d
 end
 
-estimatenoise!(spectra::Array{<:NMRData}) = map(estimatenoise!, spectra)
+estimatenoise(spectra::Array{<:NMRData}) = map(estimatenoise, spectra)
