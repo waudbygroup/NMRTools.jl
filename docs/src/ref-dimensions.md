@@ -25,63 +25,34 @@ NMRDimension
 
 ## Frequency Dimensions
 
-```@docs
-FrequencyDimension
-F1Dim
-F2Dim
-```
-
-Chemical shift dimensions with units in ppm. These are automatically created when loading processed NMR data.
+`FrequencyDimension` types (`F1Dim`, `F2Dim`, etc.) represent chemical shift axes with units in ppm. These are automatically created when loading processed NMR data.
 
 ## Time Dimensions
-
-```@docs
-TimeDimension
-TrelaxDim
-TkinDim
-```
 
 - **TrelaxDim**: Used for arrayed time delays in relaxation experiments (R1, R2, R1rho durations, nutation pulse lengths, mixing times). The `:delay_type` metadata stores the experiment context (`:relaxation`, `:r1rho`, `:calibration`, etc.).
 - **TkinDim**: Used for kinetic time points in time-resolved experiments.
 
 ## Gradient Dimensions
 
-```@docs
-GradientDimension
-G1Dim
-```
-
-Used for diffusion experiments where gradient strength is arrayed. Units are typically T/m (Tesla per meter).
+`GradientDimension` types (`G1Dim`, `G2Dim`, etc.) are used for diffusion experiments where gradient strength is arrayed. Units are typically T/m (Tesla per meter).
 
 ## Offset Dimensions
 
-```@docs
-OffsetDimension
-OffsetDim
-```
-
-Used for experiments where frequency offset is arrayed, such as CEST or off-resonance R1rho. Units are typically ppm.
+`OffsetDim` is used for experiments where frequency offset is arrayed, such as CEST or off-resonance R1rho. Units are typically ppm.
 
 ## Field Dimensions
 
-```@docs
-FieldDimension
-SpinlockDim
-```
-
-Used for experiments where RF field strength is arrayed, such as R1rho relaxation dispersion. Units are Hz (RF field strength = 1/4τ₉₀).
+`SpinlockDim` is used for experiments where RF field strength is arrayed, such as R1rho relaxation dispersion. Units are Hz (RF field strength = 1/4τ₉₀).
 
 ## Dimension Setter Functions
 
 These functions create new NMRData objects with updated dimension types:
 
-```@docs
-setrelaxtimes
-setkinetictimes
-setgradientlist
-setoffsets
-setspinlockfield
-```
+- `setrelaxtimes(spec, dim, times, units)` - Set relaxation/delay dimension
+- `setkinetictimes(spec, dim, times, units)` - Set kinetic time dimension
+- `setgradientlist(spec, dim, values, Gmax)` - Set gradient dimension
+- `setoffsets(spec, dim, offsets, units)` - Set offset dimension
+- `setspinlockfield(spec, dim, fields, units)` - Set spinlock field dimension
 
 ## Working with Dimensions
 
@@ -120,4 +91,4 @@ newspec = replacedimension(spec, 2, TrelaxDim(times))
 
 ## Automatic Dimension Assignment
 
-When loading annotated pulse programmes, NMRTools automatically assigns semantic dimension types based on the `dimensions` array in the annotations. See [Automatic Dimension Annotation](@ref) for details.
+When loading annotated pulse programmes, NMRTools automatically assigns semantic dimension types based on the `dimensions` array in the annotations. See the [annotations documentation](ref-annotations.md) for details.

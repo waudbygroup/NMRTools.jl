@@ -230,16 +230,16 @@ p1, pl1 = referencepulse(spec, "19F")
 
 ## Automatic Dimension Annotation
 
-When loading annotated data with [`loadnmr`](@ref), NMRTools automatically applies semantic dimension types based on the `dimensions` array in the annotations. This eliminates manual calls to dimension setter functions.
+When loading annotated data with `loadnmr`, NMRTools automatically applies semantic dimension types based on the `dimensions` array in the annotations. This eliminates manual calls to dimension setter functions.
 
 ### Supported Dimension Types
 
 | Annotation Pattern | Dimension Type | Units | Example |
 |-------------------|----------------|-------|---------|
-| `*.duration` | [`TrelaxDim`](@ref) | seconds | `r1rho.duration`, `relaxation.duration` |
-| `*.power` | [`SpinlockDim`](@ref) | Hz | `r1rho.power` |
-| `*.offset` | [`OffsetDim`](@ref) | ppm | `cest.offset` |
-| `*.g` | [`G1Dim`](@ref)/[`G2Dim`](@ref) | T/m | `diffusion.g` |
+| `*.duration` | `TrelaxDim` | seconds | `r1rho.duration`, `relaxation.duration` |
+| `*.power` | `SpinlockDim` | Hz | `r1rho.power` |
+| `*.offset` | `OffsetDim` | ppm | `cest.offset` |
+| `*.g` | `G1Dim`/`G2Dim` | T/m | `diffusion.g` |
 
 ### Automatic Conversions
 
@@ -273,7 +273,7 @@ spec[TrelaxDim, :delay_type]  # :r1rho
 
 If annotations are not available, dimensions can be set manually using:
 
-- [`setrelaxtimes`](@ref) - Set relaxation/delay dimension
-- [`setspinlockfield`](@ref) - Set spinlock field strength dimension
-- [`setoffsets`](@ref) - Set offset dimension
-- [`setgradientlist`](@ref) - Set gradient dimension
+- `setrelaxtimes` - Set relaxation/delay dimension
+- `setspinlockfield` - Set spinlock field strength dimension
+- `setoffsets` - Set offset dimension
+- `setgradientlist` - Set gradient dimension
