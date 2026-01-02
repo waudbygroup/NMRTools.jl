@@ -227,3 +227,53 @@ p1, pl1 = referencepulse(spec, "19F")
 - [Schema Documentation](https://waudbylab.org/pulseprograms/schema/fields/)
 - [Controlled Vocabulary (VOCABULARY.md)](https://github.com/waudbygroup/pulseprograms/blob/main/VOCABULARY.md)
 - [Decision Log](https://github.com/waudbygroup/pulseprograms/blob/main/DECISIONS.md) - Design rationale and schema evolution
+
+## Automatic Dimension Annotation
+
+When loading annotated data with [`loadnmr`](@ref), NMRTools automatically applies semantic dimension types based on the `dimensions` array in the annotations. This eliminates manual calls to dimension setter functions.
+
+### Supported Dimension Types
+
+| Annotation Pattern | Dimension Type | Units | Example |
+|-------------------|----------------|-------|---------|
+| `*.duration` | [`TrelaxDim`](@ref) | seconds | `r1rho.duration`, `relaxation.duration` |
+| `*.power` | [`SpinlockDim`](@ref) | Hz | `r1rho.power` |
+| `*.offset` | [`OffsetDim`](@ref) | ppm | `cest.offset` |
+| `*.g` | [`G1Dim`](@ref)/[`G2Dim`](@ref) | T/m | `diffusion.g` |
+
+### Automatic Conversions
+
+The annotation system automatically performs unit conversions:
+
+- **Power → Hz**: Power values (from `VALIST`) are converted to RF field strength in Hz using the reference pulse calibration
+- **FQList → ppm**: Frequency lists (from `FQ1LIST` etc.) are converted from Hz offsets to absolute ppm values
+- **Gradient scaling**: Gradient values are scaled by `gmax` to give actual field strengths
+
+### Example
+
+```julia
+# Load annotated R1rho data
+spec = loadnmr("path/to/r1rho/experiment")
+
+# Dimensions are automatically typed based on annotations
+dims(spec)
+# (F1Dim(...), SpinlockDim(...), TrelaxDim(...))
+
+# Access dimension values directly
+collect(dims(spec, SpinlockDim))  # RF field strengths in Hz
+collect(dims(spec, TrelaxDim))   # Spinlock durations in seconds
+
+# Metadata is also set
+spec[SpinlockDim, :units]  # "Hz"
+spec[TrelaxDim, :units]    # "s"
+spec[TrelaxDim, :delay_type]  # :r1rho
+```
+
+### Manual Dimension Setting
+
+If annotations are not available, dimensions can be set manually using:
+
+- [`setrelaxtimes`](@ref) - Set relaxation/delay dimension
+- [`setspinlockfield`](@ref) - Set spinlock field strength dimension
+- [`setoffsets`](@ref) - Set offset dimension
+- [`setgradientlist`](@ref) - Set gradient dimension
