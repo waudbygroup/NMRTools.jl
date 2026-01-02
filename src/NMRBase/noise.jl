@@ -1,71 +1,68 @@
 """
-    estimatenoise!(nmrdata)
+    estimatenoise!(nmrdata; sigma=4.0, maxiter=10)
 
 Estimate the rms noise level in the data and update `:noise` metadata.
 
 If called on an `Array` of data, each item will be updated.
 
+# Keyword arguments
+- `sigma`: threshold (in units of MAD) for outlier rejection during iterative clipping (default: 4.0)
+- `maxiter`: maximum iterations for sigma clipping (default: 10)
+
 # Algorithm
-Data are sorted into numerical order, and the highest and lowest 12.5% of data are discarded
-(so that 75% of the data remain). These values are then fitted to a truncated gaussian
-distribution via maximum likelihood analysis.
+1. Subsample each frequency dimension based on the correlation length of its window function,
+   to obtain approximately independent samples.
+2. Compute first differences along each frequency dimension. This removes baseline offsets
+   and suppresses broad signals (e.g. water), while preserving noise characteristics.
+3. Estimate noise using the Median Absolute Deviation (MAD), which is robust to outliers
+   (signal peaks). The MAD is scaled by 1.4826 to give an estimate of the standard deviation
+   for Gaussian noise.
+4. Iteratively clip outliers beyond `sigma` × MAD until convergence, to further improve
+   robustness against residual signal contamination.
+5. Scale by ``1/\\sqrt{2^D}`` where ``D`` is the number of frequency dimensions, to account
+   for variance doubling from each differencing operation.
 
-The log-likelihood function is:
-```math
-\\log L(\\mu, \\sigma) = \\sum_i{\\log P(y_i, \\mu, \\sigma)}
-```
-
-where the likelihood of an individual data point is:
-```math
-\\log P(y,\\mu,\\sigma) =
-    \\log\\frac{
-        \\phi\\left(\\frac{x-\\mu}{\\sigma}\\right)
-    }{
-        \\sigma \\cdot \\left[\\Phi\\left(\\frac{b-\\mu}{\\sigma}\\right) -
-            \\Phi\\left(\\frac{a-\\mu}{\\sigma}\\right)\\right]}
-```
-
-and ``\\phi(x)`` and ``\\Phi(x)`` are the standard normal pdf and cdf functions.
+See also [`correlationlength`](@ref).
 """
-function estimatenoise!(d::NMRData)
-    α = 0.25 # fraction of data to discard for noise estimation
-
-    nsamples = 1000
-    n0 = length(d)
-    step = Int(ceil(n0 / nsamples))
-
-    if isreal(data(d))
-        vd = vec(data(d))
-    elseif eltype(data(d)) <: Multicomplex
-        vd = vec(realest.(data(d)))
-    else
-        # complex data
-        vd = vec(real(data(d)))
+function estimatenoise!(d::NMRData; sigma=4.0, maxiter=10)
+    # identify frequency dimensions and calculate subsampling steps
+    freqdims = Int[]
+    steps = ones(Int, ndims(d))
+    for i in 1:ndims(d)
+        ax = dims(d, i)
+        if ax isa FrequencyDimension
+            push!(freqdims, i)
+            window = get(metadata(ax), :window, NullWindow())
+            sw = get(metadata(ax), :swhz, 1.0)
+            steps[i] = max(1, ceil(Int, correlationlength(window, sw)))
+        end
     end
-    y = sort(vd[1:step:end])
-    n = length(y)
+    nfreqdims = length(freqdims)
 
-    # select central subset of points
-    i1 = ceil(Int, (α / 2) * n)
-    i2 = floor(Int, (1 - α / 2) * n)
-    y = y[i1:i2]
+    # subsample to break correlations (creates a view where possible)
+    indices = ntuple(i -> 1:steps[i]:size(d, i), ndims(d))
+    y = realest.(view(data(d), indices...))
 
-    μ0 = mean(y)
-    σ0 = std(y)
-    a = y[1]
-    b = y[end]
-    #histogram(y)|>display
+    # take first differences along each frequency dimension
+    for i in freqdims
+        y = diff(y; dims=i)
+    end
+    y = vec(y)
 
-    # MLE of truncated normal distribution
-    𝜙(x) = (1 / sqrt(2π)) * exp.(-0.5 * x .^ 2)
-    𝛷(x) = 0.5 * erfc.(-x / sqrt(2))
-    logP(x, μ, σ) = @. log(𝜙((x - μ) / σ) / (σ * (𝛷((b - μ) / σ) - 𝛷((a - μ) / σ))))
-    ℒ(p) = -sum(logP(y, p...))
+    # iterative sigma clipping with MAD
+    for _ in 1:maxiter
+        med = median(y)
+        mad = median(abs.(y .- med))
+        threshold = sigma * 1.4826 * mad
+        mask = abs.(y .- med) .< threshold
+        sum(mask) == length(y) && break  # converged
+        y = y[mask]
+    end
 
-    p0 = [μ0, σ0]
-    res = optimize(ℒ, p0)
-    p = Optim.minimizer(res)
-    return d[:noise] = abs(p[2])
+    # final noise estimate with scaling for differencing
+    noise = 1.4826 * median(abs.(y .- median(y))) / sqrt(2.0^nfreqdims)
+
+    return d[:noise] = noise
 end
 
 estimatenoise!(spectra::Array{<:NMRData}) = map(estimatenoise!, spectra)

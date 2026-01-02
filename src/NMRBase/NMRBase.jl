@@ -149,6 +149,7 @@ export GaussWindow
 export GeneralGaussWindow, LorentzToGaussWindow
 export lineshape
 export apod
+export correlationlength
 
 export LineshapeComplexity
 export RealLineshape

@@ -271,3 +271,38 @@ function apod(t, w::GeneralSineWindow)
 end
 apod(t, w::CosWindow) = @. cos(π / 2 * t / w.tmax)
 apod(t, w::Cos²Window) = @. cos(π / 2 * t / w.tmax)^2
+
+# Correlation length ##############################################################################
+
+"""
+    correlationlength(window::WindowFunction, sw)
+
+Return the approximate correlation length (in points) introduced by the window function,
+given the spectral width `sw` in Hz.
+
+This represents the number of correlated points in the frequency domain after apodization,
+and is used to determine appropriate subsampling for noise estimation.
+"""
+function correlationlength end
+
+correlationlength(::NullWindow, sw) = 1.0
+correlationlength(::UnknownWindow, sw) = 4.0  # conservative default
+
+function correlationlength(w::ExponentialWindow, sw)
+    # Correlation length ≈ sw / (π × lb), i.e. points within one linewidth
+    w.lb > 0 ? sw / (π * w.lb) : 1.0
+end
+
+# Sine windows: effective resolution ~ 1/(2*tmax), correlation length ~ 2*sw*tmax
+correlationlength(w::CosWindow, sw) = 2 * sw * w.tmax
+correlationlength(w::Cos²Window, sw) = 2 * sw * w.tmax
+correlationlength(w::GeneralSineWindow, sw) = 2 * sw * w.tmax
+
+# Gaussian windows: dominated by Gaussian broadening
+function correlationlength(w::LorentzToGaussWindow, sw)
+    w.gaussHz > 0 ? sw / (π * w.gaussHz) : 4.0
+end
+
+function correlationlength(w::GeneralGaussWindow, sw)
+    w.gaussHz > 0 ? sw / (π * w.gaussHz) : 4.0
+end
