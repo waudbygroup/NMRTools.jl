@@ -98,7 +98,7 @@ export refdims_title
 export set, rebuild, reorder, modify, broadcast_dims, broadcast_dims!, ForwardOrdered
 # NMR properties
 export scale
-export estimatenoise!
+export estimatenoise
 export decimate
 
 # Dimensions

@@ -595,10 +595,10 @@ end
     label!(dat1d, "selectdim slice")
     @test label(dat1a) != "selectdim slice"
 
-    # Test estimatenoise! doesn't affect original after slicing
+    # Test estimatenoise doesn't affect original after slicing
     dat_for_noise = exampledata("1D_1H")
     dat_slice = dat_for_noise[7.0 .. 9.0]
-    estimatenoise!(dat_slice)
+    dat_slice = estimatenoise(dat_slice)
     # The original should have different noise value (or nil if not yet estimated)
     @test dat_for_noise[:noise] != dat_slice[:noise]
 end

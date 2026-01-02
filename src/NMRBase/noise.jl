@@ -1,7 +1,8 @@
 """
-    estimatenoise!(nmrdata; sigma=4.0, maxiter=10)
+    estimatenoise(nmrdata; sigma=4.0, maxiter=10) -> NMRData
 
 Estimate the rms noise level in the data and update `:noise` metadata.
+Returns the NMRData object with noise estimate stored in metadata.
 
 If called on an `Array` of data, each item will be updated.
 
@@ -22,9 +23,16 @@ If called on an `Array` of data, each item will be updated.
 5. Scale by ``1/\\sqrt{2^D}`` where ``D`` is the number of frequency dimensions, to account
    for variance doubling from each differencing operation.
 
+# Examples
+```julia
+spec = loadnmr("experiment/1/pdata/1")
+spec = estimatenoise(spec)  # Estimate and store noise level
+spec[:noise]  # Access the noise estimate
+```
+
 See also [`correlationlength`](@ref).
 """
-function estimatenoise!(d::NMRData; sigma=4.0, maxiter=10)
+function estimatenoise(d::NMRData; sigma=4.0, maxiter=10)
     # identify frequency dimensions and calculate subsampling steps
     freqdims = Int[]
     steps = ones(Int, ndims(d))
@@ -60,9 +68,9 @@ function estimatenoise!(d::NMRData; sigma=4.0, maxiter=10)
     end
 
     # final noise estimate with scaling for differencing
-    noise = 1.4826 * median(abs.(y .- median(y))) / sqrt(2.0^nfreqdims)
+    d[:noise] = 1.4826 * median(abs.(y .- median(y))) / sqrt(2.0^nfreqdims)
 
-    return d[:noise] = noise
+    return d
 end
 
-estimatenoise!(spectra::Array{<:NMRData}) = map(estimatenoise!, spectra)
+estimatenoise(spectra::Array{<:NMRData}) = map(estimatenoise, spectra)

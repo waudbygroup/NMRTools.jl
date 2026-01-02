@@ -39,7 +39,7 @@ Return the metadata for specified key, or `nothing` if not found. Keys are passe
 - `:window`: `WindowFunction` indicating applied apodization
 - `:referenceoffset`: referencing (in ppm) applied to the dimension
 
-See also [`estimatenoise!`](@ref).
+See also [`estimatenoise`](@ref).
 """
 function metadata end
 
