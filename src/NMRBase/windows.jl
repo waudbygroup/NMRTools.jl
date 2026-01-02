@@ -276,14 +276,24 @@ apod(t, w::Cos²Window) = @. cos(π / 2 * t / w.tmax)^2
 
 """
     correlationlength(window::WindowFunction, sw, n)
+    correlationlength(ax::FrequencyDimension)
 
 Return the approximate correlation length (in points) introduced by the window function,
 given the spectral width `sw` in Hz and dimension size `n` points.
+
+Alternatively, pass a `FrequencyDimension` directly to extract these parameters automatically.
 
 This represents the number of correlated points in the frequency domain after apodization,
 and is used to determine appropriate subsampling for noise estimation.
 """
 function correlationlength end
+
+function correlationlength(ax::FrequencyDimension)
+    window = get(metadata(ax), :window, NullWindow())
+    sw = get(metadata(ax), :swhz, 1.0)
+    n = length(ax)
+    return correlationlength(window, sw, n)
+end
 
 correlationlength(::NullWindow, sw, n) = 1.0
 correlationlength(::UnknownWindow, sw, n) = 4.0  # conservative default
