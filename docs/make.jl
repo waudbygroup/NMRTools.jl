@@ -47,4 +47,4 @@ makedocs(;
 
 deploydocs(;
            repo="github.com/waudbygroup/NMRTools.jl.git",
-           devbranch="master",)
+           devbranch="main",)
