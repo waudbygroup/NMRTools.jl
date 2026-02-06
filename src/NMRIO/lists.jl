@@ -17,6 +17,7 @@ struct FQList{T}
 end
 
 data(f::FQList) = f.values
+Base.length(f::FQList) = length(f.values)
 
 """
     ppm(f::FQList, ax::FrequencyDimension)
