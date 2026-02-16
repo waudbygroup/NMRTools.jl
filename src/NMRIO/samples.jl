@@ -34,7 +34,7 @@ function addsampleinfo(expt::NMRData)
     isnothing(expt[:samplefile]) && return expt # no matching sample found
 
     # load sample metadata from json file
-    expt[:sample] = JSON.parsefile(expt[:samplefile]; dicttype=Dict{String,Any})
+    expt[:sample] = load_sample(expt[:samplefile])
     return expt
 end
 
@@ -47,7 +47,7 @@ function findsamples(experimentfolder)
     for samplefile in samplefiles
         # read json
         try
-            j = JSON.parsefile(samplefile)
+            j = load_sample(samplefile)
             m = j["metadata"]
             v = VersionNumber(m["schema_version"])
             v >= v"0.0.3" || continue # minimum supported schema version

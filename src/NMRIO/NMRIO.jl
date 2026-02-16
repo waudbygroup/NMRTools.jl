@@ -9,6 +9,9 @@ using JSON
 using MulticomplexNumbers
 using YAML
 
+include("schema-migration.jl")
+using .SchemaMigrate
+
 include("lists.jl")
 include("loadnmr.jl")
 include("jdx.jl")

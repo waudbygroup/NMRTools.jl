@@ -1,0 +1,220 @@
+[
+  {
+    "from_version": "0.0.2",
+    "operations": [
+      {
+        "op": "move",
+        "path": "/Users",
+        "to": "/people/users"
+      },
+      {
+        "op": "rename_key",
+        "path": "/Sample",
+        "to": "sample"
+      },
+      {
+        "op": "rename_key",
+        "path": "/sample/Label",
+        "to": "label"
+      },
+      {
+        "op": "rename_key",
+        "path": "/sample/Components",
+        "to": "components"
+      },
+      {
+        "op": "rename_key",
+        "path": "/sample/components/*/Name",
+        "to": "name"
+      },
+      {
+        "op": "rename_key",
+        "path": "/sample/components/*/Concentration",
+        "to": "concentration"
+      },
+      {
+        "op": "rename_key",
+        "path": "/sample/components/*/Unit",
+        "to": "unit"
+      },
+      {
+        "op": "rename_key",
+        "path": "/sample/components/*/Isotopic labelling",
+        "to": "isotopic_labelling"
+      },
+      {
+        "op": "rename_key",
+        "path": "/sample/components/*/Custom labelling",
+        "to": "custom_labelling"
+      },
+      {
+        "op": "rename_key",
+        "path": "/Buffer",
+        "to": "buffer"
+      },
+      {
+        "op": "rename_key",
+        "path": "/buffer/pH",
+        "to": "ph"
+      },
+      {
+        "op": "rename_key",
+        "path": "/buffer/Components",
+        "to": "components"
+      },
+      {
+        "op": "rename_key",
+        "path": "/buffer/components/*/Name",
+        "to": "name"
+      },
+      {
+        "op": "rename_key",
+        "path": "/buffer/components/*/Concentration",
+        "to": "concentration"
+      },
+      {
+        "op": "rename_key",
+        "path": "/buffer/components/*/Unit",
+        "to": "unit"
+      },
+      {
+        "op": "rename_key",
+        "path": "/buffer/Chemical shift reference",
+        "to": "chemical_shift_reference"
+      },
+      {
+        "op": "rename_key",
+        "path": "/buffer/Reference concentration",
+        "to": "reference_concentration"
+      },
+      {
+        "op": "rename_key",
+        "path": "/buffer/Reference unit",
+        "to": "reference_unit"
+      },
+      {
+        "op": "rename_key",
+        "path": "/buffer/Solvent",
+        "to": "solvent"
+      },
+      {
+        "op": "rename_key",
+        "path": "/buffer/Custom solvent",
+        "to": "custom_solvent"
+      },
+      {
+        "op": "rename_key",
+        "path": "/NMR Tube",
+        "to": "nmr_tube"
+      },
+      {
+        "op": "rename_key",
+        "path": "/nmr_tube/Diameter",
+        "to": "diameter"
+      },
+      {
+        "op": "rename_key",
+        "path": "/nmr_tube/Type",
+        "to": "type"
+      },
+      {
+        "op": "rename_key",
+        "path": "/nmr_tube/Sample Volume (μL)",
+        "to": "sample_volume_uL"
+      },
+      {
+        "op": "rename_key",
+        "path": "/nmr_tube/SampleJet Rack Position",
+        "to": "samplejet_rack_position"
+      },
+      {
+        "op": "rename_key",
+        "path": "/nmr_tube/SampleJet Rack ID",
+        "to": "samplejet_rack_id"
+      },
+      {
+        "op": "rename_key",
+        "path": "/Laboratory Reference",
+        "to": "reference"
+      },
+      {
+        "op": "rename_key",
+        "path": "/reference/Labbook Entry",
+        "to": "labbook_entry"
+      },
+      {
+        "op": "rename_key",
+        "path": "/reference/Experiment ID",
+        "to": "sample_id"
+      },
+      {
+        "op": "rename_key",
+        "path": "/Notes",
+        "to": "notes"
+      },
+      {
+        "op": "rename_key",
+        "path": "/Metadata",
+        "to": "metadata"
+      },
+      {
+        "op": "set",
+        "path": "/metadata/schema_version",
+        "value": "0.0.3"
+      }
+    ]
+  },
+  {
+    "from_version": "0.0.3",
+    "operations": [
+      {
+        "op": "rename_key",
+        "path": "/sample/components/*/concentration",
+        "to": "concentration_or_amount"
+      },
+      {
+        "op": "map",
+        "path": "/nmr_tube/diameter",
+        "from": "",
+        "to": null
+      },
+      {
+        "op": "map",
+        "path": "/nmr_tube/diameter",
+        "from": "1.7 mm",
+        "to": 1.7
+      },
+      {
+        "op": "map",
+        "path": "/nmr_tube/diameter",
+        "from": "3 mm",
+        "to": 3.0
+      },
+      {
+        "op": "map",
+        "path": "/nmr_tube/diameter",
+        "from": "5 mm",
+        "to": 5.0
+      },
+      {
+        "op": "rename_key",
+        "path": "/nmr_tube/samplejet_rack_id",
+        "to": "rack_id"
+      },
+      {
+        "op": "remove",
+        "path": "/nmr_tube/samplejet_rack_position"
+      },
+      {
+        "op": "set",
+        "path": "/sample/physical_form",
+        "value": ""
+      },
+      {
+        "op": "set",
+        "path": "/metadata/schema_version",
+        "value": "0.1.0"
+      }
+    ]
+  }
+]
