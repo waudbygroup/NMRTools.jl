@@ -123,6 +123,7 @@ See the [Sample metadata](metadata-samples.md) page for detailed documentation.
 | `:title`         | Contents of `pdata/1/title`                |
 | `:label`         | First line of title, used for captions     |
 | `:date`          | Experiment timestamp (completion time)     |
+| `:field`         | Field strength (in T)                      |
 | `:pulseprogram`  | Pulse program (PULPROG) from acqus file    |
 | `:ndim`          | Number of dimensions                       |
 | `:acqusfilename` | Path to associated acqus file              |

@@ -69,6 +69,12 @@ function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
 
     # 4. merge in acqus metadata
     merge!(metadata(spectrum), aqdic)
+    try
+        spectrum[:field] = 2π * metadata(spectrum, 1, :bf) /
+                           (gyromagneticratio(H1) *
+                            xi_ratio(metadata(spectrum, 1, :nucleus)))
+    catch e
+    end
 
     # 5. estimate the spectrum noise level
     spectrum = estimatenoise(spectrum)
