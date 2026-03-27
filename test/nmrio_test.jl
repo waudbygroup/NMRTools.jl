@@ -373,6 +373,10 @@ end
     @test dat[2, :swppm] == 21.999694151751253
     @test dat[2, :pseudodim] == false
 
+    # field strength metadata (in Tesla)
+    @test dat[:field] isa Float64
+    @test 14.0 < dat[:field] < 14.2  # ~600 MHz spectrometer ≈ 14.1 T
+
     # load multicomplex spectrum (bicomplex for 2D)
     datMC = loadnmr(artifact"2D_HN"; allcomponents=true)
     @test size(datMC) == (1216, 512)

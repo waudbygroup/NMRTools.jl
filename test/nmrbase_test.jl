@@ -411,6 +411,10 @@ end
     @test hz(fq_ppm_abs, ax) ≈ [(7.0 - offsetppm) * bf * 1e-6,
                                 (7.5 - offsetppm) * bf * 1e-6,
                                 (8.0 - offsetppm) * bf * 1e-6]
+
+    # Test length
+    @test length(fq_hz_rel) == 3
+    @test length(fq_ppm_abs) == 3
 end
 
 @testset "NMRBase: nuclei and coherences" begin
@@ -580,6 +584,24 @@ end
     output = string(p7)
     @test occursin("dB", output)
     @test occursin("W", output)
+
+    # Test hz(::Power, ref_p, ref_Hz) - same power returns same Hz
+    ref = Power(10.0, :dB)
+    @test hz(ref, ref, 500.0) ≈ 500.0
+
+    # 6 dB less attenuation → 2x the field strength
+    p8 = Power(4.0, :dB)
+    @test hz(p8, ref, 500.0) ≈ 500.0 * 10^(6.0 / 20) atol=0.01
+
+    # Test hz(::Power, ref_p, ref_pulselength, ref_angle) variant
+    # 10 μs 90° pulse → 1/(4*10e-6) = 25000 Hz
+    ref_pl = Power(10.0, :dB)
+    @test hz(ref_pl, ref_pl, 10e-6, 90) ≈ 25000.0
+
+    # Consistency: both hz() methods should agree
+    ref_hz_direct = hz(p8, ref, 25000.0)
+    ref_hz_pulse = hz(p8, ref, 10e-6, 90)
+    @test ref_hz_direct ≈ ref_hz_pulse
 end
 
 @testset "NMRBase: Peak detection (1D)" begin

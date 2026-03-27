@@ -1,3 +1,11 @@
+"""
+    loadjdx(filename::String) -> Dict{Symbol, Any}
+
+Load a JCAMP-DX (.jdx) file and return a dictionary of parsed parameters.
+
+Power levels are converted to [`Power`](@ref) objects, durations to seconds,
+and frequency lists to [`FQList`](@ref) objects.
+"""
 function loadjdx(filename::String)
     isfile(filename) ||
         throw(NMRToolsError("loading JCAMP-DX data: $(filename) is not a valid file"))
