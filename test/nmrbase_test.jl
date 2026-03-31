@@ -231,7 +231,7 @@ end
     @test cest_data[2, :units] == "ppm"
     @test cest_data[2, :nucleus] == "19F"
     # Verify offset values are in ppm (converted from FQList Hz)
-    offset_axis = dims(cest_data, 2) |> collect
+    offset_axis = collect(dims(cest_data, 2))
     @test length(offset_axis) == 101  # 101 offset points
     # Values should be in ppm, not Hz (original was -2500 to +2500 Hz)
     @test all(abs.(offset_axis) .< 100)  # ppm values are much smaller than Hz
@@ -248,7 +248,7 @@ end
     # Dimension 2 should be SpinlockDim with Hz values
     @test dims(r1rho_data, 2) isa SpinlockDim
     @test r1rho_data[2, :units] == "Hz"
-    power_axis = dims(r1rho_data, 2) |> collect
+    power_axis = collect(dims(r1rho_data, 2))
     @test length(power_axis) == 18  # 18 power levels
     @test all(power_axis .> 0)  # All positive Hz values
     @test power_axis[1] < power_axis[end]  # Increasing field strength
@@ -257,7 +257,7 @@ end
     @test dims(r1rho_data, 3) isa TrelaxDim
     @test r1rho_data[3, :units] == "s"
     @test r1rho_data[3, :delay_type] == :r1rho
-    duration_axis = dims(r1rho_data, 3) |> collect
+    duration_axis = collect(dims(r1rho_data, 3))
     @test length(duration_axis) == 11  # 11 duration points
     @test duration_axis[1] ≈ 1e-4 atol = 1e-5  # First duration ~100 µs
     @test duration_axis[end] ≈ 0.08 atol = 0.01  # Last duration ~80 ms
@@ -591,7 +591,7 @@ end
 
     # 6 dB less attenuation → 2x the field strength
     p8 = Power(4.0, :dB)
-    @test hz(p8, ref, 500.0) ≈ 500.0 * 10^(6.0 / 20) atol=0.01
+    @test hz(p8, ref, 500.0) ≈ 500.0 * 10^(6.0 / 20) atol = 0.01
 
     # Test hz(::Power, ref_p, ref_pulselength, ref_angle) variant
     # 10 μs 90° pulse → 1/(4*10e-6) = 25000 Hz

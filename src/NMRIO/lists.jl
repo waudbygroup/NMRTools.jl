@@ -10,14 +10,17 @@ chemical shifts (in ppm) or relative offsets (in Hz) using [`ppm`](@ref) and
 
 See also: [`ppm`](@ref), [`hz`](@ref).
 """
-struct FQList{T}
+struct FQList{T} <: AbstractVector{T}
     values::Vector{T}
     unit::Symbol
     relative::Bool
 end
 
 data(f::FQList) = f.values
-Base.length(f::FQList) = length(f.values)
+Base.size(f::FQList) = size(f.values)
+Base.IndexStyle(::Type{<:FQList}) = IndexLinear()
+Base.getindex(f::FQList, i::Int) = f.values[i]
+Base.setindex!(f::FQList, v, i::Int) = (f.values[i] = v)
 
 """
     ppm(f::FQList, ax::FrequencyDimension)

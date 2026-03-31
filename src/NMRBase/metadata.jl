@@ -184,7 +184,7 @@ See also [`metadata`](@ref), [`acqus`](@ref).
 annotations(A::AbstractNMRData) = metadata(A, :annotations)
 
 # Variadic version: handles any number of keys
-function annotations(A::AbstractNMRData, keys::Union{String,Symbol,Integer}...)
+function annotations(A::AbstractNMRData, keys...)
     annot = annotations(A)
     isnothing(annot) && return nothing
 

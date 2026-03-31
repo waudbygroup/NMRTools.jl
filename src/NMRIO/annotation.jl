@@ -53,7 +53,7 @@ function annotate(spec::NMRData)
     spec[:annotations] = parsed_annotations
 
     # Apply dimension transformations based on annotations
-    spec = _apply_dimension_annotations(spec, parsed_annotations)
+    spec = _apply_dimension_annotations(spec)
 
     return spec
 end
@@ -254,11 +254,13 @@ end
 
 Recursively traverse annotations to find and resolve programmatic list patterns.
 """
-function _resolve_programmatic_recursive!(obj::Dict, root_annotations::Dict, spec::NMRData, dimensions::Vector)
+function _resolve_programmatic_recursive!(obj::Dict, root_annotations::Dict, spec::NMRData,
+                                          dimensions::Vector)
     for (key, value) in obj
         if _is_programmatic_pattern(value)
             # This is a programmatic list pattern - resolve it
-            resolved = _resolve_programmatic_pattern(key, value, root_annotations, spec, dimensions)
+            resolved = _resolve_programmatic_pattern(key, value, root_annotations, spec,
+                                                     dimensions)
             if !isnothing(resolved)
                 obj[key] = resolved
             end
@@ -270,7 +272,8 @@ function _resolve_programmatic_recursive!(obj::Dict, root_annotations::Dict, spe
     return obj
 end
 
-function _resolve_programmatic_recursive!(obj::Vector, root_annotations::Dict, spec::NMRData, dimensions::Vector)
+function _resolve_programmatic_recursive!(obj::Vector, root_annotations::Dict,
+                                          spec::NMRData, dimensions::Vector)
     # Don't process vectors themselves, only their elements if they're dicts
     for i in eachindex(obj)
         if obj[i] isa Dict
@@ -280,7 +283,8 @@ function _resolve_programmatic_recursive!(obj::Vector, root_annotations::Dict, s
     return obj
 end
 
-function _resolve_programmatic_recursive!(obj, root_annotations::Dict, spec::NMRData, dimensions::Vector)
+function _resolve_programmatic_recursive!(obj, root_annotations::Dict, spec::NMRData,
+                                          dimensions::Vector)
     # For any other type, return as-is
     return obj
 end
@@ -316,7 +320,8 @@ end
 
 Resolve a single programmatic list pattern to a vector.
 """
-function _resolve_programmatic_pattern(key::String, pattern::Dict, root_annotations::Dict, spec::NMRData, dimensions::Vector)
+function _resolve_programmatic_pattern(key::String, pattern::Dict, root_annotations::Dict,
+                                       spec::NMRData, dimensions::Vector)
     # Check if this is a counter-based pattern
     if haskey(pattern, "counter") && haskey(pattern, "scale")
         counter = get(pattern, "counter", nothing)
@@ -378,7 +383,7 @@ function _resolve_programmatic_pattern(key::String, pattern::Dict, root_annotati
             return [start_val + (i - 1) * step_val for i in 1:npoints]
         elseif !isnothing(end_val)
             # Linear with start/end
-            return collect(range(start_val, end_val, length=npoints))
+            return collect(range(start_val, end_val; length=npoints))
         else
             @warn "Programmatic list pattern must have either 'step' or 'end': $key"
             return nothing
@@ -386,7 +391,7 @@ function _resolve_programmatic_pattern(key::String, pattern::Dict, root_annotati
     elseif pattern_type == "log"
         if !isnothing(end_val)
             # Logarithmic spacing
-            return exp.(range(log(start_val), log(end_val), length=npoints))
+            return exp.(range(log(start_val), log(end_val); length=npoints))
         else
             @warn "Logarithmic programmatic list pattern requires 'end' value: $key"
             return nothing
@@ -426,25 +431,25 @@ end
 # Dimension application logic ################################################################
 
 """
-    _apply_dimension_annotations(spec::NMRData, ann::Dict) -> NMRData
+    _apply_dimension_annotations(spec::NMRData) -> NMRData
 
 Apply semantic dimension types based on the dimensions array in annotations.
 The dimensions array provides explicit ordering - index i in the array
 corresponds to dimension i in the data. Returns new NMRData with updated dimensions.
 """
-function _apply_dimension_annotations(spec::NMRData, ann::Dict)
-    dimensions = get(ann, "dimensions", nothing)
+function _apply_dimension_annotations(spec::NMRData)
+    dimensions = NMRBase.annotations(spec, :dimensions)
     isnothing(dimensions) && return spec
 
     # dimensions[i] specifies what dimension i represents
     for (dim_index, dim_spec) in enumerate(dimensions)
-        spec = _apply_single_dimension(spec, dim_index, dim_spec, ann)
+        spec = _apply_single_dimension(spec, dim_index, dim_spec)
     end
 
     return spec
 end
 
-function _apply_single_dimension(spec, dim_index, dim_spec::String, ann)
+function _apply_single_dimension(spec, dim_index, dim_spec::String)
     parts = split(dim_spec, ".")
 
     # Skip simple dimensions like "f1", "f2" - already correct
@@ -454,29 +459,38 @@ function _apply_single_dimension(spec, dim_index, dim_spec::String, ann)
     param_name = parts[2]  # e.g., "duration", "offset", "g", "power"
 
     # Get the parameter block from annotations
-    block = get(ann, block_name, nothing)
-    isnothing(block) && return spec
+    list = NMRBase.annotations(spec, dim_spec)
+    isnothing(list) && return spec
 
-    # Get the actual values (already resolved)
-    values = get(block, param_name, nothing)
-    isnothing(values) && return spec
+    # Adjust list size to match dimension if needed
+    if list isa AbstractVector
+        ndata = size(spec, dim_index)
+        nlist = length(list)
+        if nlist != ndata
+            if nlist > ndata
+                @warn "Annotation list for $dim_spec has $nlist entries but dimension $dim_index has $ndata points; truncating"
+                list = list[1:ndata]
+            else
+                @warn "Annotation list for $dim_spec has $nlist entries but dimension $dim_index has $ndata points; extending cyclically"
+                list = list[mod.(0:(ndata - 1), nlist) .+ 1]
+            end
+            spec[:annotations][block_name][param_name] = list
+        end
+    end
 
     # Dispatch to specific handler based on parameter type
     if param_name == "duration"
-        return _apply_duration(spec, dim_index, values, block_name)
+        return _apply_duration(spec, dim_index, list, block_name)
     elseif param_name == "g"
-        return _apply_gradient(spec, dim_index, values, block)
+        return _apply_gradient(spec, dim_index, list, block_name)
     elseif param_name == "offset"
-        return _apply_offset(spec, dim_index, values, block)
+        return _apply_offset(spec, dim_index, list, block_name)
     elseif param_name == "power"
-        return _apply_power(spec, dim_index, values, block)
+        return _apply_power(spec, dim_index, list, block_name)
     end
 
     return spec
 end
-
-# Fallback for non-string dim_spec (shouldn't happen normally)
-_apply_single_dimension(spec, dim_index, dim_spec, ann) = spec
 
 function _apply_duration(spec, dim_index, values, block_name)
     # All duration arrays use TrelaxDim
@@ -498,7 +512,8 @@ function _apply_duration(spec, dim_index, values, block_name)
     return spec
 end
 
-function _apply_gradient(spec, dim_index, values, block)
+function _apply_gradient(spec, dim_index, values, block_name)
+    block = NMRBase.annotations(spec, block_name)
     gmax = get(block, "gmax", nothing)
     if isnothing(gmax)
         @warn "No gmax specified for diffusion gradient axis"
@@ -524,7 +539,8 @@ function _apply_gradient(spec, dim_index, values, block)
     return spec
 end
 
-function _apply_offset(spec, dim_index, values, block)
+function _apply_offset(spec, dim_index, values, block_name)
+    block = NMRBase.annotations(spec, block_name)
     channel = get(block, "channel", nothing)
 
     # Convert FQList to ppm if needed
@@ -550,7 +566,8 @@ function _apply_offset(spec, dim_index, values, block)
     return spec
 end
 
-function _apply_power(spec, dim_index, values, block)
+function _apply_power(spec, dim_index, values, block_name)
+    block = NMRBase.annotations(spec, block_name)
     channel = get(block, "channel", nothing)
 
     # Convert Power values to Hz using reference pulse
