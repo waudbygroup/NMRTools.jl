@@ -426,6 +426,65 @@ end
 # Dimension application logic ################################################################
 
 """
+    _find_outermost_dim_index(ann, ndims) -> Int
+
+Determine which dim_index (in the reversed/Julia-order dimensions array) corresponds
+to the outermost acquisition loop, using the `acquisition_order` annotation if present.
+
+`acquisition_order` lists dimensions from innermost to outermost (last entry = outermost).
+Entries may be integers (1-based indices into the original/YAML-order dimensions array)
+or strings (matching entries in that array). Falls back to `ndims` if not present.
+"""
+function _find_outermost_dim_index(ann::Dict, ndims::Int)
+    acquisition_order = get(ann, "acquisition_order", nothing)
+    isnothing(acquisition_order) && return ndims
+    isempty(acquisition_order) && return ndims
+
+    outermost = last(acquisition_order)
+
+    if outermost isa Integer
+        # Integer refers to 1-based index in the ORIGINAL (pre-reversal) dimensions array.
+        # After reversal, original index k → reversed index ndims + 1 - k.
+        return ndims + 1 - Int(outermost)
+    else
+        # String: find its position in the original (pre-reversal) dimensions array.
+        original_dims = reverse(ann["dimensions"])
+        k = findfirst(==(string(outermost)), original_dims)
+        isnothing(k) && return ndims
+        return ndims + 1 - k
+    end
+end
+
+"""
+    _adjust_list_size(spec, dim_index, values, is_outer_loop) -> (NMRData, AbstractVector)
+
+Check that `values` matches the size of dimension `dim_index` in `spec`.
+- If sizes match: return unchanged.
+- If `is_outer_loop` and mismatch:
+  - List too long: truncate list to data size (warn).
+  - List too short: extend list by repeating cyclically to match data size (warn).
+- If not `is_outer_loop` and mismatch: throw `NMRToolsError`.
+"""
+function _adjust_list_size(spec::NMRData, dim_index::Int, values::AbstractVector, is_outer_loop::Bool)
+    ndata = size(spec, dim_index)
+    nlist = length(values)
+    ndata == nlist && return (spec, values)
+
+    if is_outer_loop
+        if nlist > ndata
+            @warn "Acquisition list has $nlist entries but dimension $dim_index has $ndata points; truncating list"
+            return (spec, values[1:ndata])
+        else
+            @warn "Dimension $dim_index has $ndata points but acquisition list has $nlist entries; extending list by repeating from start"
+            extended = values[mod.(0:(ndata - 1), nlist) .+ 1]
+            return (spec, extended)
+        end
+    else
+        throw(NMRToolsError("size of acquisition list ($nlist) and dimension $dim_index ($ndata) are not compatible (inner loop mismatch)"))
+    end
+end
+
+"""
     _apply_dimension_annotations(spec::NMRData, ann::Dict) -> NMRData
 
 Apply semantic dimension types based on the dimensions array in annotations.
@@ -436,15 +495,19 @@ function _apply_dimension_annotations(spec::NMRData, ann::Dict)
     dimensions = get(ann, "dimensions", nothing)
     isnothing(dimensions) && return spec
 
+    ndims_ann = length(dimensions)
+    outermost = _find_outermost_dim_index(ann, ndims_ann)
+
     # dimensions[i] specifies what dimension i represents
     for (dim_index, dim_spec) in enumerate(dimensions)
-        spec = _apply_single_dimension(spec, dim_index, dim_spec, ann)
+        is_outer_loop = (dim_index == outermost)
+        spec = _apply_single_dimension(spec, dim_index, dim_spec, ann, is_outer_loop)
     end
 
     return spec
 end
 
-function _apply_single_dimension(spec, dim_index, dim_spec::String, ann)
+function _apply_single_dimension(spec, dim_index, dim_spec::String, ann, is_outer_loop=false)
     parts = split(dim_spec, ".")
 
     # Skip simple dimensions like "f1", "f2" - already correct
@@ -463,22 +526,24 @@ function _apply_single_dimension(spec, dim_index, dim_spec::String, ann)
 
     # Dispatch to specific handler based on parameter type
     if param_name == "duration"
-        return _apply_duration(spec, dim_index, values, block_name)
+        return _apply_duration(spec, dim_index, values, block_name, is_outer_loop)
     elseif param_name == "g"
-        return _apply_gradient(spec, dim_index, values, block)
+        return _apply_gradient(spec, dim_index, values, block, is_outer_loop)
     elseif param_name == "offset"
-        return _apply_offset(spec, dim_index, values, block)
+        return _apply_offset(spec, dim_index, values, block, is_outer_loop)
     elseif param_name == "power"
-        return _apply_power(spec, dim_index, values, block)
+        return _apply_power(spec, dim_index, values, block, is_outer_loop)
     end
 
     return spec
 end
 
 # Fallback for non-string dim_spec (shouldn't happen normally)
-_apply_single_dimension(spec, dim_index, dim_spec, ann) = spec
+_apply_single_dimension(spec, dim_index, dim_spec, ann, is_outer_loop=false) = spec
 
-function _apply_duration(spec, dim_index, values, block_name)
+function _apply_duration(spec, dim_index, values, block_name, is_outer_loop=false)
+    spec, values = _adjust_list_size(spec, dim_index, values, is_outer_loop)
+
     # All duration arrays use TrelaxDim
     label_text = if block_name == "relaxation"
         "Relaxation delay"
@@ -498,13 +563,14 @@ function _apply_duration(spec, dim_index, values, block_name)
     return spec
 end
 
-function _apply_gradient(spec, dim_index, values, block)
+function _apply_gradient(spec, dim_index, values, block, is_outer_loop=false)
     gmax = get(block, "gmax", nothing)
     if isnothing(gmax)
         @warn "No gmax specified for diffusion gradient axis"
         gmax = 0.55  # Default assumption
     end
     gvals = gmax .* values
+    spec, gvals = _adjust_list_size(spec, dim_index, gvals, is_outer_loop)
 
     # Select appropriate gradient dimension type based on index
     DimConstructor = if dim_index == 1
@@ -524,7 +590,7 @@ function _apply_gradient(spec, dim_index, values, block)
     return spec
 end
 
-function _apply_offset(spec, dim_index, values, block)
+function _apply_offset(spec, dim_index, values, block, is_outer_loop=false)
     channel = get(block, "channel", nothing)
 
     # Convert FQList to ppm if needed
@@ -540,6 +606,8 @@ function _apply_offset(spec, dim_index, values, block)
         offset_values = values
     end
 
+    spec, offset_values = _adjust_list_size(spec, dim_index, offset_values, is_outer_loop)
+
     newdim = OffsetDim(offset_values)
     spec = replacedimension(spec, dim_index, newdim)
     label!(spec, dim_index, "Saturation offset")
@@ -550,7 +618,7 @@ function _apply_offset(spec, dim_index, values, block)
     return spec
 end
 
-function _apply_power(spec, dim_index, values, block)
+function _apply_power(spec, dim_index, values, block, is_outer_loop=false)
     channel = get(block, "channel", nothing)
 
     # Convert Power values to Hz using reference pulse
@@ -571,6 +639,8 @@ function _apply_power(spec, dim_index, values, block)
     else
         field_hz = values
     end
+
+    spec, field_hz = _adjust_list_size(spec, dim_index, field_hz, is_outer_loop)
 
     newdim = SpinlockDim(field_hz)
     spec = replacedimension(spec, dim_index, newdim)
