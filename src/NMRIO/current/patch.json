@@ -216,5 +216,51 @@
         "value": "0.1.0"
       }
     ]
+  },
+  {
+    "from_version": "0.1.0",
+    "operations": [
+      {
+        "op": "set",
+        "path": "/metadata/schema_version",
+        "value": "0.2.0"
+      },
+      {
+        "op": "set",
+        "path": "/metadata/schema_source",
+        "value": "https://raw.githubusercontent.com/nmr-samples/schema/main/versions/v0.2.0/schema.json"
+      }
+    ]
+  },
+  {
+    "from_version": "0.2.0",
+    "operations": [
+      {
+        "op": "set",
+        "path": "/sample/components/*/molecular_weight",
+        "value": null
+      },
+      {
+        "op": "map",
+        "path": "/sample/components/*/unit",
+        "from": "equiv",
+        "to": ""
+      },
+      {
+        "op": "rename_key",
+        "path": "/nmr_tube/diameter",
+        "to": "diameter_mm"
+      },
+      {
+        "op": "set",
+        "path": "/metadata/schema_version",
+        "value": "0.3.0"
+      },
+      {
+        "op": "set",
+        "path": "/metadata/schema_source",
+        "value": "https://raw.githubusercontent.com/nmr-samples/schema/main/versions/v0.3.0/schema.json"
+      }
+    ]
   }
 ]

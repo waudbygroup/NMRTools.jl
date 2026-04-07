@@ -74,8 +74,43 @@ end
 
 function _apply_set(data, op)
     segments = _parse_path(op["path"])
-    parent, key = _ensure_parents(data, segments)
-    return parent[key] = op["value"]
+    value = op["value"]
+    if !("*" in segments)
+        parent, key = _ensure_parents(data, segments)
+        parent[key] = value
+    else
+        _walk_and_set(data, segments, 1, value)
+    end
+end
+
+function _walk_and_set(obj, segments, depth, value)
+    if depth == length(segments)
+        seg = segments[depth]
+        if seg == "*"
+            if isa(obj, Vector)
+                for i in eachindex(obj)
+                    obj[i] = value
+                end
+            end
+        elseif isa(obj, Dict)
+            obj[seg] = value
+        end
+        return
+    end
+
+    seg = segments[depth]
+    if seg == "*"
+        if isa(obj, Vector)
+            for item in obj
+                _walk_and_set(item, segments, depth + 1, value)
+            end
+        end
+    elseif isa(obj, Dict)
+        if !haskey(obj, seg) || !isa(obj[seg], Union{Dict,Vector})
+            obj[seg] = Dict{String,Any}()
+        end
+        _walk_and_set(obj[seg], segments, depth + 1, value)
+    end
 end
 
 function _apply_remove(data, op)

@@ -1,9 +1,9 @@
 {
     "$schema": "https://json-schema.org/draft/2019-09/schema",
-    "$id": "https://raw.githubusercontent.com/waudbygroup/nmr-sample-schema/main/current/schema.json",
+    "$id": "https://raw.githubusercontent.com/nmr-samples/schema/main/versions/v0.3.0/schema.json",
     "title": "NMR Sample Metadata",
     "description": "Schema for NMR sample metadata collection in TopSpin environments",
-    "version": "0.1.0",
+    "version": "0.3.0",
     "type": "object",
     "additionalProperties": false,
     "required": [],
@@ -68,8 +68,17 @@
                                 "type": "string",
                                 "description": "Molecule name"
                             },
+                            "molecular_weight": {
+                                "title": "Molecular weight (Da)",
+                                "type": [
+                                    "number",
+                                    "null"
+                                ],
+                                "minimum": 0,
+                                "description": "Molecular weight in Daltons"
+                            },
                             "concentration_or_amount": {
-                                "title": "Concentration",
+                                "title": "Concentration/amount",
                                 "type": [
                                     "number",
                                     "null"
@@ -87,7 +96,6 @@
                                     "mg/mL",
                                     "%w/v",
                                     "%v/v",
-                                    "equiv",
                                     "mg",
                                     "umol",
                                     "nmol"
@@ -233,7 +241,7 @@
                         "100% D2O",
                         "CDCl3",
                         "D6-DMSO",
-                        "D4-Methanol",
+                        "D4-methanol",
                         "custom"
                     ],
                     "default": "",
@@ -252,7 +260,7 @@
             "title": "NMR Tube / Rotor",
             "additionalProperties": false,
             "properties": {
-                "diameter": {
+                "diameter_mm": {
                     "title": "Diameter (mm)",
                     "type": [
                         "number",
@@ -271,6 +279,7 @@
                         "shigemi",
                         "shaped",
                         "coaxial",
+                        "J Young",
                         "zirconia rotor",
                         "silicon nitride rotor",
                         "sapphire rotor"
@@ -279,7 +288,7 @@
                     "description": "Type of NMR tube or rotor"
                 },
                 "sample_volume_uL": {
-                    "title": "Sample Volume (μL)",
+                    "title": "Sample volume (μL)",
                     "type": [
                         "number",
                         "null"
@@ -287,7 +296,7 @@
                     "description": "Sample volume (µL)"
                 },
                 "sample_mass_mg": {
-                    "title": "Sample Mass (mg)",
+                    "title": "Sample mass (mg)",
                     "type": [
                         "number",
                         "null"
@@ -295,7 +304,7 @@
                     "description": "Sample mass (mg)"
                 },
                 "rack_id": {
-                    "title": "SampleJet Rack ID",
+                    "title": "Rack ID",
                     "type": "string",
                     "description": "Identifier for SampleJet rack",
                     "default": ""
@@ -320,7 +329,7 @@
                     "description": "Local sample identifier"
                 },
                 "labbook_entry": {
-                    "title": "Labbook Entry",
+                    "title": "Labbook entry",
                     "type": "string",
                     "description": "Reference to laboratory notebook entry"
                 }
@@ -358,7 +367,13 @@
                     "title": "Schema version",
                     "type": "string",
                     "description": "Version of this schema used",
-                    "default": "0.1.0"
+                    "default": "0.3.0"
+                },
+                "schema_source": {
+                    "title": "Schema source",
+                    "type": "string",
+                    "description": "Source of this schema version",
+                    "default": "https://raw.githubusercontent.com/nmr-samples/schema/main/versions/v0.3.0/schema.json"
                 }
             }
         }
