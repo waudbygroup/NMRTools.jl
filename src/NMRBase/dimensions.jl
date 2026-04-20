@@ -181,7 +181,7 @@ hz(ax::FrequencyDimension) = ax[:bf] * (data(ax) .- ax[:offsetppm]) * 1e-6
 Return the chemical shifts for a given offset or list of offsets along a frequency axis.
 """
 function ppm(offset::Union{Number,AbstractArray{<:Number}}, ax::FrequencyDimension)
-    return (offset + ax[:offsethz]) * 1e6 / ax[:bf]
+    return (offset .+ ax[:offsethz]) * 1e6 / ax[:bf]
 end
 
 """
