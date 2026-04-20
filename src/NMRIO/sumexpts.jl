@@ -33,13 +33,13 @@ function sumexpts(inputexpts...; out, weights=[])
     # Check if input directories exist
     for expt in inputexpts_str
         if !isdir(expt)
-            error("Input experiment directory does not exist: $expt")
+            throw(ArgumentError("Input experiment directory does not exist: $expt"))
         end
     end
     
     # Check if weights are supplied and have correct length
     if !isempty(weights) && length(weights) != length(inputexpts)
-        error("Length of weight vector must match the number of input experiments")
+        throw(DimensionMismatch("Length of weight vector must match the number of input experiments"))
     end
     
     # Create default weights if not supplied
@@ -163,7 +163,7 @@ function sumexpts(inputexpts...; out, weights=[])
         println("Loading $(expt)/$data_file")
         
         if !isfile(datapath)
-            error("Data file not found: $datapath")
+            throw(ArgumentError("Data file not found: $datapath"))
         end
         
         # Read data

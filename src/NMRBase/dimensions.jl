@@ -236,14 +236,14 @@ function resolvedim(spec, dim_ref)
     elseif dim_ref isa Nucleus
         dim_no = finddim(spec, dim_ref)
         if isnothing(dim_no)
-            throw(NMRToolsError("resolvedim: No dimension found for nucleus $dim_ref"))
+            throw(ArgumentError("resolvedim: No dimension found for nucleus $dim_ref"))
         end
         return dim_no
     else
         # Assume it's a dimension type like F1Dim
         dim_no = findfirst(d -> d isa dim_ref, dims(spec))
         if isnothing(dim_no)
-            throw(NMRToolsError("resolvedim: Dimension $dim_ref not found in NMRData object"))
+            throw(ArgumentError("resolvedim: Dimension $dim_ref not found in NMRData object"))
         end
         return dim_no
     end
@@ -276,11 +276,11 @@ function shiftdim(spec, dim_ref, offsetppm)
 
     # check that dim_no is valid (within the range of dims)
     if dim_no > length(spec.dims) || dim_no < 1
-        throw(NMRToolsError("shiftdim: Dimension index $dim_no is out of range"))
+        throw(ArgumentError("shiftdim: Dimension index $dim_no is out of range"))
     end
     # check that the dimension is a FrequencyDimension
     if !(dims(spec, dim_no) isa FrequencyDimension)
-        throw(NMRToolsError("shiftdim: Dimension $dim_ref is not a FrequencyDimension"))
+        throw(ArgumentError("shiftdim: Dimension $dim_ref is not a FrequencyDimension"))
     end
 
     dim = dims(spec, dim_no)
@@ -291,7 +291,7 @@ function shiftdim(spec, dim_ref, offsetppm)
     # Get the appropriate FrequencyDimension constructor
     DimConstructor = get(FDIM_CONSTRUCTORS, dim_no, nothing)
     if isnothing(DimConstructor)
-        throw(NMRToolsError("shiftdim: Unsupported dimension index $dim_no (max 4)"))
+        throw(ArgumentError("shiftdim: Unsupported dimension index $dim_no (max 4)"))
     end
     newdim = DimConstructor(new_data; metadata=md)
 

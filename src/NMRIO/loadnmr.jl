@@ -74,6 +74,7 @@ function loadnmr(filename; experimentfolder=nothing, allcomponents=false)
                            (gyromagneticratio(H1) *
                             xi_ratio(metadata(spectrum, 1, :nucleus)))
     catch e
+        @debug "Could not calculate field strength" exception=e
     end
 
     # 5. estimate the spectrum noise level

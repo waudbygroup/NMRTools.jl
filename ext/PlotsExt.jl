@@ -142,7 +142,7 @@ end
                           for A in v]) / length(v) * vstack
         ordering = :back
     else
-        error("vstack must be a Bool or Number")
+        throw(ArgumentError("vstack must be a Bool or Number"))
     end
 
     # TODO add guide lines
@@ -207,7 +207,7 @@ end
         refspec = normalize
         σ = refspec[:noise] * scale(dfwd) / scale(refspec)
     else
-        error("normalize must be true, false or a reference spectrum")
+        throw(ArgumentError("normalize must be true, false or a reference spectrum"))
     end
 
     stype = get(plotattributes, :seriestype, nothing)
@@ -274,7 +274,7 @@ end
     elseif isa(normalize, AbstractNMRData)
         scaling = scale(z)
     else
-        error("normalize must be true, false or a reference spectrum")
+        throw(ArgumentError("normalize must be true, false or a reference spectrum"))
     end
 
     stype = get(plotattributes, :seriestype, nothing)
@@ -381,7 +381,7 @@ end
             refspec = normalize
             σ = refspec[:noise] * scale(dfwd) / scale(refspec)
         else
-            error("normalize must be true, false or a reference spectrum")
+            throw(ArgumentError("normalize must be true, false or a reference spectrum"))
         end
 
         @series begin

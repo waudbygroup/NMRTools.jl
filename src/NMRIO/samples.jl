@@ -65,6 +65,7 @@ function findsamples(experimentfolder)
             end
             push!(samples, (samplefile, tcreation, tejection))
         catch e
+            @debug "Skipping sample entry due to parse error" samplefile exception=e
             continue
         end
     end

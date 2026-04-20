@@ -21,7 +21,7 @@ const MIGRATIONS_PATH = Ref(joinpath(@__DIR__, "current", "patch.json"))
 
 function _parse_path(path)
     isempty(path) && return String[]
-    startswith(path, "/") || error("Path must start with '/': " * path)
+    startswith(path, "/") || throw(ArgumentError("Path must start with '/': " * path))
     parts = split(path[2:end], "/")
     return [replace(replace(p, "~1" => "/"), "~0" => "~") for p in parts]
 end
@@ -128,8 +128,8 @@ function _apply_rename_key(data, op)
     for (parent, key) in _resolve(data, segments)
         if isa(parent, Dict) && haskey(parent, key)
             if haskey(parent, to)
-                error("rename_key: target key '" * to * "' already exists at path '" *
-                      op["path"] * "'")
+                throw(ArgumentError("rename_key: target key '" * to * "' already exists at path '" *
+                                    op["path"] * "'"))
             end
             parent[to] = pop!(parent, key)
         end
@@ -191,7 +191,7 @@ function update_to_latest_schema!(data, migrations_path=MIGRATIONS_PATH[])
             if block["from_version"] == version
                 for op in block["operations"]
                     handler = get(_OPS, op["op"], nothing)
-                    handler === nothing && error("Unknown operation: " * op["op"])
+                    handler === nothing && throw(ArgumentError("Unknown operation: " * op["op"]))
                     handler(data, op)
                 end
                 applied = true

@@ -58,7 +58,7 @@ end
 function DD.modify(f, A::AbstractNMRData)
     newdata = f(parent(A))
     size(newdata) == size(A) ||
-        error("$f returns an array with size $(size(newdata)) when the original size was $(size(A))")
+        throw(DimensionMismatch("$f returns an array with size $(size(newdata)) when the original size was $(size(A))"))
     return rebuild(A, newdata)
 end
 
@@ -328,7 +328,7 @@ Return a new NMRData, in which the numbered axis is replaced by a new `Dimension
 function replacedimension(A::NMRData, olddimnumber, newdim)
     olddim = dims(A, olddimnumber)
     length(olddim) == length(newdim) ||
-        throw(NMRToolsError("size of old and new dimensions are not compatible"))
+        throw(DimensionMismatch("replacedimension: size of old ($(length(olddim))) and new ($(length(newdim))) dimensions are not compatible"))
     merge!(metadata(newdim).val, metadata(olddim).val)
 
     olddims = Vector{NMRDimension}([dims(A)...])

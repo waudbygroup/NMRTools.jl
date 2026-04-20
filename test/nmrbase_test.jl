@@ -690,7 +690,7 @@ end
     @test resolvedim(spec, H1) == 1
 
     # Test resolvedim error for non-existent nucleus
-    @test_throws NMRToolsError resolvedim(spec, C13)
+    @test_throws ArgumentError resolvedim(spec, C13)
 end
 
 @testset "NMRBase: shiftdim with nucleus" begin
