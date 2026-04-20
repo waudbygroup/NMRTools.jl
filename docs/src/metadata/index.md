@@ -1,6 +1,6 @@
 # Metadata Overview
 
-[`NMRData`](@ref) objects contain comprehensive metadata on processing and acquisition parameters that are populated automatically upon loading a spectrum. This metadata system provides access to all the information needed to understand, process, and analyze NMR data.
+[`NMRData`](@ref) objects contain metadata on processing and acquisition parameters, populated automatically when loading a spectrum.
 
 ## Types of metadata
 
@@ -65,7 +65,7 @@ Window functions (apodization) applied during processing are stored as structure
 win = spec[F2Dim, :window]
 ```
 
-See the [Window functions](metadata-windows.md) page for detailed documentation.
+See the [Window functions](windows.md) page for detailed documentation.
 
 ### Power levels
 
@@ -78,7 +78,7 @@ db(p)      # Get as dB
 watts(p)   # Get as Watts
 ```
 
-See the [Power levels](metadata-power.md) page for detailed documentation.
+See the [Power levels](power.md) page for detailed documentation.
 
 ### Frequency lists
 
@@ -93,7 +93,7 @@ ppm(fqlist, dims(spec, F2Dim))
 hz(fqlist, dims(spec, F2Dim))
 ```
 
-See the [Frequency lists](metadata-fqlists.md) page for detailed documentation.
+See the [Frequency lists](fqlists.md) page for detailed documentation.
 
 ### Sample metadata
 
@@ -110,7 +110,7 @@ sample(spec)
 sample(spec, :sample, :label)
 ```
 
-See the [Sample metadata](metadata-samples.md) page for detailed documentation.
+See the [Sample metadata](samples.md) page for detailed documentation.
 
 ## Standard metadata keys
 
@@ -168,14 +168,14 @@ NMRTools performs automatic unit conversion:
 - `:vdlist`: Variable delays, in seconds
 - `:valist`: Variable amplitude, in dB (converted from Watts if necessary)
 - `:vplist`: Variable pulse lengths, in seconds
-- `:fq1list` through `:fq8list`: Frequency lists (see [Frequency lists](metadata-fqlists.md))
+- `:fq1list` through `:fq8list`: Frequency lists (see [Frequency lists](fqlists.md))
 
 ## Next steps
 
-- **[Times and frequencies](metadata-timeunits.md)**: Learn about units used for pulse lengths, delays and frequencies
-- **[Power levels](metadata-power.md)**: Representation of powers and RF field strength calculations
-- **[Frequency lists](metadata-fqlists.md)**: Understand frequency list handling and conversions
-- **[Window functions](metadata-windows.md)**: Explore apodization functions and lineshape effects
-- **[Sample metadata](metadata-samples.md)**: Working with sample metadata and the nmr-sample-schema
-- **[Tutorial: Metadata](tutorial-metadata.md)**: Step-by-step introduction to working with metadata (see Tutorials section)
-- **[Reference: Metadata](ref-metadata.md)**: Complete API reference for metadata functions (see Reference guide section)
+- **[Times and frequencies](timeunits.md)**: Units used for pulse lengths, delays and frequencies
+- **[Power levels](power.md)**: Representation of powers and RF field strength calculations
+- **[Frequency lists](fqlists.md)**: Frequency list handling and conversions
+- **[Window functions](windows.md)**: Apodization functions and lineshape effects
+- **[Sample metadata](samples.md)**: Working with sample metadata and the nmr-sample-schema
+- **[Tutorial: Metadata](../tutorials/metadata.md)**: Step-by-step introduction to working with metadata
+- **[Reference: Metadata](../reference/metadata.md)**: API reference for metadata functions

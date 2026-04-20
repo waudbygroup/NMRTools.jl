@@ -1,8 +1,8 @@
 # Metadata
 
-[`NMRData`](@ref) objects contain comprehensive metadata on processing and acquisition parameters. These are populated automatically when loading a spectrum. Entries are divided into **spectrum metadata** – associated with the experiment in general – and **axis metadata**, that are associated with a particular dimension of the data.
+[`NMRData`](@ref) objects contain metadata on processing and acquisition parameters, populated automatically when loading a spectrum. Entries are divided into **spectrum metadata** – associated with the experiment in general – and **axis metadata**, that are associated with a particular dimension of the data.
 
-Examples of spectrum metadata include: number of scans, receiver gain, pulse program, experiment title, number of dimensions, noise level (calculated when the spectrum is loaded), acquisition parameters (pulse lengths etc, from the `acqus` file), contents of auxilliary files (e.g. vclists and vdlists).
+Examples of spectrum metadata include: number of scans, receiver gain, pulse program, experiment title, number of dimensions, noise level (calculated when the spectrum is loaded), acquisition parameters (pulse lengths etc, from the `acqus` file), contents of auxiliary files (e.g. vclists and vdlists).
 
 Examples of axis metadata include: the number of points, the original time domain size (before zero filling, linear prediction or extraction of a subregion), carrier frequency, spectrum width, window function used for processing.
 
@@ -19,7 +19,7 @@ spec = exampledata("2D_HN")
 metadata(spec)
 ```
 
-For convenience, entries can be accessed by passing a second argument to the `metadata` function:
+Entries can be accessed by passing a second argument to the `metadata` function:
 
 ```@example 1
 metadata(spec, :title)
@@ -45,7 +45,7 @@ Axes can also be accessed by their type, e.g. `F1Dim` or `F2Dim`:
 metadata(spec, F2Dim)
 ```
 
-Again, for convenience entries can be accessed by passing an additional argument to the `metadata` function:
+Individual entries can be accessed by passing an additional argument to the `metadata` function:
 
 ```@example 1
 metadata(spec, F1Dim, :label)
@@ -60,7 +60,7 @@ spec[2, :offsetppm]
 
 ## Accessing acquisition parameters
 
-Spectrometer acquisition parameters are automatically parsed from the `acqus` file when data are loaded. This is stored as a dictionary in the `:acqus` entry of the spectrum metadata, but can more conveniently be accessed through the function `acqus(spec, parametername)`. Parameter names can be provided either as strings (case insensitive, e.g. `"TE"` for the temperature) or as lowercase symbols (e.g. `:te`).
+Spectrometer acquisition parameters are automatically parsed from the `acqus` file when data are loaded. This is stored as a dictionary in the `:acqus` entry of the spectrum metadata, but can also be accessed through the function `acqus(spec, parametername)`. Parameter names can be provided either as strings (case insensitive, e.g. `"TE"` for the temperature) or as lowercase symbols (e.g. `:te`).
 
 ```@example 1
 acqus(spec, :te)
@@ -72,7 +72,7 @@ Arrayed parameters such as pulse lengths are returned as dictionaries:
 acqus(spec, :p)
 ```
 
-For convenience, particular entries can be accessed directly by supplying an additional index parameter:
+Particular entries can be accessed directly by supplying an additional index parameter:
 
 ```@example 1
 acqus(spec, :cnst, 4)

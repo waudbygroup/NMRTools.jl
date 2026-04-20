@@ -5,7 +5,7 @@ NMRTools contains recipes for plotting common types of spectra, using the `Plots
 
 ## Plotting a 1D spectrum
 
-Let's load and plot an example 1D 19F spectrum, using the `loadnmr` and `plot` commands:
+Load and plot an example 1D ¹⁹F spectrum using the `loadnmr` and `plot` commands:
 
 ```@example 1
 using NMRTools, Plots
@@ -20,7 +20,7 @@ By default, plots are titled using the label generated when the data are loaded,
 comes from the first line of the title file. Titles can be removed by specifying `title=""` in
 the plot command (and the title can be changed in the same manner).
 
-The plot colour can also be modified, by specifying e.g. `c=:black` in the plot command.
+The plot colour can be modified by specifying e.g. `c=:black` in the plot command.
 
 ```@example 1
 plot(spec, title="", c=:black)
@@ -35,8 +35,8 @@ savefig("plot-1D-black.svg"); nothing # hide
 The plot range can be set using the usual `xlims` argument or command, e.g. passing `xlims=[-124,-122]`
 as an option to the plot command.
 
-Alternatively, the region of the spectrum can be selected *before* plotting, by using the NMRTools `..`
-selector.
+Alternatively, the region of interest can be selected *before* plotting using the NMRTools `..`
+selector:
 
 ```@example 1
 plot(spec[-124 .. -123])
@@ -46,13 +46,13 @@ savefig("plot-1D-zoom.svg"); nothing # hide
 ![](plot-1D-zoom.svg)
 
 There are two advantages of this approach. If `xlims` are set, the y axis will be scaled to fit the entire
-spectrum, including regions that are not actually displayed - this may not show your data at its best.
-If the data are selected before plotting, the y axis will be scaled according only to the selected region. Secondly, for large spectra, it may be quicker to plot only a subset of the data, and this can result in smaller figure sizes also.
+spectrum, including regions that are not actually displayed — this may not show your data at its best.
+If the data are selected before plotting, the y axis is scaled according only to the selected region. For large spectra, pre-selecting a subset also reduces figure sizes.
 
 
 ## Overlaying multiple 1D spectra
 
-Multiple experiments can conveniently be loaded from a list of filenames using the `map` function.
+Multiple experiments can be loaded from a list of filenames using the `map` function.
 
 ```julia
 # create a list of bruker experiment directories
@@ -70,7 +70,7 @@ filenames = ["my_experiment/1",
 spectra = map(loadnmr, filenames)
 ```
 
-This creates a vector of `NMRData` objects containing the individual spectra. To plot this series, we can pass the list to the plot function:
+This creates a vector of `NMRData` objects containing the individual spectra. To plot this series, pass the list to the plot function:
 
 ```@example 1
 spectra = exampledata("1D_19F_titration"); # hide
@@ -121,9 +121,9 @@ savefig("plot-2D.svg"); nothing # hide
 
 As for 1Ds, plots are titled using the label generated when the data are loaded. Positive and negative contour levels are generated starting from *five times the noise level*.
 
-The most convenient way to adjust the contour levels is simply to multiply or divide the spectrum by a scaling factor - the noise level stored within the spectrum metadata is not updated and so the contour levels will change accordingly.
+Contour levels can be adjusted by multiplying or dividing the spectrum by a scaling factor — the noise level stored within the spectrum metadata is not updated, so the contour levels will change accordingly.
 
-The plot colour can also be modified, by specifying e.g. `c=:purple` in the plot command. By default, the requested colour will be used to generate a lighter shade for negative contours. Negative contours can be turned off with `negcontours=false`:
+The plot colour can also be modified by specifying e.g. `c=:purple` in the plot command. By default, the requested colour will be used to generate a lighter shade for negative contours. Negative contours can be turned off with `negcontours=false`:
 
 ```@example 1
 plot(spec2d / 3, c=:purple, negcontours=false)
@@ -173,7 +173,7 @@ filenames = ["titration_experiment/1",
 spectra2d = map(loadnmr, filenames)
 ```
 
-As for 1D experiments, these can be plotted, with automatic normalisation for varying numbers of scans and receiver gain, simply by passing the list of spectra to the plot function:
+These can be plotted by passing the list of spectra to the plot function, with automatic normalisation for varying numbers of scans and receiver gain:
 
 ```@example 1
 spectra2d = exampledata("2D_HN_titration"); # hide
@@ -256,12 +256,67 @@ savefig("plot-diff-heatmap.svg"); nothing # hide
 ![](plot-diff-heatmap.svg)
 
 
+## Colours
+
+Colours can be specified using named colour symbols from the [Colors.jl](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/) library, which is included with Plots.jl. The following named colours are commonly used:
+
+```@example 1
+colours = [:black, :red, :blue, :darkgreen, :purple, :darkorange, :teal, :navy]
+ps = [plot(spec[-124.5 .. -123.5], c=c, title=string(c), titlefontsize=9,
+           legend=false, xaxis=false, yaxis=false, ticks=nothing, border=:none)
+      for c in colours]
+plot(ps..., layout=(2, 4), size=(600, 200))
+savefig("plot-colours.svg"); nothing # hide
+```
+
+![](plot-colours.svg)
+
+Any valid Plots.jl colour specification can be used, including:
+
+- **Named symbols**: `:red`, `:blue`, `:darkgreen`, `:purple`, `:teal`, `:navy`, `:darkorange`, `:black`, `:gray`, and [hundreds more](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/)
+- **RGB values**: `RGB(0.2, 0.4, 0.8)`
+- **Hex strings**: `"#4A8BC4"`
+
+For 2D spectra, the `c` argument sets the colour of the positive contours. Negative contours default to a lighter shade of the same colour, but can be set independently with `negcolor`:
+
+```julia
+plot(spec2d, c=:navy, negcolor=:red)
+```
+
+
 ## Saving plots
 
-All plots can be saved as high quality vector graphics, or as png files, using the `savefig` command.
+All plots can be saved as high quality vector graphics, or as PNG files, using the `savefig` command.
 
 ```julia
 savefig("myspectrum.pdf")
-savefig("myspectrum.svd")
+savefig("myspectrum.svg")
 savefig("myspectrum.png")
 ```
+
+
+## Plot options reference
+
+### 1D spectra
+
+| Keyword | Type | Default | Description |
+|:--------|:-----|:--------|:------------|
+| `title` | `String` | from spectrum label | Plot title. Pass `""` to suppress. |
+| `c` / `color` | Color | auto | Line colour. |
+| `normalize` | `Bool` | `true` | Scale by number of scans and receiver gain. |
+| `vstack` | `Bool` or `Number` | `false` | Stack spectra vertically. Pass a number to adjust spacing. |
+| `xlims` | Tuple | auto | Chemical shift range to display (ppm). |
+| `legend` | Symbol | auto | Legend position (e.g. `:topright`). Pass `nothing` to suppress. |
+
+### 2D spectra
+
+| Keyword | Type | Default | Description |
+|:--------|:-----|:--------|:------------|
+| `title` | `String` | from spectrum label | Plot title. Pass `""` to suppress. |
+| `c` / `color` | Color | auto | Positive contour colour. |
+| `negcontours` | `Bool` | `true` | Show negative contours. |
+| `negcolor` | Color | lighter shade of `c` | Negative contour colour. |
+| `normalize` | `Bool` or `NMRData` | `true` | Scale by scans/gain, or normalize relative to a reference spectrum. |
+| `xlims` | Tuple | auto | Chemical shift range in the direct dimension (ppm). |
+| `ylims` | Tuple | auto | Chemical shift range in the indirect dimension (ppm). |
+| `legend` | Symbol | auto | Legend position. Pass `nothing` to suppress. |

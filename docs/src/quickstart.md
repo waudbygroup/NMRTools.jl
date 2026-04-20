@@ -21,7 +21,7 @@ using NMRTools, Plots
 spec = exampledata("1D_19F")
 ```
 
-NMRTools contains Plots recipes for common types of spectrum. To plot our 1D spectrum, we just use
+NMRTools contains Plots recipes for common types of spectrum. To plot a 1D spectrum, use
 the `plot` command:
 
 ```@example 1
@@ -43,7 +43,7 @@ savefig("plot-y2.svg"); nothing # hide
 
 All plots can be saved as high quality vector graphics or png files, using the `savefig` command:
 
-```julis
+```julia
 savefig("myspectrum.pdf")
 ```
 
@@ -61,7 +61,7 @@ savefig("plot-2d.svg"); nothing # hide
 
 ![](plot-2d.svg)
 
-Contour levels are set to five times the noise level. The most convenient way to adjust this is simply to multiply or divide the spectrum by some scaling factor. You can also adjust the title - by default taken from the spectrum label - using the `title` keyword. Use an empty string (`title=""`) to remove the title.
+Contour levels are set to five times the noise level. To adjust them, multiply or divide the spectrum by a scaling factor. You can also adjust the title — by default taken from the spectrum label — using the `title` keyword. Use an empty string (`title=""`) to remove the title.
 
 ```@example 2d
 plot(spec / 2, title="spectrum divided by two")

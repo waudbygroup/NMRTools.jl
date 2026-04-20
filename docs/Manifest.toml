@@ -34,14 +34,11 @@ deps = ["LinearAlgebra", "Requires"]
 git-tree-sha1 = "7e35fca2bdfba44d797c53dfe63a51fabf39bfc0"
 uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
 version = "4.4.0"
+weakdeps = ["SparseArrays", "StaticArrays"]
 
     [deps.Adapt.extensions]
     AdaptSparseArraysExt = "SparseArrays"
     AdaptStaticArraysExt = "StaticArrays"
-
-    [deps.Adapt.weakdeps]
-    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [[deps.AliasTables]]
 deps = ["PtrArrays", "Random"]
@@ -193,16 +190,12 @@ version = "2.5.0"
 git-tree-sha1 = "b4b092499347b18a015186eae3042f72267106cb"
 uuid = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
 version = "1.6.0"
+weakdeps = ["IntervalSets", "LinearAlgebra", "StaticArrays"]
 
     [deps.ConstructionBase.extensions]
     ConstructionBaseIntervalSetsExt = "IntervalSets"
     ConstructionBaseLinearAlgebraExt = "LinearAlgebra"
     ConstructionBaseStaticArraysExt = "StaticArrays"
-
-    [deps.ConstructionBase.weakdeps]
-    IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
-    LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [[deps.Contour]]
 git-tree-sha1 = "439e35b0b36e2e5881738abc8857bd92ad6ff9a8"
@@ -473,12 +466,10 @@ deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "LinearAlgebra", "Lo
 git-tree-sha1 = "afb7c51ac63e40708a3071f80f5e84a752299d4f"
 uuid = "f6369f11-7733-5829-9624-2563aa707210"
 version = "0.10.39"
+weakdeps = ["StaticArrays"]
 
     [deps.ForwardDiff.extensions]
     ForwardDiffStaticArraysExt = "StaticArrays"
-
-    [deps.ForwardDiff.weakdeps]
-    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [[deps.FreeType2_jll]]
 deps = ["Artifacts", "Bzip2_jll", "JLLWrappers", "Libdl", "Zlib_jll"]
@@ -909,6 +900,18 @@ version = "1.11.0"
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
 version = "2025.5.20"
 
+[[deps.MulticomplexNumbers]]
+deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArrays"]
+git-tree-sha1 = "59ad985e11a0b5393674f2105c7ff84dbae0257f"
+uuid = "d39bb3b7-cc9c-4bb9-be86-52b494dfee17"
+version = "0.3.0"
+
+    [deps.MulticomplexNumbers.extensions]
+    FFTWExt = "FFTW"
+
+    [deps.MulticomplexNumbers.weakdeps]
+    FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+
 [[deps.NLSolversBase]]
 deps = ["ADTypes", "DifferentiationInterface", "Distributed", "FiniteDiff", "ForwardDiff"]
 git-tree-sha1 = "25a6638571a902ecfb1ae2a18fc1575f86b1d4df"
@@ -916,10 +919,10 @@ uuid = "d41bc354-129a-5804-8e4c-c37616107c6c"
 version = "7.10.0"
 
 [[deps.NMRTools]]
-deps = ["ArtifactUtils", "Artifacts", "ColorSchemes", "Colors", "Dates", "DimensionalData", "JSON", "LazyArtifacts", "LinearAlgebra", "Optim", "Peaks", "PrecompileTools", "Reexport", "SimpleTraits", "SpecialFunctions", "Statistics", "YAML"]
+deps = ["ArtifactUtils", "Artifacts", "ColorSchemes", "Colors", "Dates", "DimensionalData", "JSON", "LazyArtifacts", "LinearAlgebra", "MulticomplexNumbers", "Optim", "Peaks", "PrecompileTools", "Reexport", "SimpleTraits", "SpecialFunctions", "Statistics", "YAML"]
 path = "/Users/chris/git/NMRTools.jl"
 uuid = "c2839fe3-f1de-42fc-897f-c1b0e8db4db6"
-version = "0.2.3"
+version = "0.2.9"
 weakdeps = ["Plots"]
 
     [deps.NMRTools.extensions]
@@ -1293,6 +1296,20 @@ deps = ["Random"]
 git-tree-sha1 = "4f96c596b8c8258cc7d3b19797854d368f243ddc"
 uuid = "860ef19b-820b-49d6-a774-d7a799459cd3"
 version = "1.0.4"
+
+[[deps.StaticArrays]]
+deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
+git-tree-sha1 = "246a8bb2e6667f832eea063c3a56aef96429a3db"
+uuid = "90137ffa-7385-5640-81b9-e52037218182"
+version = "1.9.18"
+
+    [deps.StaticArrays.extensions]
+    StaticArraysChainRulesCoreExt = "ChainRulesCore"
+    StaticArraysStatisticsExt = "Statistics"
+
+    [deps.StaticArrays.weakdeps]
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[deps.StaticArraysCore]]
 git-tree-sha1 = "6ab403037779dae8c514bad259f32a447262455a"

@@ -10,9 +10,9 @@ spec = exampledata("1D_19F")
 pks = detectpeaks(spec)
 ```
 
-The `detectpeaks` function returns a vector of `SimplePeak` objects with information about each detected peak:
+The `detectpeaks` function returns a vector of `SimplePeak` objects with information about each detected peak.
 
-To visualize the detected peaks, simply plot them alongside the spectrum:
+To visualize the detected peaks, plot them alongside the spectrum:
 
 ```@example peaks
 plot(spec)
@@ -83,6 +83,6 @@ sorted_by_shift = sort(peaks; by=p -> p.δ, rev=true)
 
 ## See Also
 
-- [Plotting Tutorial](tutorial-plotrecipes.md): Learn more about visualizing NMR data
-- [Working with NMR Data](tutorial-data.md): Data processing and manipulation
-- [Utilities](utilities.md): Additional analysis tools
+- [Plotting](plotting.md): Visualizing NMR data
+- [Working with NMR Data](data.md): Data processing and manipulation
+- [Utilities](../utilities.md): Additional analysis tools

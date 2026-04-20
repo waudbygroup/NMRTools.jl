@@ -1,6 +1,6 @@
 # Chemical Shift Referencing
 
-NMRTools provides comprehensive chemical shift referencing capabilities, including:
+NMRTools supports chemical shift referencing, including:
 - Direct referencing of individual dimensions
 - Indirect referencing of heteronuclear dimensions using IUPAC Xi ratios
 - Temperature-dependent water referencing for aqueous samples
@@ -87,4 +87,3 @@ The water chemical shift is calculated using the empirical formula:
 δ(H₂O) = 7.83 − T / 96.9
 
 where T is the temperature in Kelvin. Bruker spectrometers typically set the water reference to 4.7 ppm when locking, so the correction is applied relative to this default.
-

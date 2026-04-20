@@ -55,7 +55,7 @@ julia> sumexpts("myexperiment/11", "myexperiment/12", out="myexperiment/999")
 
 ### Adding multiple experiments
 
-To combine more than two experiments, simply provide all experiment numbers:
+To combine more than two experiments, provide all experiment numbers:
 
 ```julia
 # Add three experiments together

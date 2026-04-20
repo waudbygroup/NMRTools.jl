@@ -1,11 +1,11 @@
 # Working with NMR data
 
-NMR measurements are arrays of data, with additional numerical data associated with each dimension, or axis. Within NMRTools, these data are stored as [`NMRData`](@ref) structures, which provides a convenient way to encapsulate both the data, axis information, and additional metadata providing information on acquisition or processing.
+NMR measurements are arrays of data, with additional numerical data associated with each dimension, or axis. Within NMRTools, these data are stored as [`NMRData`](@ref) structures, which encapsulate the data, axis information, and metadata on acquisition or processing.
 
 
 ## Loading NMR data
 
-NMR data are loaded using the [`loadnmr`](@ref) function. This can handle processed Bruker experiments, or NMRPipe-format data.
+NMR data are loaded using the [`loadnmr`](@ref) function. This handles processed Bruker experiments and NMRPipe-format data.
 
 ```julia
 # load bruker experiment number 1 from a directory '2D_HN'
@@ -26,13 +26,13 @@ When spectra are loaded, a simple algorithm runs to estimate the noise level, wh
 
 ## Manipulating spectrum data
 
-[`NMRData`](@ref) structures encapsulate a standard Julia array. This can be accessed using the [`data`](@ref) command. However, through the magic of multiple dispatch, most operations will work transparently on NMRData variables as if they are regular arrays, with the added benefit that axis information and metadata are preserved. Data can be sliced and accessed like a regular array using the usual square brackets:
+[`NMRData`](@ref) structures encapsulate a standard Julia array. This can be accessed using the [`data`](@ref) command. Through multiple dispatch, most operations work directly on NMRData variables as if they are regular arrays, with the added benefit that axis information and metadata are preserved. Data can be sliced and accessed like a regular array using the usual square brackets:
 ```julia
 spec1d[100:105]
 spec2d[3:4, 10:14]
 ```
 
-However, more conveniently, value-based selectors can also be used to locate data using chemical shifts. Three selectors are defined:
+Value-based selectors can also be used to locate data using chemical shifts. Three selectors are defined:
 - `At(x)`: select data precisely at the specified value
 - `Near(x)`: select data at the nearest matching position
 - `x .. y`: select the range of data between `x` and `y` (closed interval)
@@ -62,7 +62,7 @@ dims(spec2d, 1)
 
 `NMRDimension`s can be treated like vectors (one-dimensional arrays) for most purposes, including indexing and slicing. Value-based selectors can also be used, as for spectrum data. Like spectrum data, the underlying numerical data can be accessed if needed using the [`data`](@ref) function.
 
-A heirarchy of types are defined for NMR dimensions, reflecting the variety of different experiments:
+A hierarchy of types is defined for NMR dimensions, reflecting the variety of different experiments:
 - `NMRDimension`
     - `FrequencyDimension`: with specific types `F1Dim` to `F4Dim`
     - `NonFrequencyDimension`
@@ -77,7 +77,7 @@ A heirarchy of types are defined for NMR dimensions, reflecting the variety of d
 
 The `shiftdim` function allows you to adjust the referencing of your NMR spectrum by adding a specified offset to the chemical shift values along a given dimension. This can be useful if you need to correct referencing errors or align spectra.
 
-To use `shiftdim`, you need to specify the NMRData object, the dimension to adjust, and the offset value to add. Here is a simple example:
+To use `shiftdim`, specify the NMRData object, the dimension to adjust, and the offset value to add. Here is a simple example:
 
 ```@example offset
 using NMRTools, Plots #hide
@@ -108,7 +108,7 @@ In this example, the chemical shift values in the first dimension of `spec2d` ar
 
 ## Accessing metadata
 
-[`NMRData`](@ref) objects contain comprehensive metadata on processing and acquisition parameters that are populated automatically upon loading a spectrum. Entries are divided into *spectrum* metadata - associated with the experiment in general - and *axis* metadata, that are associated with a particular dimension of the data.
+[`NMRData`](@ref) objects contain metadata on processing and acquisition parameters that are populated automatically upon loading a spectrum. Entries are divided into *spectrum* metadata - associated with the experiment in general - and *axis* metadata, that are associated with a particular dimension of the data.
 
 Metadata entries are labelled by symbols such as `:ns` or `:pulseprogram`. Entries can be accessed using the `metadata` function, or directly as a dictionary-style lookup:
 ```@repl 1
@@ -129,6 +129,3 @@ metadata(spec2d, F2Dim, :label)
 spec2d[2, :bf]
 spec2d[F2Dim, :window]
 ```
-
-
-

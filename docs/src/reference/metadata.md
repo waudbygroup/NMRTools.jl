@@ -26,20 +26,20 @@ units
 
 ## Acquisition data
 
-When spectra are loaded, the contents of the `acqus` file  are parsed (as are the `acqu2s` files etc. too, if present). These can be accessed with `:acqus` and `:acqu2s` keys, etc. For convenience though, the additional function [`acqus`](@ref) is provided to access acquisiton data directly.
+When spectra are loaded, the contents of the `acqus` file  are parsed (as are the `acqu2s` files etc. too, if present). These can be accessed with `:acqus` and `:acqu2s` keys, etc. For convenience though, the additional function [`acqus`](@ref) is provided to access acquisition data directly.
 
 ```@docs; canonical=false
 acqus
 ```
 
-## Auxilliary files
+## Auxiliary files
 
-`acqus` can also be used to access the contents of auxilliary files (and if not present, `nothing` will be returned). Note that NMRTools will perform automatic unit conversion as follows:
+`acqus` can also be used to access the contents of auxiliary files (and if not present, `nothing` will be returned). Note that NMRTools will perform automatic unit conversion as follows:
 - `:vclist`: variable loopcounter
 - `:vdlist`: variable delays, in seconds
 - `:valist`: variable amplitude, in dB (converted from Watts if necessary)
 - `:vplist`: variable pulse lengths, in seconds
-- `:fq1list` up to `:fq8list`: frequency lists – see the [Frequency lists](metadata-fqlists.md) page for more information.
+- `:fq1list` up to `:fq8list`: frequency lists – see the [Frequency lists](../metadata/fqlists.md) page for more information.
 
 ## Frequency list API
 
@@ -51,7 +51,7 @@ ppm
 hz
 ```
 
-Raw numerical data can be accessed using the `data()` function, but it is recommended to use `ppm` and `hz` functions to access frequency data safely. See the [Frequency lists](metadata-fqlists.md) page for detailed examples.
+Raw numerical data can be accessed using the `data()` function, but it is recommended to use `ppm` and `hz` functions to access frequency data safely. See the [Frequency lists](../metadata/fqlists.md) page for detailed examples.
 
 
 ## Standard metadata: spectra
