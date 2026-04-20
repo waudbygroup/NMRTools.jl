@@ -75,9 +75,7 @@ A hierarchy of types is defined for NMR dimensions, reflecting the variety of di
 
 ## Chemical shift referencing
 
-The `shiftdim` function allows you to adjust the referencing of your NMR spectrum by adding a specified offset to the chemical shift values along a given dimension. This can be useful if you need to correct referencing errors or align spectra.
-
-To use `shiftdim`, specify the NMRData object, the dimension to adjust, and the offset value to add. Here is a simple example:
+The [`reference`](@ref) function corrects the referencing of a spectrum by specifying a known chemical shift: you provide an `old => new` pair indicating where a reference peak currently appears and where it should appear.
 
 ```@example offset
 using NMRTools, Plots #hide
@@ -85,11 +83,8 @@ using NMRTools, Plots #hide
 # Load example data
 spec2d_original = exampledata("2D_HN")
 
-# Add an offset of 0.1 ppm to the first dimension (specified as a number)
-spec2d = shiftdim(spec2d_original, 1, 0.1)
-
-# Add a further offset of -0.5 ppm to the second dimension (specified as F2Dim)
-spec2d = shiftdim(spec2d, F2Dim, -0.5)
+# Reference the 1H dimension: peak at 4.72 ppm should be at 4.70 ppm
+spec2d = reference(spec2d_original, F2Dim, 4.72 => 4.70)
 
 label!(spec2d_original, "unreferenced")
 label!(spec2d, "referenced")
@@ -99,11 +94,30 @@ savefig("plot-offset.svg"); nothing # hide
 
 ![](plot-offset.svg)
 
-In this example, the chemical shift values in the first dimension of `spec2d` are increased by 0.1 ppm, and the values in the second dimension are decreased by 0.5 ppm.
+The dimension can be specified as a dimension index (`1`, `2`, ...), a dimension type (`F1Dim`, `F2Dim`, ...), or a nucleus (`H1`, `N15`, ...).
+
+By default, `reference` also applies indirect referencing to all other frequency dimensions using IUPAC Xi ratios. This ensures that, for example, correcting the ¹H reference in an HSQC automatically corrects the ¹⁵N or ¹³C axis too:
+
+```julia
+# Reference 1H; 15N dimension is automatically updated via Xi ratios
+spec = reference(spec, H1, 4.72 => 4.70)
+
+# Disable indirect referencing if needed
+spec = reference(spec, H1, 4.72 => 4.70; indirect=false)
+```
+
+For aqueous samples, `reference` can determine the ¹H water chemical shift from the sample temperature and apply the correction automatically:
+
+```julia
+# Reference to water using temperature from spectrum metadata
+spec = reference(spec)
+
+# Or specify the temperature manually (in Kelvin)
+spec = reference(spec; temperature=298.15)
+```
 
 !!! note
-    The `shiftdim` function will adjust metadata (`:offsetppm`, `:offsethz` and `:sf`) to keep track of the altered
-    referencing. A new metadata entry `:referenceoffset` will be created to keep track of this referencing.
+    `reference` updates the axis values and adjusts metadata (`:offsetppm`, `:offsethz`, `:sf`) to record the altered referencing. See [Chemical Shift Referencing](@ref) for full details of indirect referencing and Xi ratio tables.
 
 
 ## Accessing metadata
