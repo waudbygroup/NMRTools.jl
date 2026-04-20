@@ -7,7 +7,7 @@ NMRTools.jl is a Julia library for working with NMR spectroscopy data. It provid
 - **Built-in plotting**: Publication-quality plots with sensible defaults via Plots.jl recipes
 - **Metadata handling**: Easily access acquisition parameters from Bruker `acqus` files
 - **Window functions**: Access and analyse apodization functions used for acquisition
-- **DimensionalData.jl integration**: Leverage powerful array indexing with named dimensions to work seamlessly with frequency, time, and gradient dimensions
+- **DimensionalData.jl integration**: Leverage array indexing with named dimensions to work seamlessly with frequency, time, and gradient dimensions
 
 ## Installation
 
@@ -22,12 +22,8 @@ Load and plot a spectrum:
 
 ```julia
 using NMRTools, Plots
-spec = loadnmr("path/to/experiment")
+spec = loadnmr("path/to/experiment/1")
 plot(spec)
 ```
 
 See the [Getting started](@ref) guide for more examples, or explore the tutorial pages for detailed workflows including relaxation analysis, diffusion experiments, and advanced plotting techniques.
-
-!!! note
-    This package is under active development and it may be a while before its features and syntax stabilises.
-

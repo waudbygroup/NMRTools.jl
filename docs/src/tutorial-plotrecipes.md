@@ -56,22 +56,21 @@ Multiple experiments can conveniently be loaded from a list of filenames using t
 
 ```julia
 # create a list of bruker experiment directories
-filenames = ["../../exampledata/1D_19F_titration/1",
-             "../../exampledata/1D_19F_titration/2",
-             "../../exampledata/1D_19F_titration/3",
-             "../../exampledata/1D_19F_titration/4",
-             "../../exampledata/1D_19F_titration/5",
-             "../../exampledata/1D_19F_titration/6",
-             "../../exampledata/1D_19F_titration/7",
-             "../../exampledata/1D_19F_titration/8",
-             "../../exampledata/1D_19F_titration/9",
-             "../../exampledata/1D_19F_titration/10",
-             "../../exampledata/1D_19F_titration/11"]
+filenames = ["my_experiment/1",
+             "my_experiment/2",
+             "my_experiment/3",
+             "my_experiment/4",
+             "my_experiment/5",
+             "my_experiment/6",
+             "my_experiment/7",
+             "my_experiment/8",
+             "my_experiment/9",
+             "my_experiment/10",
+             "my_experiment/11"]
 spectra = map(loadnmr, filenames)
-nothing # hide
 ```
 
-This creates a list (`Vector`) of `NMRData` containing the individual spectra. To plot this series of spectra, we can simply pass the list of spectra to the plot function:
+This creates a vector of `NMRData` objects containing the individual spectra. To plot this series, we can pass the list to the plot function:
 
 ```@example 1
 spectra = exampledata("1D_19F_titration"); # hide
@@ -112,10 +111,9 @@ savefig("plot-19F-stack-space.svg"); nothing # hide
 2D spectra can be loaded and plotted in the same way as for 1D experiments:
 
 ```@example 1
-# load a bruker experiment
-# spec2d = loadnmr("exampledata/2D_HN/1")
 spec2d = exampledata("2D_HN")
 plot(spec2d)
+xlims!(6, 9.5)
 savefig("plot-2D.svg"); nothing # hide
 ```
 
@@ -125,14 +123,25 @@ As for 1Ds, plots are titled using the label generated when the data are loaded.
 
 The most convenient way to adjust the contour levels is simply to multiply or divide the spectrum by a scaling factor - the noise level stored within the spectrum metadata is not updated and so the contour levels will change accordingly.
 
-The plot colour can also be modified, by specifying e.g. `c=:purple` in the plot command. The hue of the requested colour will be used to generate two shades, for positive and negative contours.
+The plot colour can also be modified, by specifying e.g. `c=:purple` in the plot command. By default, the requested colour will be used to generate a lighter shade for negative contours. Negative contours can be turned off with `negcontours=false`:
 
 ```@example 1
-plot(spec2d/3, c=:purple, xlims=(6,10))
+plot(spec2d / 3, c=:purple, negcontours=false)
+xlims!(6, 9.5); nothing # hide
 savefig("plot-2D-purple.svg"); nothing # hide
 ```
 
 ![](plot-2D-purple.svg)
+
+Negative contour colours can be specified separately with `negcolor`:
+
+```@example 1
+plot(spec2d, c=:black, negcolor=:red)
+xlims!(6, 9.5); nothing # hide
+savefig("plot-2D-blackred.svg"); nothing # hide
+```
+
+![](plot-2D-blackred.svg)
 
 
 Spectra can also be plotted in other formats, e.g. heatmaps:
@@ -147,21 +156,20 @@ savefig("plot-2D-heatmap.svg"); nothing # hide
 
 ## Overlaying multiple 2D spectra
 
-Multiple 2D experiments can conveniently be loaded from a list of filenames using the `map` function.
+Multiple 2D experiments can be loaded from a list of filenames using the `map` function.
 
 ```julia
-# create a list of nmrPipe-processed experiments
-filenames = ["../../exampledata/2D_HN_titration/1/test.ft2",
-             "../../exampledata/2D_HN_titration/2/test.ft2",
-             "../../exampledata/2D_HN_titration/3/test.ft2",
-             "../../exampledata/2D_HN_titration/4/test.ft2",
-             "../../exampledata/2D_HN_titration/5/test.ft2",
-             "../../exampledata/2D_HN_titration/6/test.ft2",
-             "../../exampledata/2D_HN_titration/7/test.ft2",
-             "../../exampledata/2D_HN_titration/8/test.ft2",
-             "../../exampledata/2D_HN_titration/9/test.ft2",
-             "../../exampledata/2D_HN_titration/10/test.ft2",
-             "../../exampledata/2D_HN_titration/11/test.ft2"]
+filenames = ["titration_experiment/1",
+             "titration_experiment/2",
+             "titration_experiment/3",
+             "titration_experiment/4",
+             "titration_experiment/5",
+             "titration_experiment/6",
+             "titration_experiment/7",
+             "titration_experiment/8",
+             "titration_experiment/9",
+             "titration_experiment/10",
+             "titration_experiment/11"]
 spectra2d = map(loadnmr, filenames)
 ```
 
@@ -177,10 +185,10 @@ savefig("plot-2D-titration.svg"); nothing # hide
 
 A gradient of colours will automatically be generated when spectra are plotted in this way, and a legend generated from spectrum labels.
 
-As usual, plot limits can be adjusted with the `xlims` and `ylims` options:
+A list of colours can be passed for plotting, and as usual, plot limits can be adjusted with the `xlims` and `ylims` options.
 
 ```@example 1
-plot(spectra2d[[1,6]], xlims=(8,8.5),ylims=(120,125))
+plot(spectra2d[[1,11]], c=[:blue, :red], xlims=(8.1,8.6), ylims=(119.5,124.5))
 savefig("plot-2D-lims.svg"); nothing # hide
 ```
 

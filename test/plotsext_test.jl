@@ -134,13 +134,13 @@ end
         plot!(dat5[11]; normalize=dat5[1])
         xlims!(7, 8)
         ylims!(115, 120)
-    end "plot_2D_HN_overlay_normalised.png" false 0.02
+    end "plot_2D_overlay_normalised.png" false 0.02
     @plottest begin
         plot(dat5[1]; poscolor=:black, negcolor=:red)
         plot!(dat5[11]; normalize=dat5[1], poscolor=:blue, negcolor=:orange)
         xlims!(6.5, 7.5)
         ylims!(114, 118)
-    end "plot_2D_HN_overlay_colors.png" false 0.02
+    end "plot_2D_overlay_colors.png" false 0.02
 
     @plottest begin
         dat6 = exampledata("3D_HNCA")
