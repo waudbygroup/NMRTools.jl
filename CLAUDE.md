@@ -5,54 +5,123 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Common Development Commands
 
 **Testing:**
-- `julia -e 'using Pkg; Pkg.test()'` - Run all tests using SafeTestsets
+- `julia -e 'using Pkg; Pkg.test()'` — run all tests using SafeTestsets
 - Test files: `test/nmrbase_test.jl`, `test/nmrio_test.jl`, `test/plotsext_test.jl`
 
 **Documentation:**
-- `julia make-local-docs.jl` - Build documentation locally (installs package in dev mode and runs docs/make.jl)
-- `julia docs/make.jl` - Build documentation directly
+- `julia make-local-docs.jl` — build documentation locally (installs package in dev mode and runs docs/make.jl)
 - Documentation uses Documenter.jl with visual regression tests for plots
 
 **Package Management:**
-- Standard Julia package - use `] dev .` to develop locally
+- Standard Julia package — use `] dev .` to develop locally
 - Extensions system: PlotsExt.jl provides plotting functionality when Plots.jl is loaded
 
 ## Architecture Overview
 
-NMRTools.jl is organized into two main modules that handle different aspects of NMR data processing:
+NMRTools.jl is a Julia library for NMR spectroscopy data. It encodes the structure of NMR data in the type system: multicomplex algebra for quadrature detection, named dimensions for physical axes, and metadata for acquisition parameters.
 
-### Core Structure
-- **NMRTools.jl** (main module): Re-exports NMRBase and NMRIO modules
-- **NMRBase/**: Core data structures and NMR-specific operations
-- **NMRIO/**: File I/O for various NMR formats (Bruker, nmrPipe, UCSF, JDX)
-- **ext/PlotsExt.jl**: Plotting recipes loaded when Plots.jl is available
+### Module structure
 
-### Key Data Architecture
-- **AbstractNMRData**: Base type extending DimensionalData.AbstractDimArray
-- **NMRData**: Main data container wrapping arrays with metadata and dimensions
-- **NMR Dimensions**: Custom dimension types (FrequencyDimension, TimeDimension, GradientDimension, etc.)
-- Built on DimensionalData.jl for array indexing with named dimensions
+- **NMRTools.jl** (main): re-exports NMRBase, NMRIO, and MulticomplexNumbers
+- **NMRBase/**: core data structures, dimension types, metadata, window functions, lineshapes, peaks, referencing
+- **NMRIO/**: file I/O (Bruker, nmrPipe, UCSF, JDX), annotation parsing, sample metadata
+- **ext/PlotsExt.jl**: plotting recipes loaded when Plots.jl is available
 
-### File Format Support
-- **Bruker**: Native Bruker format with acqus parameter parsing
-- **nmrPipe**: NMRPipe format support
-- **UCSF/Sparky**: UCSF format for 2D/3D data
-- **JCAMP-DX**: JDX format support
-- **loadnmr()**: Universal loader that auto-detects format
+### Key types
 
-### Plotting Integration
-- Recipe-based plotting using Plots.jl extension system
-- Automatic axis labeling with chemical shift units
-- Support for 1D, 2D, pseudo-2D, and 3D NMR data visualization
-- Contour plots for 2D data with customizable levels
+- **`NMRData <: AbstractDimArray`**: main data container. Wraps arrays with named dimensions and metadata. Built on DimensionalData.jl.
+- **`Multicomplex{T,N,C}`**: element type for NMR data. From MulticomplexNumbers.jl. A 2D experiment has `Multicomplex{Float64,2,4}` elements (bicomplex, 4 components). `im1` is the conventional complex unit — never use Julia's `im`.
+- **Dimension hierarchy**: `FrequencyDimension` (F1Dim–F4Dim), `TimeDimension` (T1Dim–T4Dim, TrelaxDim, TkinDim), `GradientDimension` (G1Dim–G4Dim), `UnknownDimension` (X1Dim–X4Dim), `OffsetDimension` (OffsetDim), `FieldDimension` (SpinlockDim)
+- **`WindowFunction`** subtypes: `ExponentialWindow`, `CosWindow`, `Cos²Window`, `SineWindow`, `GaussWindow`, `LorentzToGaussWindow`, `NullWindow`, `UnknownWindow`
 
-### Testing Patterns
-- Uses SafeTestsets for isolated test environments  
-- Visual regression tests for plotting functionality using reference PNG files
-- Test data includes real NMR datasets for format validation
+### Critical metadata: `:mcindex`
 
-### Key Conventions
-- Dimensions follow NMR naming: F1Dim, F2Dim (frequency), T1Dim, T2Dim (time), G1Dim (gradients)
-- Metadata stored using custom Metadata types with acqus parameter integration
-- Chemical shift axes default to ppm units with reversed (right-to-left) orientation
-- Window functions and apodization follow standard NMR processing conventions
+Every `TimeDimension` and `FrequencyDimension` has an `:mcindex` metadata entry that links the dimension to its imaginary unit in the multicomplex representation. This is set once by `loadfid` and never modified:
+
+| Dimension | `:mcindex` | Imaginary unit |
+|---|---|---|
+| T1Dim / F1Dim | `1` | `im1` |
+| T2Dim / F2Dim | `2` | `im2` |
+| T3Dim / F3Dim | `3` | `im3` |
+| T4Dim / F4Dim | `4` | `im4` |
+| TrelaxDim, X2Dim, etc. | `nothing` | none (not Fourier transformed) |
+
+Processing functions (`ft`, `phase`, `apodize`) read `:mcindex` from the target dimension to determine which imaginary unit to operate on. The `fft!`/`ifft!` functions in MulticomplexNumbers.jl accept the mcindex directly as their `unit` argument.
+
+### Data representation
+
+The element type of `NMRData` is `Multicomplex{Float64,N,C}` throughout the entire processing pipeline — from `loadfid` through apodization, zero-filling, Fourier transform, and phase correction. The element type never changes during processing. Only `real(spec)` at the very end extracts the real part and converts to `Float64`.
+
+Even 1D data uses `Multicomplex{Float64,1,2}` (first-order, isomorphic to Complex but using `im1` not `im`). This keeps the type system uniform. Use `complex(spec)` for explicit conversion to Julia `Complex` when needed.
+
+### File format support
+
+- **Bruker processed** (pdata): `loadnmr("experiment/1/pdata/1")` or just `loadnmr("experiment/1")` — 1D, 2D, 3D
+- **nmrPipe**: `loadnmr("test.ft2")` — 1D, 2D, 3D (including plane series)
+- **UCSF/Sparky**: `loadnmr("spectrum.ucsf")`
+- **`loadnmr`** auto-detects format from filename/path
+
+Reading time-domain data (under development):
+- **Bruker raw** (fid/ser): `loadfid("experiment/1")` — under development
+
+### Annotation system (under development)
+
+Pulse programme annotations (`;@ ` prefixed YAML in pulse programmes) are parsed automatically by `annotate()` during loading. They resolve parameter references against acqus, generate programmatic lists, and apply semantic dimension types. Schema v0.0.2. See `ANNOTATIONS.md` for the schema.
+
+### Processing pipeline (under development)
+
+Target API uses `|>` piping with composable functions:
+
+```julia
+loadfid("1/ser") |> apodize |> zerofill |> ft |>
+    phase(F1Dim, -50) |> phase(F2Dim, 0) |> real
+```
+
+Processing functions dispatch on dimension types — `TimeDimension`s are processed, others are skipped. All functions accept optional dimension arguments for per-dimension control.
+
+## Style Conventions
+
+Follow Julia Base style throughout:
+
+- **Public function names**: lowercase, no underscores (`loadnmr`, `apodize`, `zerofill`, `estimatenoise`, `detectpeaks`, `lineshape`). Avoid underscores unless necessary for readability of long compound names.
+- **Internal functions**: underscore prefix (`_buildfreqdim`, `_readfid`, `_resolve_recursive!`)
+- **Types**: CamelCase (`NMRData`, `FrequencyDimension`, `ExponentialWindow`)
+- **Constants**: UPPER_SNAKE_CASE for true constants, CamelCase for type-like constants (`im1`, `im2` follow MulticomplexNumbers convention)
+
+Prefer multiple dispatch over conditional logic. Use positional arguments for the primary operation, keyword arguments for options. Argument ordering follows Julia Base convention: function target first, then modifiers.
+
+## Error Handling
+
+- Use Julia standard exceptions where they apply: `ArgumentError` for bad arguments, `BoundsError` for out-of-range indices, `DimensionMismatch` for size mismatches.
+- Use `NMRToolsError` only for domain-specific errors: unknown file format, missing `:mcindex`, unsupported NMR operation.
+- Never use bare `error()` — always throw a typed exception.
+- Never silently swallow exceptions in `catch` blocks — at minimum `@debug` the error.
+
+## Logging
+
+- **`@debug`**: internal tracing, parsing details, metadata construction. Annotation parsing failures go here.
+- **`@info`**: significant user-facing operations (referencing applied, data loaded, format detected).
+- **`@warn`**: things the user should know about and may need to act on (unsupported schema version, missing calibration data, data size mismatches, silent assumptions like default gmax).
+- Avoid `@warn` for best-effort parsing that commonly fails gracefully — use `@debug` instead.
+
+## Multicomplex Conventions
+
+- `im1` is the conventional NMR complex unit. Never use Julia's `im`.
+- A `Multicomplex{Float64,N,C}` has `N` imaginary units (`im1` through `imN`) and `C = 2^N` real components.
+- Component ordering: for bicomplex (N=2), components are `(rr, ir, ri, ii)` representing `rr + ir*im1 + ri*im2 + ii*im1*im2`.
+- `real(m)` strips the highest-order imaginary unit. `realest(m)` extracts the purely real component.
+- `fft!(A, unit, dims)` Fourier transforms array `A` along array dimensions `dims`, treating imaginary unit `unit` as the complex `i` for the transform.
+
+## Key Dependencies
+
+- **MulticomplexNumbers.jl** (`waudbygroup/MulticomplexNumbers.jl`): multicomplex number types with FFTW extension for `fft!`/`ifft!`
+- **DimensionalData.jl**: named dimension arrays, selectors, metadata infrastructure
+- **Plots.jl** (weak dependency): plotting recipes via extension
+- **FFTW.jl** (via MulticomplexNumbers): Fourier transforms
+
+## Testing Patterns
+
+- SafeTestsets for isolated test environments
+- Visual regression tests for plotting (VisualRegressionTests.jl with reference PNGs)
+- Test data: real NMR datasets bundled as Julia Artifacts (Bruker and nmrPipe formats)
+- Example data accessed via `exampledata("2D_HN")` etc.
