@@ -303,7 +303,7 @@ function parselist!(dic, basedir, listtype, listname, listvalue)
         inner = strip(m.captures[1])
         lines = split(inner, r"[,\s]+")
     else
-        @warn "unsupported list value format '$listvalue' in pulseprogram"
+        @debug "unsupported list value format '$listvalue' in pulseprogram"
         return nothing
     end
     return parselistdata!(dic, listtype, listname, lines)
@@ -323,7 +323,7 @@ function listdirectory(listtype)
     elseif listtype == "gradient"
         return "gp"
     else
-        @warn "unsupported list type '$listtype' in pulseprogram"
+        @debug "unsupported list type '$listtype' in pulseprogram"
         return ""
     end
 end
@@ -444,7 +444,7 @@ function parselistdata!(dic, listtype, listname, lines)
     elseif listtype == "gradient"
         dic[Symbol(listname)] = parsegplist(lines)
     else
-        @warn "unsupported list type '$listtype' in pulseprogram"
+        @debug "unsupported list type '$listtype' in pulseprogram"
         return nothing
     end
 end
@@ -452,7 +452,7 @@ end
 function parsevclist(lines)
     xint = tryparse.(Int, lines)
     if any(xint .== nothing)
-        @warn "Unable to parse format of vclist"
+        @debug "Unable to parse format of vclist"
         return lines
     end
 
@@ -467,7 +467,7 @@ function parsevdlist(lines)
     lines = replace.(lines, "s" => "")
     xf = tryparse.(Float64, lines)
     if any(xf .== nothing)
-        @warn "Unable to parse format of vdlist"
+        @debug "Unable to parse format of vdlist"
         return lines
     end
 
@@ -487,7 +487,7 @@ function parsevplist(lines)
     xf = tryparse.(Float64, lines)
 
     if any(xf .== nothing)
-        @warn "Unable to parse format of vplist"
+        @debug "Unable to parse format of vplist"
         return lines
     end
 
@@ -504,7 +504,7 @@ function parsevalist(lines)
     xf = tryparse.(Float64, lines)
 
     if any(xf .== nothing)
-        @warn "Unable to parse format of valist"
+        @debug "Unable to parse format of valist"
         return lines
     end
 
@@ -560,7 +560,7 @@ function parsefqlist(lines)
             unit = :ppm
             relative = true
         else
-            @warn "Unable to parse format of fqlist"
+            @debug "Unable to parse format of fqlist"
             return lines
         end
     end
@@ -569,7 +569,7 @@ function parsefqlist(lines)
     xf = tryparse.(Float64, lines)
 
     if any(xf .== nothing)
-        @warn "Unable to parse format of fqlist"
+        @debug "Unable to parse format of fqlist"
         return lines
     end
 
@@ -586,7 +586,7 @@ function parsegplist(lines)
     xf = tryparse.(Float64, lines)
 
     if any(xf .== nothing)
-        @warn "Unable to parse format of gradient list"
+        @debug "Unable to parse format of gradient list"
         return lines
     end
 

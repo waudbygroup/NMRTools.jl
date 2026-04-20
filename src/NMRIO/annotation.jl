@@ -93,7 +93,7 @@ function parse_annotations(content::String)::Dict{String,Any}
     try
         return YAML.load(yaml_content)
     catch e
-        @warn "Failed to parse pulse programme annotations as YAML: $e"
+        @debug "Failed to parse pulse programme annotations as YAML: $e"
         return Dict{String,Any}()
     end
 end
@@ -328,18 +328,18 @@ function _resolve_programmatic_pattern(key::String, pattern::Dict, root_annotati
         scale = get(pattern, "scale", nothing)
 
         if isnothing(counter)
-            @warn "Counter-based pattern missing 'counter' value for: $key"
+            @debug "Counter-based pattern missing 'counter' value for: $key"
             return nothing
         end
 
         if isnothing(scale)
-            @warn "Counter-based pattern missing 'scale' value for: $key"
+            @debug "Counter-based pattern missing 'scale' value for: $key"
             return nothing
         end
 
         # Counter must be a vector or array
         if !(counter isa AbstractVector)
-            @warn "Counter-based pattern 'counter' must be an array for: $key"
+            @debug "Counter-based pattern 'counter' must be an array for: $key"
             return nothing
         end
 
@@ -351,14 +351,14 @@ function _resolve_programmatic_pattern(key::String, pattern::Dict, root_annotati
     # Find which dimension this key corresponds to
     dim_path = _find_dimension_path(key, root_annotations)
     if isnothing(dim_path)
-        @warn "Could not find dimension path for programmatic list key: $key"
+        @debug "Could not find dimension path for programmatic list key: $key"
         return nothing
     end
 
     # Find dimension number in the dimensions array
     dim_index = findfirst(==(dim_path), dimensions)
     if isnothing(dim_index)
-        @warn "Could not find dimension for programmatic list: $dim_path not in dimensions array"
+        @debug "Could not find dimension for programmatic list: $dim_path not in dimensions array"
         return nothing
     end
 
@@ -372,7 +372,7 @@ function _resolve_programmatic_pattern(key::String, pattern::Dict, root_annotati
     end_val = get(pattern, "end", nothing)
 
     if isnothing(start_val)
-        @warn "Programmatic list pattern missing 'start' value for: $key"
+        @debug "Programmatic list pattern missing 'start' value for: $key"
         return nothing
     end
 
@@ -385,7 +385,7 @@ function _resolve_programmatic_pattern(key::String, pattern::Dict, root_annotati
             # Linear with start/end
             return collect(range(start_val, end_val; length=npoints))
         else
-            @warn "Programmatic list pattern must have either 'step' or 'end': $key"
+            @debug "Programmatic list pattern must have either 'step' or 'end': $key"
             return nothing
         end
     elseif pattern_type == "log"
@@ -393,11 +393,11 @@ function _resolve_programmatic_pattern(key::String, pattern::Dict, root_annotati
             # Logarithmic spacing
             return exp.(range(log(start_val), log(end_val); length=npoints))
         else
-            @warn "Logarithmic programmatic list pattern requires 'end' value: $key"
+            @debug "Logarithmic programmatic list pattern requires 'end' value: $key"
             return nothing
         end
     else
-        @warn "Unknown programmatic list type: $pattern_type (expected 'linear' or 'log')"
+        @debug "Unknown programmatic list type: $pattern_type (expected 'linear' or 'log')"
         return nothing
     end
 end
@@ -574,7 +574,7 @@ function _apply_power(spec, dim_index, values, block_name)
     if !isnothing(channel)
         ref_pulse = referencepulse(spec, channel)
         if isnothing(ref_pulse)
-            @warn "No reference pulse found for channel $channel, cannot convert power to Hz"
+            @debug "No reference pulse found for channel $channel, cannot convert power to Hz"
             return spec
         end
         ref_duration, ref_power = ref_pulse
