@@ -177,7 +177,7 @@ As for 1D experiments, these can be plotted, with automatic normalisation for va
 
 ```@example 1
 spectra2d = exampledata("2D_HN_titration"); # hide
-plot(spectra2d, legend=:topleft)
+plot(spectra2d / 2, legend=:topleft, xlims=(8.1,8.6), ylims=(119.5,124.5))
 savefig("plot-2D-titration.svg"); nothing # hide
 ```
 
@@ -185,7 +185,7 @@ savefig("plot-2D-titration.svg"); nothing # hide
 
 A gradient of colours will automatically be generated when spectra are plotted in this way, and a legend generated from spectrum labels.
 
-A list of colours can be passed for plotting, and as usual, plot limits can be adjusted with the `xlims` and `ylims` options.
+A list of colours can be passed for plotting. This will cycle if there are more spectra than colours in the list.
 
 ```@example 1
 plot(spectra2d[[1,11]], c=[:blue, :red], xlims=(8.1,8.6), ylims=(119.5,124.5))
