@@ -261,7 +261,7 @@ savefig("plot-diff-heatmap.svg"); nothing # hide
 Colours can be specified using named colour symbols from the [Colors.jl](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/) library, which is included with Plots.jl. The following named colours are commonly used:
 
 ```@example 1
-colours = [:black, :red, :blue, :darkgreen, :purple, :darkorange, :teal, :navy]
+colours = [:black, :red, :dodgerblue, :limegreen, :lightgrey,:orange, :hotpink, :purple]
 ps = [plot(spec[-124.5 .. -123.5], c=c, title=string(c), titlefontsize=9,
            legend=false, xaxis=false, yaxis=false, ticks=nothing, border=:none)
       for c in colours]
@@ -273,7 +273,7 @@ savefig("plot-colours.svg"); nothing # hide
 
 Any valid Plots.jl colour specification can be used, including:
 
-- **Named symbols**: `:red`, `:blue`, `:darkgreen`, `:purple`, `:teal`, `:navy`, `:darkorange`, `:black`, `:gray`, and [hundreds more](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/)
+- **Named symbols**: `:black`, `:red`, `:dodgerblue`, `:limegreen`, `:lightgrey`, `:orange`, `:hotpink`, `:purple` and [hundreds more](https://juliagraphics.github.io/Colors.jl/stable/namedcolors/)
 - **RGB values**: `RGB(0.2, 0.4, 0.8)`
 - **Hex strings**: `"#4A8BC4"`
 
