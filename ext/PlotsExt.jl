@@ -18,6 +18,14 @@ struct ContourLike end
 
 contourlevels(spacing=1.7, n=12) = (spacing^i for i in 0:(n - 1))
 
+_parse_colorant(c::Colorant) = c
+_parse_colorant(c) = parse(Colorant, c)
+
+function _derive_negcolor(poscolor)
+    hsv = convert(HSV, _parse_colorant(poscolor))
+    HSV(hsv.h, hsv.s * 0.4, min(1.0, max(0.5, hsv.v + 0.4)))
+end
+
 axislabel(dat::NMRData, n=1) = axislabel(dims(dat, n))
 axislabel(dim::FrequencyDimension) = "$(label(dim)) chemical shift (ppm)"
 function axislabel(dim::NMRDimension)
@@ -169,7 +177,13 @@ end
 
 # 2D plot
 @recipe function f(d::D; normalize=true,
-                   usegradient=false) where {D<:NMRData{T,2} where {T}}
+                   usegradient=false,
+                   poscolor=nothing,
+                   negcolor=nothing,
+                   negcontours=true) where {D<:NMRData{T,2} where {T}}
+    plotattributes[:poscolor] = poscolor
+    plotattributes[:negcolor] = negcolor
+    plotattributes[:negcontours] = negcontours
     return SimpleTraits.trait(HasNonFrequencyDimension{D}), d
 end
 
@@ -215,25 +229,42 @@ end
         # heatmap
         data(x), data(y), permutedims(data(dfwd))
     else
-        # generate light and dark colours for plot contours, based on supplied colour
-        # - create a 5-tone palette with the same hue as the passed colour, and select the
-        # fourth and second entries to provide dark and light shades
-        basecolor = get(plotattributes, :seriescolor, :blue)
+        poscolor = get(plotattributes, :poscolor, nothing)
+        negcolor_arg = get(plotattributes, :negcolor, nothing)
+        negcontours = get(plotattributes, :negcontours, true)
+        delete!(plotattributes, :poscolor)
+        delete!(plotattributes, :negcolor)
+        delete!(plotattributes, :negcontours)
 
-        colors = sequential_palette(hue(convert(HSV, parse(Colorant, basecolor))), 5)[[4,
-                                                                                       2]]
+        if isnothing(poscolor)
+            poscolor = get(plotattributes, :seriescolor, nothing)
+        end
+        if isnothing(poscolor)
+            # Advance through Plots palette for sequential plot!/plot calls.
+            # Each spectrum contributes 2 series (pos+neg), so series_count÷2 gives spectrum index.
+            p = get(plotattributes, :plot_object, Plots.current())
+            n_prev = (p isa Plots.Plot) ? length(p.series_list) : 0
+            pal = Plots.palette(:auto)
+            poscolor = pal[mod1(n_prev ÷ 2 + 1, length(pal))]
+        end
+
+        poscolor_c = _parse_colorant(poscolor)
+        negcolor_c = isnothing(negcolor_arg) ? _derive_negcolor(poscolor_c) :
+                     _parse_colorant(negcolor_arg)
 
         @series begin
             levels --> 5σ .* contourlevels()
-            seriescolor := colors[1]
+            seriescolor := poscolor_c
             primary --> true
             data(x), data(y), permutedims(data(dfwd))
         end
-        @series begin
-            levels --> -5σ .* contourlevels()
-            seriescolor := colors[2]
-            primary := false
-            data(x), data(y), permutedims(data(dfwd))
+        if negcontours
+            @series begin
+                levels --> -5σ .* contourlevels()
+                seriescolor := negcolor_c
+                primary := false
+                data(x), data(y), permutedims(data(dfwd))
+            end
         end
     end
 end
@@ -326,24 +357,55 @@ end
 end
 
 # multiple 2D plots
-@recipe function f(v::Vector{D}; normalize=true) where {D<:NMRData{T,2}} where {T}
+@recipe function f(v::Vector{D}; normalize=true,
+                   poscolor=nothing,
+                   negcolor=nothing,
+                   negcontours=true) where {D<:NMRData{T,2}} where {T}
+    plotattributes[:poscolor] = poscolor
+    plotattributes[:negcolor] = negcolor
+    plotattributes[:negcontours] = negcontours
     return SimpleTraits.trait(HasNonFrequencyDimension{D}), v
 end
 
 @recipe function f(::Type{Not{HasNonFrequencyDimension{D}}},
                    v::Vector{D}) where {D<:NMRData{T,2}} where {T}
     n = length(v)
-    hues = map(h -> HSV(h, 0.5, 0.5), (0:(n - 1)) .* (360 / n))
+
+    # Resolve poscolors / negcolors
+    poscolors_arg = get(plotattributes, :poscolor, nothing)
+    negcolors_arg = get(plotattributes, :negcolor, nothing)
+    negcontours = get(plotattributes, :negcontours, true)
+    delete!(plotattributes, :poscolor)
+    delete!(plotattributes, :negcolor)
+    delete!(plotattributes, :negcontours)
+
+    if isnothing(poscolors_arg)
+        poscolors_arg = get(plotattributes, :seriescolor, nothing)
+    end
+
+    if isnothing(poscolors_arg)
+        poscolors = [HSV(h, 0.9, 0.85) for h in (0:(n - 1)) .* (360.0 / n)]
+    elseif isa(poscolors_arg, AbstractVector)
+        poscolors = [_parse_colorant(poscolors_arg[mod1(i, length(poscolors_arg))]) for i in 1:n]
+    else
+        poscolors = fill(_parse_colorant(poscolors_arg), n)
+    end
+
+    if isnothing(negcolors_arg)
+        negcolors = [_derive_negcolor(c) for c in poscolors]
+    elseif isa(negcolors_arg, AbstractVector)
+        negcolors = [_parse_colorant(negcolors_arg[mod1(i, length(negcolors_arg))]) for i in 1:n]
+    else
+        negcolors = fill(_parse_colorant(negcolors_arg), n)
+    end
 
     seriestype --> :contour
 
     dfwd = reorder(v[1], ForwardOrdered) # make sure data axes are in forwards order
-    # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
     x, y = dims(dfwd)
 
     # set default title
     title --> ""
-    # legend --> :outerright
     colorbar --> nothing
     framestyle --> :box
 
@@ -360,17 +422,16 @@ end
     normalize = get(plotattributes, :normalize, true)
     delete!(plotattributes, :normalize)
 
-    h = 0.0
     # scaling calculations:
     # normalisation:
     # - if false, clev = 5 * noise(d) * scale(d) / scale(d) = 5 * noise(d), z = d
     # - if true or refspec, clev = 5 * noise(refspec) * scale(d) / scale(refspec), z = d
 
-    for d in v
+    for (i, d) in enumerate(v)
         dfwd = reorder(d, ForwardOrdered) # make sure data axes are in forwards order
-        # dfwd = DimensionalData.maybe_permute(dfwd, (YDim, XDim))
         x, y = dims(dfwd)
-        colors = sequential_palette(h, 5)[[4, 2]]
+        poscolor_c = poscolors[i]
+        negcolor_c = negcolors[i]
 
         if normalize == false
             σ = dfwd[:noise]
@@ -386,26 +447,27 @@ end
 
         @series begin
             levels --> 5σ .* contourlevels()
-            seriescolor := colors[1]
-            primary := false # true
-            label := nothing
-            data(x), data(y), permutedims(data(dfwd))
-        end
-        @series begin
-            levels --> -5σ .* contourlevels()
-            seriescolor := colors[2]
+            seriescolor := poscolor_c
             primary := false
             label := nothing
             data(x), data(y), permutedims(data(dfwd))
         end
+        if negcontours
+            @series begin
+                levels --> -5σ .* contourlevels()
+                seriescolor := negcolor_c
+                primary := false
+                label := nothing
+                data(x), data(y), permutedims(data(dfwd))
+            end
+        end
         @series begin
             seriestype := :path
-            seriescolor := colors[1]
+            seriescolor := poscolor_c
             primary --> true
             label --> label(dfwd)
             [], []
         end
-        h += 360.0 / n
     end
 end
 

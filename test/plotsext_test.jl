@@ -86,6 +86,18 @@ end
     @plottest begin
         plot(dat2)
     end "plot_2D_HN.png" false 0.02
+    @plottest begin
+        plot(dat2; c=:black)
+    end "plot_2D_black.png" false 0.02
+    @plottest begin
+        plot(dat2; poscolor=:red)
+    end "plot_2D_red.png" false 0.02
+    @plottest begin
+        plot(dat2; poscolor=:blue, negcolor=:red)
+    end "plot_2D_blue_red.png" false 0.02
+    @plottest begin
+        plot(dat2; poscolor=:limegreen, negcontours=false)
+    end "plot_2D_noneg.png" false 0.02
 
     dat3 = exampledata("pseudo2D_XSTE")
     dat3 = setgradientlist(dat3, LinRange(0.05, 0.95, 10), 0.55)
@@ -103,6 +115,9 @@ end
     @plottest begin
         plot(dat4; xlims=(-125, -121), vstack=true)
     end "plot_1D_19F_titration_vstack.png" false 0.02
+    @plottest begin
+        plot(dat4; xlims=(-125, -121), vstack=5)
+    end "plot_1D_19F_titration_vstack_5.png" false 0.02
 
     dat5 = exampledata("2D_HN_titration")
     @plottest begin
@@ -110,10 +125,22 @@ end
     end "plot_2D_HN_titration.png" false 0.02
     @plottest begin
         plot(dat5[1])
-        plot!(dat5[11]; c=:red)
+        plot!(dat5[11]; c=:hotpink)
         xlims!(7, 8)
         ylims!(115, 120)
     end "plot_2D_HN_overlay.png" false 0.02
+    @plottest begin
+        plot(dat5[1])
+        plot!(dat5[11]; normalize=dat5[1])
+        xlims!(7, 8)
+        ylims!(115, 120)
+    end "plot_2D_HN_overlay_normalised.png" false 0.02
+    @plottest begin
+        plot(dat5[1]; poscolor=:black, negcolor=:red)
+        plot!(dat5[11]; normalize=dat5[1], poscolor=:blue, negcolor=:orange)
+        xlims!(6.5, 7.5)
+        ylims!(114, 118)
+    end "plot_2D_HN_overlay_colors.png" false 0.02
 
     @plottest begin
         dat6 = exampledata("3D_HNCA")
