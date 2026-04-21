@@ -48,6 +48,10 @@ metadata(A::AbstractNMRData, dim) = metadata(dims(A, dim))
 metadata(A::AbstractNMRData, dim, key::Symbol) = get(metadata(A, dim), key, nothing)
 metadata(d::NMRDimension, key::Symbol) = get(metadata(d), key, nothing)
 
+# NMRExperiment metadata accessors
+metadata(e::NMRExperiment) = e.metadata
+metadata(e::NMRExperiment, key::Symbol) = get(e.metadata, key, nothing)
+
 Base.getindex(A::AbstractNMRData, key::Symbol) = metadata(A, key)
 Base.getindex(A::AbstractNMRData, dim, key::Symbol) = metadata(A, dim, key)
 Base.getindex(d::NMRDimension, key::Symbol) = metadata(d, key)
@@ -56,6 +60,8 @@ function Base.setindex!(A::AbstractNMRData, v, dim, key::Symbol)
     return setindex!(metadata(A, dim), v, key)
 end  #(A[dim, key] = v  =>  metadata(A, dim)[key] = v)
 Base.setindex!(d::NMRDimension, v, key::Symbol) = setindex!(metadata(d), v, key)  #(d[key] = v  =>  metadata(d)[key] = v)
+Base.getindex(e::NMRExperiment, key::Symbol) = metadata(e, key)
+Base.setindex!(e::NMRExperiment, v, key::Symbol) = (e.metadata[key] = v)
 
 """
     units(nmrdata)
@@ -82,6 +88,7 @@ See also [`label!`](@ref).
 """
 function label end
 label(A::AbstractNMRData) = metadata(A, :label)
+label(e::NMRExperiment) = metadata(e, :label)
 label(A::AbstractNMRData, dim) = metadata(A, dim, :label)
 label(d::NMRDimension) = get(metadata(d), :label, nothing)
 
@@ -129,11 +136,12 @@ julia> acqus(expt, :vclist)
 See also [`metadata`](@ref).
 """
 acqus(A::AbstractNMRData) = metadata(A, :acqus)
-function acqus(A::AbstractNMRData, key::Symbol)
+acqus(e::NMRExperiment) = metadata(e, :acqus)
+function acqus(A::Union{AbstractNMRData,NMRExperiment}, key::Symbol)
     return ismissing(acqus(A)) ? missing : get(acqus(A), key, missing)
 end
-acqus(A::AbstractNMRData, key::String) = acqus(A, Symbol(lowercase(key)))
-acqus(A::AbstractNMRData, key, index) = acqus(A, key)[index]
+acqus(A::Union{AbstractNMRData,NMRExperiment}, key::String) = acqus(A, Symbol(lowercase(key)))
+acqus(A::Union{AbstractNMRData,NMRExperiment}, key, index) = acqus(A, key)[index]
 
 """
     annotations(nmrdata)
@@ -181,10 +189,10 @@ julia> annotations(spec, "calibration.duration.start")
 
 See also [`metadata`](@ref), [`acqus`](@ref).
 """
-annotations(A::AbstractNMRData) = metadata(A, :annotations)
+annotations(x) = metadata(x, :annotations)
 
 # Variadic version: handles any number of keys
-function annotations(A::AbstractNMRData, keys...)
+function annotations(A, keys...)
     annot = annotations(A)
     isnothing(annot) && return nothing
 
@@ -263,25 +271,23 @@ function sample(spec)
     return metadata(spec, :sample)
 end
 
-# Variadic version: handles any number of keys
+sample(s::NMRSample) = s
+
+# Variadic version: handles any number of keys, works for NMRData/NMRExperiment and NMRSample directly
 function sample(spec, keys::Union{String,Symbol}...)
     sample_data = sample(spec)
     isnothing(sample_data) && return nothing
+    return sample(sample_data, keys...)
+end
 
-    # Navigate through nested dictionaries
-    current = sample_data
+function sample(s::NMRSample, keys::Union{String,Symbol}...)
+    current = s.metadata
     for key in keys
-        # Convert to lowercase string
         key_str = lowercase(string(key))
-
-        if current isa AbstractDict
-            current = get(current, key_str, nothing)
-            isnothing(current) && return nothing
-        else
-            return nothing
-        end
+        current isa AbstractDict || return nothing
+        current = get(current, key_str, nothing)
+        isnothing(current) && return nothing
     end
-
     return current
 end
 
@@ -291,8 +297,19 @@ end
 Check if the NMRData object has any associated sample metadata.
 """
 function hassample(spec)
-    return !isnothing(spec[:sample]) && !isempty(spec[:sample])
+    return !isnothing(sample(spec))
 end
+
+"""
+    samplefile(x) -> Union{String, Nothing}
+
+Return the path to the JSON sample file associated with `x`, or `nothing` if no
+sample has been matched. Works with [`NMRData`](@ref) and [`NMRExperiment`](@ref).
+
+See also [`sample`](@ref), [`hassample`](@ref).
+"""
+samplefile(x) = hassample(x) ? sample(x).path : nothing
+samplefile(s::NMRSample) = s.path
 
 """
     referencepulse(spec, nucleus) -> (pulse_length, power)

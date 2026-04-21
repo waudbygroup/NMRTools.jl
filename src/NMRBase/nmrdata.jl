@@ -10,6 +10,50 @@ DimensionalData.jl [`Dimension`]($DDdimdocs)s.
 """
 abstract type AbstractNMRData{T,N,D,A} <: AbstractDimArray{T,N,D,A} end
 
+"""
+    NMRSample
+
+A lightweight wrapper around an NMR sample JSON file. Holds the file path and
+parsed metadata. Access fields via [`sample`](@ref).
+
+See also: [`scansamples`](@ref), [`findsample`](@ref).
+"""
+struct NMRSample
+    path::String
+    metadata::Dict{String,Any}
+end
+
+"""
+    NMRExperiment
+
+A lightweight, metadata-only descriptor for a Bruker NMR experiment folder.
+Does not load any binary data. Upgrade to a full [`NMRData`](@ref) via `loadnmr`.
+
+See also: [`scanexperiments`](@ref), [`findsample`](@ref), [`loadnmr`](@ref).
+"""
+struct NMRExperiment
+    path::String
+    metadata::Dict{Symbol,Any}
+end
+
+function Base.show(io::IO, e::NMRExperiment)
+    lbl = get(e.metadata, :label, nothing)
+    pp  = get(e.metadata, :pulseprogram, nothing)
+    d   = get(e.metadata, :date, nothing)
+    print(io, "NMRExperiment(", repr(e.path))
+    isnothing(lbl) || isempty(lbl) || print(io, " \"$lbl\"")
+    isnothing(pp)  || print(io, " [$pp]")
+    isnothing(d)   || print(io, " $(Dates.format(d, "yyyy-mm-dd"))")
+    print(io, ")")
+end
+
+function Base.show(io::IO, s::NMRSample)
+    lbl = get(get(s.metadata, "sample", Dict()), "label", nothing)
+    print(io, "NMRSample(", repr(s.path))
+    isnothing(lbl) || print(io, " \"$lbl\"")
+    print(io, ")")
+end
+
 # Base methods #####################################################################################
 
 function Base.:(==)(A::AbstractNMRData{T,N}, B::AbstractNMRData{T,N}) where {T,N}

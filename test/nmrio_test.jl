@@ -484,13 +484,13 @@ end
 @testset "Samples" begin
     spec = loadnmr(joinpath("test-data", "samples", "2"))
     @test spec[:date] == DateTime(2023, 10, 9, 10, 11, 34)
-    @test basename(spec[:samplefile]) == "2025-08-23_163924_lysozyme.json"
-    @test spec[:sample]["sample"]["label"] == "lysozyme"
+    @test basename(samplefile(spec)) == "2025-08-23_163924_lysozyme.json"
+    @test sample(spec, "sample", "label") == "lysozyme"
     @test hassample(spec) == true
     @test sample(spec, :sample, :label) == "lysozyme"
 
     spec = loadnmr(joinpath("test-data", "samples", "12"))
-    @test spec[:sample]["sample"]["label"] == "lysozyme (1mM Gd)"
+    @test sample(spec, "sample", "label") == "lysozyme (1mM Gd)"
     @test sample(spec, "sample", "label") == "lysozyme (1mM Gd)"
 
     spec = loadnmr(joinpath("test-data", "samples", "22"))

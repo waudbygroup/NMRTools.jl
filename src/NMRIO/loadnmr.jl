@@ -118,3 +118,12 @@ function getformat(filename)
 
     return :unknown, filename
 end
+
+"""
+    loadnmr(expt::NMRExperiment; pdatadir=1, allcomponents=false) -> NMRData
+
+Load the full NMR spectrum for an experiment previously discovered by [`scanexperiments`](@ref).
+"""
+function loadnmr(expt::NMRExperiment; pdatadir::Int=1, allcomponents::Bool=false)
+    return loadnmr(joinpath(expt.path, "pdata", string(pdatadir)); allcomponents)
+end

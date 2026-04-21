@@ -15,6 +15,7 @@ const DDarraydocs = joinpath(DDdocs, "#DimensionalData.AbstractDimensionalArray"
 # const DDselectordocs = joinpath(DDdocs, "#DimensionalData.Selector")
 # const DDtidocs = joinpath(DDdocs, "#DimensionalData.Ti")
 
+using Dates: Dates, DateTime, Date, unix2datetime
 using LinearAlgebra
 using MulticomplexNumbers
 using Optim
@@ -84,6 +85,8 @@ export hz
 # NMRData
 export AbstractNMRData
 export NMRData
+export NMRExperiment
+export NMRSample
 # Selectors
 export Selector, IntSelector, ArraySelector
 export At, Between, Touches, Contains, Near, Where, All, ..
@@ -140,7 +143,7 @@ export metadatahelp
 export label, label!, units
 export acqus
 export annotations, hasannotations
-export sample, hassample
+export sample, hassample, samplefile
 export referencepulse
 
 # Window functions

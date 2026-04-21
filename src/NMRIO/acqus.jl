@@ -1,3 +1,60 @@
+"""
+    loadmetadata(experimentfolder) -> Dict{Symbol,Any}
+
+Load all text-based metadata from a Bruker experiment folder without reading
+any binary data (ser, fid, 2rr, etc.). Returns a metadata dictionary compatible
+with NMRData metadata.
+"""
+function loadmetadata(experimentfolder::String)
+    md = Dict{Symbol,Any}()
+    md[:experimentfolder] = experimentfolder
+
+    # parse the acqus file
+    acqusfilename = joinpath(experimentfolder, "acqus")
+    if isfile(acqusfilename)
+        acqusmetadata = parseacqus(acqusfilename)
+        md[:acqus] = acqusmetadata
+        md[:topspin] = acqusmetadata[:topspin]
+        md[:ns] = acqusmetadata[:ns]
+        md[:rg] = acqusmetadata[:rg]
+        md[:pulseprogram] = acqusmetadata[:pulprog]
+        md[:acqusfilename] = acqusfilename
+        md[:temperature] = get(acqusmetadata, :te, nothing)
+        md[:solvent] = get(acqusmetadata, :solvent, "unknown")
+        if haskey(acqusmetadata, :date)
+            md[:date] = unix2datetime(acqusmetadata[:date])
+        end
+    else
+        @warn "cannot locate acqus file in $experimentfolder - some metadata will be missing"
+    end
+
+    # parse the acquXs files, if they exist, and store in :acquXs dict entries
+    for i in 2:4
+        acquXsfilename = joinpath(experimentfolder, "acqu$(i)s")
+        if isfile(acquXsfilename)
+            acquXsmetadata = parseacqus(acquXsfilename, false) # don't parse aux files
+            md[Symbol("acqu$(i)s")] = acquXsmetadata
+        else
+            break
+        end
+    end
+
+    # load the title file
+    titlefilename = joinpath(experimentfolder, "pdata", "1", "title")
+    if isfile(titlefilename)
+        title = read(titlefilename, String)
+        title = replace(title, "\r\n" => "\n") # replace Windows line endings with Unix
+        md[:title] = strip(title)
+        # use first line of title for experiment label
+        titleline1 = split(title, "\n")[1]
+        md[:label] = strip(titleline1)
+    else
+        @debug "cannot locate title file in $experimentfolder"
+    end
+
+    return md
+end
+
 function getacqusmetadata(format, filename, experimentfolder=nothing)
     md = Dict{Symbol,Any}()
     md[:format] = format
@@ -40,52 +97,9 @@ function getacqusmetadata(format, filename, experimentfolder=nothing)
         end
     end
 
-    # add filenames to metadata
     md[:filename] = filename
-    md[:experimentfolder] = experimentfolder
-
-    # parse the acqus file
-    acqusfilename = joinpath(experimentfolder, "acqus")
-    if isfile(acqusfilename)
-        acqusmetadata = parseacqus(acqusfilename)
-        md[:acqus] = acqusmetadata
-        md[:topspin] = acqusmetadata[:topspin]
-        md[:ns] = acqusmetadata[:ns]
-        md[:rg] = acqusmetadata[:rg]
-        md[:pulseprogram] = acqusmetadata[:pulprog]
-        md[:acqusfilename] = acqusfilename
-        md[:temperature] = get(acqusmetadata, :te, nothing)
-        md[:solvent] = get(acqusmetadata, :solvent, "unknown")
-        if haskey(acqusmetadata, :date)
-            md[:date] = unix2datetime(acqusmetadata[:date])
-        end
-    else
-        @warn "cannot locate acqus file for $(filename) - some metadata will be missing"
-    end
-
-    # parse the acquXs files, if they exist, and store in :acquXs dict entries
-    for i in 2:4
-        acquXsfilename = joinpath(experimentfolder, "acqu$(i)s")
-        if isfile(acquXsfilename)
-            acquXsmetadata = parseacqus(acquXsfilename, false) # don't parse aux files
-            md[Symbol("acqu$(i)s")] = acquXsmetadata
-        else
-            break
-        end
-    end
-
-    # load the title file
-    titlefilename = joinpath(experimentfolder, "pdata", "1", "title")
-    if isfile(titlefilename)
-        title = read(titlefilename, String)
-        title = replace(title, "\r\n" => "\n") # replace Windows line endings with Unix
-        md[:title] = strip(title)
-        # use first line of title for experiment label
-        titleline1 = split(title, "\n")[1]
-        md[:label] = titleline1
-    else
-        @warn "cannot locate title file for $(filename) - some metadata will be missing"
-    end
+    merge!(md, loadmetadata(experimentfolder))
+    md[:format] = format  # restore format (loadmetadata doesn't set it)
 
     return md
 end
@@ -238,6 +252,14 @@ function pulseprogram(spec::NMRData; precomp=true)
         acqus(spec, :pulseprogram_precomp)
     else
         acqus(spec, :pulseprogram_code)
+    end
+end
+
+function pulseprogram(e::NMRExperiment; precomp=true)
+    if precomp
+        acqus(e, :pulseprogram_precomp)
+    else
+        acqus(e, :pulseprogram_code)
     end
 end
 

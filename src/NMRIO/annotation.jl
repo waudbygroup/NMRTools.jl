@@ -59,6 +59,35 @@ function annotate(spec::NMRData)
 end
 
 """
+    _annotate_metadata!(md::Dict{Symbol,Any})
+
+Parse pulse programme annotations from a raw metadata dict and store them under `:annotations`.
+Only parses the raw YAML — skips parameter resolution and programmatic list expansion, which
+require loaded data. Suitable for use with `NMRExperiment` descriptors.
+"""
+function _annotate_metadata!(md::Dict{Symbol,Any})
+    acqus_dict = get(md, :acqus, nothing)
+    isnothing(acqus_dict) && return md
+
+    pp = get(acqus_dict, :pulseprogram_precomp, nothing)
+    if isnothing(pp) || ismissing(pp) || isempty(pp)
+        return md
+    end
+
+    parsed_annotations = parse_annotations(pp)
+
+    schema_version = get(parsed_annotations, "schema_version", nothing)
+    isnothing(schema_version) && return md
+    if schema_version != "0.0.2"
+        @warn "Pulse programme uses unsupported schema version $schema_version. Only v0.0.2 is currently supported."
+        return md
+    end
+
+    md[:annotations] = parsed_annotations
+    return md
+end
+
+"""
     parse_annotations(content::String) -> Dict{String, Any}
 
 Parse pulse programme annotations from content string. Annotations are embedded 
