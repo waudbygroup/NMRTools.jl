@@ -1,9 +1,9 @@
 # NMRTools.jl
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://waudbygroup.github.io/NMRTools.jl/stable)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://waudbygroup.github.io/NMRTools.jl/dev)
-[![CI](https://github.com/waudbygroup/NMRTools.jl/actions/workflows/Runtests.yml/badge.svg)](https://github.com/waudbygroup/NMRTools.jl/actions/workflows/Runtests.yml)
-[![Codecov](https://codecov.io/gh/waudbygroup/NMRTools.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/waudbygroup/NMRTools.jl)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://waudbylab.github.io/NMRTools.jl/stable)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://waudbylab.github.io/NMRTools.jl/dev)
+[![CI](https://github.com/waudbylab/NMRTools.jl/actions/workflows/Runtests.yml/badge.svg)](https://github.com/waudbylab/NMRTools.jl/actions/workflows/Runtests.yml)
+[![Codecov](https://codecov.io/gh/waudbylab/NMRTools.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/waudbylab/NMRTools.jl)
 [![DOI](https://zenodo.org/badge/251587402.svg)](https://zenodo.org/badge/latestdoi/251587402)
 
 ![NMRTools logo](logo.png)
@@ -54,7 +54,7 @@ Documentation with tutorials and examples is available at:
 
 ## Development Status
 
-> **NOTE**: This package is under active development and the API may change between releases. Please refer to the [documentation](https://waudbygroup.github.io/NMRTools.jl/stable) for current usage examples.
+> **NOTE**: This package is under active development and the API may change between releases. Please refer to the [documentation](https://waudbylab.github.io/NMRTools.jl/stable) for current usage examples.
 
 ## Citation
 

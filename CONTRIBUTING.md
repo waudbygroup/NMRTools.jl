@@ -13,7 +13,7 @@ Thank you for your interest in contributing! This document covers how to report 
 
 ## Reporting bugs and requesting features
 
-Please open a [GitHub issue](https://github.com/waudbygroup/NMRTools.jl/issues) and include:
+Please open a [GitHub issue](https://github.com/waudbylab/NMRTools.jl/issues) and include:
 
 - Julia version (`julia --version`) and NMRTools.jl version.
 - A minimal reproducible example, ideally using the bundled example data (`exampledata("2D_HN")`).

@@ -140,7 +140,9 @@ acqus(e::NMRExperiment) = metadata(e, :acqus)
 function acqus(A::Union{AbstractNMRData,NMRExperiment}, key::Symbol)
     return ismissing(acqus(A)) ? missing : get(acqus(A), key, missing)
 end
-acqus(A::Union{AbstractNMRData,NMRExperiment}, key::String) = acqus(A, Symbol(lowercase(key)))
+function acqus(A::Union{AbstractNMRData,NMRExperiment}, key::String)
+    return acqus(A, Symbol(lowercase(key)))
+end
 acqus(A::Union{AbstractNMRData,NMRExperiment}, key, index) = acqus(A, key)[index]
 
 """
@@ -239,7 +241,7 @@ end
     sample(nmrdata, keys...)
 
 Return the sample metadata associated with the NMRData object, or `nothing` if not available.
-Sample metadata follows the schema defined at https://github.com/waudbygroup/nmr-sample-schema.
+Sample metadata follows the schema defined at https://github.com/waudbylab/nmr-sample-schema.
 
 When keys are provided, navigates nested dictionaries using the given keys. Keys can be strings
 or symbols and are automatically converted to lowercase strings for consistent access.

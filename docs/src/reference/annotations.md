@@ -76,7 +76,7 @@ This creates an explicit connection: `r1rho.power` refers to the `power` field i
 
 ## Using Annotations in NMRTools.jl
 
-The complete annotation schema is defined in the [pulse programmes repository](https://github.com/waudbygroup/pulseprograms). See the [schema documentation](https://waudbylab.org/pulseprograms/schema/fields/) and [controlled vocabulary](https://github.com/waudbygroup/pulseprograms/blob/main/VOCABULARY.md) for details.
+The complete annotation schema is defined in the [pulse programmes repository](https://github.com/waudbylab/pulseprograms). See the [schema documentation](https://waudbylab.org/pulseprograms/schema/fields/) and [controlled vocabulary](https://github.com/waudbylab/pulseprograms/blob/main/VOCABULARY.md) for details.
 
 In NMRTools.jl, parsed annotation data is accessible via the `:annotations` metadata field or the [`annotations()`](@ref) convenience function.
 
@@ -133,7 +133,7 @@ This example experiment is annotated as follows (schema v0.0.2):
 ;@   - Jan Overbeck
 ;@ created: 2020-01-01
 ;@ last_modified: 2025-11-15
-;@ repository: github.com/waudbygroup/pulseprograms
+;@ repository: github.com/waudbylab/pulseprograms
 ;@ status: beta
 ;@ experiment_type: [r1rho, 1d]
 ;@ features: [on_resonance, temperature_compensation]
@@ -223,10 +223,10 @@ p1, pl1 = referencepulse(spec, "19F")
 
 ## Resources
 
-- [Pulse Programme Repository](https://github.com/waudbygroup/pulseprograms)
+- [Pulse Programme Repository](https://github.com/waudbylab/pulseprograms)
 - [Schema Documentation](https://waudbylab.org/pulseprograms/schema/fields/)
-- [Controlled Vocabulary (VOCABULARY.md)](https://github.com/waudbygroup/pulseprograms/blob/main/VOCABULARY.md)
-- [Decision Log](https://github.com/waudbygroup/pulseprograms/blob/main/DECISIONS.md) - Design rationale and schema evolution
+- [Controlled Vocabulary (VOCABULARY.md)](https://github.com/waudbylab/pulseprograms/blob/main/VOCABULARY.md)
+- [Decision Log](https://github.com/waudbylab/pulseprograms/blob/main/DECISIONS.md) - Design rationale and schema evolution
 
 ## Automatic Dimension Annotation
 

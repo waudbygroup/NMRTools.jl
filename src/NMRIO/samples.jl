@@ -15,7 +15,7 @@ Search for and load sample metadata from JSON files in the experiment folder.
 Returns the NMRData object with sample information added to metadata under `:sample`
 as an [`NMRSample`](@ref).
 
-Sample files are JSON files following the schema at https://github.com/waudbygroup/nmr-sample-schema.
+Sample files are JSON files following the schema at https://github.com/waudbylab/nmr-sample-schema.
 The function matches samples based on creation/ejection timestamps against the experiment date.
 
 # Examples
@@ -86,7 +86,7 @@ function scansamples(dir::AbstractString; recursive::Bool=false)::Vector{NMRSamp
         try
             push!(samples, NMRSample(path))
         catch e
-            @debug "Skipping sample file" path exception=e
+            @debug "Skipping sample file" path exception = e
         end
     end
     return samples
@@ -107,11 +107,11 @@ sample's creation–ejection timestamp window.
 function findsample(expt::NMRExperiment)::Union{NMRSample,Nothing}
     experimentfolder = expt[:experimentfolder]
     isnothing(experimentfolder) && return nothing
-    findsample(expt, dirname(experimentfolder))
+    return findsample(expt, dirname(experimentfolder))
 end
 
 function findsample(expt::NMRExperiment, dir::AbstractString)::Union{NMRSample,Nothing}
-    findsample(expt, scansamples(dir))
+    return findsample(expt, scansamples(dir))
 end
 
 function findsample(expt::NMRExperiment,
@@ -132,7 +132,7 @@ function _scan_sample_files(dir::AbstractString; recursive::Bool=false)
     # Returns list of (path, tcreation, tejection) for valid sample JSON files, sorted by tcreation
     results = Tuple{String,DateTime,DateTime}[]
     _collect_sample_files!(results, dir, recursive)
-    sort!(results, by = x -> x[2])
+    sort!(results; by=x -> x[2])
     return results
 end
 
@@ -160,7 +160,7 @@ function _collect_sample_files!(results, dir, recursive)
 
                 push!(results, (entry, tcreation, tejection))
             catch e
-                @debug "Skipping sample entry due to parse error" entry exception=e
+                @debug "Skipping sample entry due to parse error" entry exception = e
             end
         end
     end

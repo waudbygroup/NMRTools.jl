@@ -1,6 +1,6 @@
 # Sample metadata
 
-Sample metadata can be automatically loaded when present, following the schema defined at [nmr-sample-schema](https://github.com/waudbygroup/nmr-sample-schema). This provides structured information about the physical sample, buffer composition, NMR tube characteristics, and personnel involved in the experiment.
+Sample metadata can be automatically loaded when present, following the schema defined at [nmr-sample-schema](https://github.com/waudbylab/nmr-sample-schema). This provides structured information about the physical sample, buffer composition, NMR tube characteristics, and personnel involved in the experiment.
 
 Sample metadata is stored as JSON files in the experiment directory and is automatically associated with spectra based on timestamps:
 
@@ -69,7 +69,7 @@ The sample metadata follows a hierarchical structure with the following main sec
   - `modified_timestamp`: When the sample metadata was last modified
 - **notes**: Free-text notes about the sample
 
-For the complete schema specification, see the [nmr-sample-schema repository](https://github.com/waudbygroup/nmr-sample-schema).
+For the complete schema specification, see the [nmr-sample-schema repository](https://github.com/waudbylab/nmr-sample-schema).
 
 ## Timestamp matching
 

@@ -11,7 +11,7 @@
 ;@   - 10.26434/chemrxiv-2025-vt1wg
 ;@ created: 2020-01-01
 ;@ last_modified: 2025-08-01
-;@ repository: github.com/waudbygroup/pulseprograms
+;@ repository: github.com/waudbylab/pulseprograms
 ;@ status: beta
 ;@ experiment_type: [r1rho, 1d]
 ;@ features: [relaxation dispersion, on-resonance, temperature compensation]

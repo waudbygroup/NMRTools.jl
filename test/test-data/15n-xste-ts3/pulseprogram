@@ -12,7 +12,7 @@
 ;@   - Ferrage et al., JACS (2004) 126:5654
 ;@ created: 2020-09-04
 ;@ last_modified: 2025-11-15
-;@ repository: github.com/waudbygroup/pulseprograms
+;@ repository: github.com/waudbylab/pulseprograms
 ;@ status: experimental
 ;@ experiment_type: [diffusion, 1d]
 ;@ features: [xste, watergate]

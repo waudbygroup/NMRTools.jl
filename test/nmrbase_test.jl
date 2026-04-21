@@ -617,7 +617,7 @@ end
 
 @testset "NMRBase: Metadata independence after slicing (issue #25)" begin
     # Test that sliced NMRData has independent metadata from the original
-    # See GitHub issue #25: https://github.com/waudbygroup/NMRTools.jl/issues/25
+    # See GitHub issue #25: https://github.com/waudbylab/NMRTools.jl/issues/25
 
     # 2D pseudo-data test
     dat1a = exampledata("pseudo2D_XSTE")

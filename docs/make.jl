@@ -15,8 +15,7 @@ makedocs(;
                                 "Metadata" => "tutorials/metadata.md",
                                 "Animating spectra" => "tutorials/animation.md",
                                 "1D relaxation analysis" => "tutorials/relaxation.md",
-                                "Diffusion analysis" => "tutorials/diffusion.md",
-                                ],
+                                "Diffusion analysis" => "tutorials/diffusion.md"],
                 "Metadata" => ["Overview" => "metadata/index.md",
                                "Times and frequencies" => "metadata/timeunits.md",
                                "Power levels" => "metadata/power.md",
@@ -24,19 +23,17 @@ makedocs(;
                                "Window functions" => "metadata/windows.md",
                                "Sample metadata" => "metadata/samples.md"],
                 "Utilities" => "utilities.md",
-                "Reference guide" => [
-                                      "Chemical shift referencing" => "reference/referencing.md",
+                "Reference guide" => ["Chemical shift referencing" => "reference/referencing.md",
                                       "Metadata" => "reference/metadata.md",
                                       "Annotations" => "reference/annotations.md",
-                                      "Coherences and isotope data" => "reference/coherences.md",
-                                      ],
+                                      "Coherences and isotope data" => "reference/coherences.md"],
                 "API" => "api.md",
                 "Index" => "indexes.md"],
-         # repo=GitHub("waudbygroup", "NMRTools.jl"),
+         # repo=GitHub("waudbylab", "NMRTools.jl"),
          sitename="NMRTools.jl",
          authors="Chris Waudby",
          warnonly=[:missing_docs],)
 
 deploydocs(;
-           repo="github.com/waudbygroup/NMRTools.jl.git",
+           repo="github.com/waudbylab/NMRTools.jl.git",
            devbranch="main",)

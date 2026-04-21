@@ -116,7 +116,7 @@ Prefer multiple dispatch over conditional logic. Use positional arguments for th
 
 ## Key Dependencies
 
-- **MulticomplexNumbers.jl** (`waudbygroup/MulticomplexNumbers.jl`): multicomplex number types with FFTW extension for `fft!`/`ifft!`
+- **MulticomplexNumbers.jl** (`waudbylab/MulticomplexNumbers.jl`): multicomplex number types with FFTW extension for `fft!`/`ifft!`
 - **DimensionalData.jl**: named dimension arrays, selectors, metadata infrastructure
 - **Plots.jl** (weak dependency): plotting recipes via extension
 - **FFTW.jl** (via MulticomplexNumbers): Fourier transforms

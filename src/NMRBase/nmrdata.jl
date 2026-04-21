@@ -38,20 +38,20 @@ end
 
 function Base.show(io::IO, e::NMRExperiment)
     lbl = get(e.metadata, :label, nothing)
-    pp  = get(e.metadata, :pulseprogram, nothing)
-    d   = get(e.metadata, :date, nothing)
+    pp = get(e.metadata, :pulseprogram, nothing)
+    d = get(e.metadata, :date, nothing)
     print(io, "NMRExperiment(", repr(e.path))
     isnothing(lbl) || isempty(lbl) || print(io, " \"$lbl\"")
-    isnothing(pp)  || print(io, " [$pp]")
-    isnothing(d)   || print(io, " $(Dates.format(d, "yyyy-mm-dd"))")
-    print(io, ")")
+    isnothing(pp) || print(io, " [$pp]")
+    isnothing(d) || print(io, " $(Dates.format(d, "yyyy-mm-dd"))")
+    return print(io, ")")
 end
 
 function Base.show(io::IO, s::NMRSample)
     lbl = get(get(s.metadata, "sample", Dict()), "label", nothing)
     print(io, "NMRSample(", repr(s.path))
     isnothing(lbl) || print(io, " \"$lbl\"")
-    print(io, ")")
+    return print(io, ")")
 end
 
 # Base methods #####################################################################################
@@ -81,7 +81,7 @@ missingval(A::AbstractNMRData) = A.missingval
 
 # Rebuild types of AbstractNMRData
 # Note: metadata is deep-copied by default to ensure sliced/copied data have independent metadata.
-# See GitHub issue #25: https://github.com/waudbygroup/NMRTools.jl/issues/25
+# See GitHub issue #25: https://github.com/waudbylab/NMRTools.jl/issues/25
 function DD.rebuild(X::A, data, dims::Tuple, refdims, name,
                     metadata=deepcopy(metadata(X)),
                     missingval=missingval(X)) where {A<:AbstractNMRData}
@@ -169,10 +169,11 @@ end
 NMRData(A::AbstractArray; dims, kw...) = NMRData(A, dims; kw...)
 
 # Note: metadata is deep-copied by default to ensure copied data have independent metadata.
-# See GitHub issue #25: https://github.com/waudbygroup/NMRTools.jl/issues/25
+# See GitHub issue #25: https://github.com/waudbylab/NMRTools.jl/issues/25
 function NMRData(A::AbstractDimArray;
                  data=parent(A), dims=dims(A), refdims=refdims(A),
-                 name=name(A), metadata=deepcopy(metadata(A)), missingval=missingval(A), kw...)
+                 name=name(A), metadata=deepcopy(metadata(A)), missingval=missingval(A),
+                 kw...)
     return NMRData(data, dims; refdims, name, metadata, missingval, kw...)
 end
 
@@ -356,7 +357,8 @@ end
 Return a new NMRData with a spinlock field strength axis.
 Dimension number must be specified explicitly.
 """
-function setspinlockfield(A::NMRData, dimnumber::Integer, fields::AbstractVector, units="Hz")
+function setspinlockfield(A::NMRData, dimnumber::Integer, fields::AbstractVector,
+                          units="Hz")
     newdim = SpinlockDim(fields)
     newA = replacedimension(A, dimnumber, newdim)
     label!(newA, newdim, "Spinlock field")
@@ -379,7 +381,8 @@ function replacedimension(A::NMRData, olddimnumber, newdim)
     olddims[olddimnumber] = newdim
     newdims = tuple(olddims...)
 
-    return NMRData(A.data, newdims; name=A.name, refdims=A.refdims, metadata=deepcopy(A.metadata))
+    return NMRData(A.data, newdims; name=A.name, refdims=A.refdims,
+                   metadata=deepcopy(A.metadata))
 end
 
 """
