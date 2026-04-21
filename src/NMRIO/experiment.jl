@@ -6,7 +6,7 @@ Reads acqus, title, and pulse programme (text files only) — no binary data loa
 Annotations are parsed from the pulse programme YAML but parameter references are
 not resolved (full resolution happens in `loadnmr`).
 
-See also: [`scanexperiments`](@ref), [`loadnmr`](@ref).
+See also: [`scanexperiments`](@ref NMRTools.NMRIO.scanexperiments), [`loadnmr`](@ref NMRTools.NMRIO.loadnmr).
 """
 function NMRExperiment(experimentfolder::AbstractString)
     path = abspath(experimentfolder)

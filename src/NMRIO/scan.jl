@@ -29,7 +29,7 @@ cest = filter(e -> "cest" in get(annotations(e), "experiment_type", []), expts)
 spec = loadnmr(expts[1])
 ```
 
-See also: [`NMRExperiment`](@ref), [`scansamples`](@ref), [`findexperiments`](@ref).
+See also: [`NMRExperiment`](@ref), [`scansamples`](@ref NMRTools.NMRIO.scansamples), [`findexperiments`](@ref NMRTools.NMRIO.findexperiments).
 """
 function scanexperiments(dir::AbstractString;
                          recursive::Bool=true,
@@ -85,7 +85,7 @@ the sample's creation–ejection timestamp window.
 - With a directory path, calls `scanexperiments(dir; kw...)` then filters.
 - With a pre-scanned `Vector{NMRExperiment}`, filters without any disk I/O.
 
-See also: [`scanexperiments`](@ref), [`findsample`](@ref).
+See also: [`scanexperiments`](@ref NMRTools.NMRIO.scanexperiments), [`findsample`](@ref NMRTools.NMRIO.findsample).
 """
 function findexperiments(sample::NMRSample; kw...)::Vector{NMRExperiment}
     findexperiments(sample, dirname(samplefile(sample)); kw...)

@@ -103,8 +103,6 @@ s = findsample(expts[1], samples)   # faster — uses pre-scanned list
 group = findexperiments(samples[1], expts)
 ```
 
-See [Scanning experiments](@ref) for a full guide to the scanning API.
-
 ## Reference
 
 ```@docs; canonical=false
