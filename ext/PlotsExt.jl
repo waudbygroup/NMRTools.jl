@@ -473,8 +473,6 @@ end
 
 @recipe function f(::Type{HasNonFrequencyDimension{D}},
                    v::Vector{D}) where {D<:NMRData{T,2}} where {T}
-    n = length(v)
-
     # Axis setup from first dataset
     z0 = reorder(v[1], ForwardOrdered)
     if dims(z0)[1] isa NonFrequencyDimension
@@ -499,18 +497,6 @@ end
     normalize = get(plotattributes, :normalize, true)
     delete!(plotattributes, :normalize)
 
-    # Single colour per dataset
-    seriescolors_arg = get(plotattributes, :seriescolor, nothing)
-    if isnothing(seriescolors_arg)
-        seriescolors = [HSV(h, 0.9, 0.85) for h in (0:(n - 1)) .* (360.0 / n)]
-    elseif isa(seriescolors_arg, AbstractVector)
-        seriescolors = [_parse_colorant(seriescolors_arg[mod1(i, length(seriescolors_arg))]) for i in 1:n]
-    else
-        seriescolors = fill(_parse_colorant(seriescolors_arg), n)
-    end
-
-    refscaling = scale(z0)
-
     for (j, d) in enumerate(v)
         z = reorder(d, ForwardOrdered)
         if dims(z)[1] isa NonFrequencyDimension
@@ -518,12 +504,12 @@ end
         end
         x, y = dims(z)
 
-        if normalize == false
-            scaling = 1
+        scaling = if normalize == false
+            1
         elseif normalize == true
-            scaling = refscaling
+            scale(z)
         elseif isa(normalize, AbstractNMRData)
-            scaling = scale(normalize)
+            scale(normalize)
         else
             throw(ArgumentError("normalize must be true, false or a reference spectrum"))
         end
@@ -532,7 +518,7 @@ end
         for i in 1:length(y)
             @series begin
                 seriestype --> :path3d
-                seriescolor --> seriescolors[j]
+                seriescolor --> j
                 primary --> (i == 1)
                 fillrange --> 0
                 data(x), xones * y[i], data(z)[:, i] / scaling
