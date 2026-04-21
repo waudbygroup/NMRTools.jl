@@ -473,11 +473,56 @@ end
 
 @recipe function f(::Type{HasNonFrequencyDimension{D}},
                    v::Vector{D}) where {D<:NMRData{T,2}} where {T}
-    @warn "plot recipe for series of pseudo-2D NMR data not yet well-defined"
-    # just make repeat calls to single plot recipe
-    for d in v
-        @series begin
-            HasPseudoDimension{D}, d
+    # Axis setup from first dataset
+    z0 = reorder(v[1], ForwardOrdered)
+    if dims(z0)[1] isa NonFrequencyDimension
+        z0 = transpose(z0)
+    end
+    x0, y0 = dims(z0)
+
+    title --> ""
+    legend --> false
+    framestyle --> :box
+
+    xguide --> axislabel(x0)
+    xflip --> true
+    xgrid --> false
+    xtick_direction --> :out
+
+    yguide --> axislabel(y0)
+    yflip --> false
+    ygrid --> false
+    ytick_direction --> :out
+
+    normalize = get(plotattributes, :normalize, true)
+    delete!(plotattributes, :normalize)
+
+    for (j, d) in enumerate(v)
+        z = reorder(d, ForwardOrdered)
+        if dims(z)[1] isa NonFrequencyDimension
+            z = transpose(z)
+        end
+        x, y = dims(z)
+
+        scaling = if normalize == false
+            1
+        elseif normalize == true
+            scale(z)
+        elseif isa(normalize, AbstractNMRData)
+            scale(normalize)
+        else
+            throw(ArgumentError("normalize must be true, false or a reference spectrum"))
+        end
+
+        xones = ones(length(x))
+        for i in 1:length(y)
+            @series begin
+                seriestype --> :path3d
+                seriescolor --> j
+                primary --> (i == 1)
+                fillrange --> 0
+                data(x), xones * y[i], data(z)[:, i] / scaling
+            end
         end
     end
 end
