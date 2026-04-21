@@ -473,11 +473,70 @@ end
 
 @recipe function f(::Type{HasNonFrequencyDimension{D}},
                    v::Vector{D}) where {D<:NMRData{T,2}} where {T}
-    @warn "plot recipe for series of pseudo-2D NMR data not yet well-defined"
-    # just make repeat calls to single plot recipe
-    for d in v
-        @series begin
-            HasPseudoDimension{D}, d
+    n = length(v)
+
+    # Axis setup from first dataset
+    z0 = reorder(v[1], ForwardOrdered)
+    if dims(z0)[1] isa NonFrequencyDimension
+        z0 = transpose(z0)
+    end
+    x0, y0 = dims(z0)
+
+    title --> ""
+    legend --> false
+    framestyle --> :box
+
+    xguide --> axislabel(x0)
+    xflip --> true
+    xgrid --> false
+    xtick_direction --> :out
+
+    yguide --> axislabel(y0)
+    yflip --> false
+    ygrid --> false
+    ytick_direction --> :out
+
+    normalize = get(plotattributes, :normalize, true)
+    delete!(plotattributes, :normalize)
+
+    # Single colour per dataset
+    seriescolors_arg = get(plotattributes, :seriescolor, nothing)
+    if isnothing(seriescolors_arg)
+        seriescolors = [HSV(h, 0.9, 0.85) for h in (0:(n - 1)) .* (360.0 / n)]
+    elseif isa(seriescolors_arg, AbstractVector)
+        seriescolors = [_parse_colorant(seriescolors_arg[mod1(i, length(seriescolors_arg))]) for i in 1:n]
+    else
+        seriescolors = fill(_parse_colorant(seriescolors_arg), n)
+    end
+
+    refscaling = scale(z0)
+
+    for (j, d) in enumerate(v)
+        z = reorder(d, ForwardOrdered)
+        if dims(z)[1] isa NonFrequencyDimension
+            z = transpose(z)
+        end
+        x, y = dims(z)
+
+        if normalize == false
+            scaling = 1
+        elseif normalize == true
+            scaling = refscaling
+        elseif isa(normalize, AbstractNMRData)
+            scaling = scale(normalize)
+        else
+            throw(ArgumentError("normalize must be true, false or a reference spectrum"))
+        end
+
+        xones = ones(length(x))
+        for i in 1:length(y)
+            @series begin
+                seriestype --> :path3d
+                seriescolor --> seriescolors[j]
+                primary --> (i == 1)
+                fillrange --> 0
+                data(x), xones * y[i], data(z)[:, i] / scaling
+            end
         end
     end
 end
