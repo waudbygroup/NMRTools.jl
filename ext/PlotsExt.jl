@@ -36,6 +36,27 @@ function axislabel(dim::NMRDimension)
     end
 end
 
+# Multicomplex preprocessing: extract real part before delegating to existing recipes
+@recipe function f(A::NMRData{<:Multicomplex,1,Tuple{D}}) where {D<:FrequencyDimension}
+    rebuild(A; data=realest.(parent(A)))
+end
+
+@recipe function f(A::NMRData{<:Multicomplex,1,Tuple{D}}) where {D<:NonFrequencyDimension}
+    rebuild(A; data=realest.(parent(A)))
+end
+
+@recipe function f(A::NMRData{<:Multicomplex,2})
+    rebuild(A; data=realest.(parent(A)))
+end
+
+@recipe function f(v::Vector{<:NMRData{<:Multicomplex,1}})
+    [rebuild(A; data=realest.(parent(A))) for A in v]
+end
+
+@recipe function f(v::Vector{D}) where {D<:NMRData{<:Multicomplex,2}}
+    [rebuild(A; data=realest.(parent(A))) for A in v]
+end
+
 # 1D plot (frequency)
 @recipe function f(A::NMRData{T,1,Tuple{D}}; normalize=true) where {T,D<:FrequencyDimension}
     Afwd = reorder(A, ForwardOrdered) # make sure data axes are in forwards order

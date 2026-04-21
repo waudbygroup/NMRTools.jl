@@ -76,6 +76,31 @@ end
 #     @test_throws Exception Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(:normalize => "invalid"), dat1)
 # end
 
+@testset "PlotsExt: Multicomplex 2D" begin
+    datMC = loadnmr(artifact"2D_HN"; allcomponents=true)
+    @test parent(datMC) isa Matrix{<:Multicomplex}
+
+    # Recipe should strip multicomplex and return a real-valued NMRData
+    pr = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(), datMC)
+    result = pr[1].args[1]
+    @test result isa NMRData
+    @test eltype(result) <: Real
+    @test label(result) == "13C,15N ubiquitin"
+end
+
+@testset "PlotsExt: Multicomplex 1D (slice)" begin
+    datMC2D = loadnmr(artifact"2D_HN"; allcomponents=true)
+    datMC = datMC2D[:, 1]
+    @test parent(datMC) isa AbstractVector{<:Multicomplex}
+
+    # Recipe should strip multicomplex and return a real-valued NMRData
+    pr = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(), datMC)
+    result = pr[1].args[1]
+    @test result isa NMRData
+    @test eltype(result) <: Real
+    @test dims(result, 1) isa FrequencyDimension
+end
+
 @testset "PlotsExt: visual regression testing" begin
     dat1 = exampledata("1D_19F")
     @plottest begin
