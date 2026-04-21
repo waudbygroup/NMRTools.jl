@@ -92,8 +92,8 @@ expts = scanexperiments("/nmr/projects/lysozyme/")
 hassample(expts[1])
 sample(expts[1], "sample", "label")
 
-# Scan all sample files in a directory
-samples = scansamples("/nmr/samples/")
+# Scan all sample files in the same directory (sample JSONs live alongside experiment folders)
+samples = scansamples("/nmr/projects/lysozyme/")
 
 # Find the sample matching a specific experiment
 s = findsample(expts[1])
@@ -101,18 +101,4 @@ s = findsample(expts[1], samples)   # faster — uses pre-scanned list
 
 # Find all experiments for a given sample
 group = findexperiments(samples[1], expts)
-```
-
-## Reference
-
-```@docs; canonical=false
-NMRSample
-NMRExperiment
-sample
-hassample
-samplefile
-scansamples
-scanexperiments
-findsample
-findexperiments
 ```

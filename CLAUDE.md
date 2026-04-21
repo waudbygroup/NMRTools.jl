@@ -11,6 +11,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Documentation:**
 - `julia make-local-docs.jl` — build documentation locally (installs package in dev mode and runs docs/make.jl)
 - Documentation uses Documenter.jl with visual regression tests for plots
+- Do not add "Reference" sections (with `@docs` or `@autodocs` blocks) to doc pages — all API reference lives in `docs/src/api.md` only
+- Documenter.jl resolves `@ref` links in the context of the module where a docstring is defined. When a docstring in `NMRBase` references a function in `NMRIO`, the unqualified `@ref` fails. Use the fully-qualified form: `` [`name`](@ref NMRTools.NMRIO.name) ``
 
 **Package Management:**
 - Standard Julia package — use `] dev .` to develop locally
