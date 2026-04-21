@@ -16,7 +16,7 @@ abstract type AbstractNMRData{T,N,D,A} <: AbstractDimArray{T,N,D,A} end
 A lightweight wrapper around an NMR sample JSON file. Holds the file path and
 parsed metadata. Access fields via [`sample`](@ref).
 
-See also: [`scansamples`](@ref), [`findsample`](@ref).
+See also: [`scansamples`](@ref NMRTools.NMRIO.scansamples), [`findsample`](@ref NMRTools.NMRIO.findsample).
 """
 struct NMRSample
     path::String
@@ -29,7 +29,7 @@ end
 A lightweight, metadata-only descriptor for a Bruker NMR experiment folder.
 Does not load any binary data. Upgrade to a full [`NMRData`](@ref) via `loadnmr`.
 
-See also: [`scanexperiments`](@ref), [`findsample`](@ref), [`loadnmr`](@ref).
+See also: [`scanexperiments`](@ref NMRTools.NMRIO.scanexperiments), [`findsample`](@ref NMRTools.NMRIO.findsample), [`loadnmr`](@ref NMRTools.NMRIO.loadnmr).
 """
 struct NMRExperiment
     path::String
