@@ -36,6 +36,9 @@ function axislabel(dim::NMRDimension)
     end
 end
 
+_realdata(A::AbstractNMRData) = data(A)
+_realdata(A::AbstractNMRData{<:Multicomplex}) = realest.(data(A))
+
 # 1D plot (frequency)
 @recipe function f(A::NMRData{T,1,Tuple{D}}; normalize=true) where {T,D<:FrequencyDimension}
     Afwd = reorder(A, ForwardOrdered) # make sure data axes are in forwards order
@@ -64,7 +67,7 @@ end
     scaling = (normalize !== false) ? scale(Afwd) : 1
 
     delete!(plotattributes, :normalize)
-    return data(x), data(Afwd) ./ scaling
+    return data(x), _realdata(Afwd) ./ scaling
 end
 
 # 1D plot (non-frequency)
@@ -113,7 +116,7 @@ end
 
     scaling = (normalize !== false) ? scale(Afwd) : 1
     delete!(plotattributes, :normalize)
-    return data(x), data(Afwd) ./ scaling
+    return data(x), _realdata(Afwd) ./ scaling
 end
 
 # multiple 1D plots
@@ -169,7 +172,7 @@ end
             Afwd = reorder(A, ForwardOrdered) # make sure data axes are in forwards order
             x = dims(Afwd, 1)
             label --> label(A)
-            data(x), data(Afwd) ./ scaling .+ voffset
+            data(x), _realdata(Afwd) ./ scaling .+ voffset
         end
         voffset += vdelta
     end
@@ -227,7 +230,7 @@ end
     stype = get(plotattributes, :seriestype, nothing)
     if stype ∈ [:heatmap, :wireframe]
         # heatmap
-        data(x), data(y), permutedims(data(dfwd))
+        data(x), data(y), permutedims(_realdata(dfwd))
     else
         poscolor = get(plotattributes, :poscolor, nothing)
         negcolor_arg = get(plotattributes, :negcolor, nothing)
@@ -256,14 +259,14 @@ end
             levels --> 5σ .* contourlevels()
             seriescolor := poscolor_c
             primary --> true
-            data(x), data(y), permutedims(data(dfwd))
+            data(x), data(y), permutedims(_realdata(dfwd))
         end
         if negcontours
             @series begin
                 levels --> -5σ .* contourlevels()
                 seriescolor := negcolor_c
                 primary := false
-                data(x), data(y), permutedims(data(dfwd))
+                data(x), data(y), permutedims(_realdata(dfwd))
             end
         end
     end
@@ -311,7 +314,7 @@ end
     stype = get(plotattributes, :seriestype, nothing)
     if stype ∈ [:heatmap, :wireframe]
         # heatmap
-        data(x), data(y), permutedims(data(z)) ./ scaling
+        data(x), data(y), permutedims(_realdata(z)) ./ scaling
     else
         # default
 
@@ -334,6 +337,7 @@ end
         setpalette = :seriescolor ∉ keys(plotattributes) ||
                      :linecolor ∉ keys(plotattributes)
 
+        zreal = _realdata(z)
         xones = ones(length(x))
         for i in 1:length(y)
             @series begin
@@ -341,7 +345,7 @@ end
                 seriescolor --> i
 
                 if gradient
-                    line_z --> data(z)[:, i]  # colour by height
+                    line_z --> zreal[:, i]  # colour by height
                     palette --> :darkrainbow
                 else
                     if setpalette
@@ -350,7 +354,7 @@ end
                 end
                 primary --> (i == 1)
                 fillrange --> 0 # not currently implemented in plots for 3D data
-                data(x), xones * y[i], data(z)[:, i] / scaling
+                data(x), xones * y[i], zreal[:, i] / scaling
             end
         end
     end
@@ -450,7 +454,7 @@ end
             seriescolor := poscolor_c
             primary := false
             label := nothing
-            data(x), data(y), permutedims(data(dfwd))
+            data(x), data(y), permutedims(_realdata(dfwd))
         end
         if negcontours
             @series begin
@@ -458,7 +462,7 @@ end
                 seriescolor := negcolor_c
                 primary := false
                 label := nothing
-                data(x), data(y), permutedims(data(dfwd))
+                data(x), data(y), permutedims(_realdata(dfwd))
             end
         end
         @series begin
@@ -514,6 +518,7 @@ end
             throw(ArgumentError("normalize must be true, false or a reference spectrum"))
         end
 
+        zreal = _realdata(z)
         xones = ones(length(x))
         for i in 1:length(y)
             @series begin
@@ -521,7 +526,7 @@ end
                 seriescolor --> j
                 primary --> (i == 1)
                 fillrange --> 0
-                data(x), xones * y[i], data(z)[:, i] / scaling
+                data(x), xones * y[i], zreal[:, i] / scaling
             end
         end
     end

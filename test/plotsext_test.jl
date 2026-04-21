@@ -76,6 +76,27 @@ end
 #     @test_throws Exception Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(:normalize => "invalid"), dat1)
 # end
 
+@testset "PlotsExt: Multicomplex 2D" begin
+    datMC = loadnmr(artifact"2D_HN"; allcomponents=true)
+    @test parent(datMC) isa Matrix{<:Multicomplex}
+
+    pr = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(), datMC)
+
+    @test pr[1].plotattributes[:normalize] == true
+    @test label(pr[1].args[2]) == "13C,15N ubiquitin"
+end
+
+@testset "PlotsExt: Multicomplex 1D (slice)" begin
+    datMC2D = loadnmr(artifact"2D_HN"; allcomponents=true)
+    datMC = datMC2D[:, 1]
+    @test parent(datMC) isa AbstractVector{<:Multicomplex}
+
+    # 1D recipe goes all the way to series data in one apply_recipe call
+    pr = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(), datMC)
+    @test pr[1].plotattributes[:xflip] == true
+    @test eltype(pr[1].args[2]) <: Real
+end
+
 @testset "PlotsExt: visual regression testing" begin
     dat1 = exampledata("1D_19F")
     @plottest begin
