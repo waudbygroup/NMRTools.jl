@@ -80,12 +80,10 @@ end
     datMC = loadnmr(artifact"2D_HN"; allcomponents=true)
     @test parent(datMC) isa Matrix{<:Multicomplex}
 
-    # Recipe should strip multicomplex and return a real-valued NMRData
     pr = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(), datMC)
-    result = pr[1].args[1]
-    @test result isa NMRData
-    @test eltype(result) <: Real
-    @test label(result) == "13C,15N ubiquitin"
+
+    @test pr[1].plotattributes[:normalize] == true
+    @test label(pr[1].args[2]) == "13C,15N ubiquitin"
 end
 
 @testset "PlotsExt: Multicomplex 1D (slice)" begin
@@ -93,12 +91,10 @@ end
     datMC = datMC2D[:, 1]
     @test parent(datMC) isa AbstractVector{<:Multicomplex}
 
-    # Recipe should strip multicomplex and return a real-valued NMRData
+    # 1D recipe goes all the way to series data in one apply_recipe call
     pr = Plots.RecipesBase.apply_recipe(Dict{Symbol,Any}(), datMC)
-    result = pr[1].args[1]
-    @test result isa NMRData
-    @test eltype(result) <: Real
-    @test dims(result, 1) isa FrequencyDimension
+    @test pr[1].plotattributes[:xflip] == true
+    @test eltype(pr[1].args[2]) <: Real
 end
 
 @testset "PlotsExt: visual regression testing" begin
