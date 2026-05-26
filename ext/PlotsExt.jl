@@ -245,7 +245,15 @@ end
         if isnothing(poscolor)
             # Advance through Plots palette for sequential plot!/plot calls.
             # Each spectrum contributes 2 series (pos+neg), so series_count÷2 gives spectrum index.
-            p = get(plotattributes, :plot_object, Plots.current())
+            p = get(plotattributes, :plot_object, nothing)
+            if isnothing(p)
+                # Plots.current() throws if no plot exists yet (first plot() call)
+                try
+                    p = Plots.current()
+                catch
+                    p = nothing
+                end
+            end
             n_prev = (p isa Plots.Plot) ? length(p.series_list) : 0
             pal = Plots.palette(:auto)
             poscolor = pal[mod1(n_prev ÷ 2 + 1, length(pal))]
