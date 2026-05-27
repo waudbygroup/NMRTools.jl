@@ -72,12 +72,17 @@ function NMRTools.nmrplot!(ax::Makie.Axis3, spec::_Spec3DFreq;
 
     vol = _realdata(dfwd)
     pos_levels = [base_level * σ * 1.7^i for i in 0:(nlevels - 1)]
-    plt_pos = Makie.contour!(ax, data(x), data(y), data(z), vol;
+    # Makie's 3D contour expects (start, stop) endpoint tuples for each
+    # axis, not full coordinate vectors (VolumeLike convention).
+    xr = (Float64(first(data(x))), Float64(last(data(x))))
+    yr = (Float64(first(data(y))), Float64(last(data(y))))
+    zr = (Float64(first(data(z))), Float64(last(data(z))))
+    plt_pos = Makie.contour!(ax, xr, yr, zr, vol;
                              levels=pos_levels, color=poscolor_c, alpha=alpha,
                              kwargs...)
     if negcontours
         neg_levels = [-l for l in reverse(pos_levels)]
-        Makie.contour!(ax, data(x), data(y), data(z), vol;
+        Makie.contour!(ax, xr, yr, zr, vol;
                        levels=neg_levels, color=negcolor_c, alpha=alpha,
                        kwargs...)
     end

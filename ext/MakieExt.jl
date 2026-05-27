@@ -6,6 +6,7 @@ using NMRTools: NMRData, AbstractNMRData, NMRDimension, FrequencyDimension,
 using NMRTools: data, dims, refdims, refdims_title, label, scale, units,
                 reorder, ForwardOrdered
 using MulticomplexNumbers: Multicomplex, realest
+using Statistics: quantile
 using Makie
 using Colors
 
@@ -30,6 +31,23 @@ function NMRTools.nmrplot!(fig::Makie.Figure, args...; kwargs...)
                                           Create one with `nmrplot(fig[1,1], spec)` \
                                           or pass an `Axis` directly."))
     return NMRTools.nmrplot!(ax, args...; kwargs...)
+end
+
+# `nmrplot!(spec; kwargs...)` with no axis argument falls back to Makie's
+# `current_axis()` so the common workflow `nmrplot(spec); nmrplot!(spec/2)`
+# works without an explicit handle.
+function NMRTools.nmrplot!(spec::NMRData; kwargs...)
+    ax = Makie.current_axis()
+    isnothing(ax) && throw(ArgumentError("nmrplot!: no current axis. \
+        Call nmrplot(spec) first, or pass an Axis / Axis3 explicitly."))
+    return NMRTools.nmrplot!(ax, spec; kwargs...)
+end
+
+function NMRTools.nmrplot!(v::AbstractVector{<:NMRData}; kwargs...)
+    ax = Makie.current_axis()
+    isnothing(ax) && throw(ArgumentError("nmrplot!: no current axis. \
+        Call nmrplot(specs) first, or pass an Axis / Axis3 explicitly."))
+    return NMRTools.nmrplot!(ax, v; kwargs...)
 end
 
 # Fallback for 3D shapes other than pure-frequency (pseudo-3D, mixed

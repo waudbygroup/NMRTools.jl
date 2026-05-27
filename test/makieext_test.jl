@@ -158,19 +158,51 @@ end
 
 @testset "MakieExt: 2D projections" begin
     dat = exampledata("2D_HN")
-    # Default max projection on both edges.
     fig, ax, plt = nmrplot(dat; xprojection=true, yprojection=true)
     @test ax isa Makie.Axis
-    # Sum projection.
     fig, ax, plt = nmrplot(dat; xprojection=:sum, yprojection=:sum)
     @test ax isa Makie.Axis
-    # Only one side.
     fig, ax, plt = nmrplot(dat; xprojection=true)
     @test ax isa Makie.Axis
-    # User-supplied 1D spectrum on the x edge.
     slice = dat[:, 1]
     fig, ax, plt = nmrplot(dat; xprojection=slice)
     @test ax isa Makie.Axis
+end
+
+@testset "MakieExt: overlay with projections" begin
+    dat = exampledata("2D_HN")
+    fap = nmrplot(dat; xprojection=true, yprojection=true)
+    plt2 = nmrplot!(fap, dat / 2; xprojection=true, yprojection=true,
+                    poscolor=:red)
+    @test plt2 isa Makie.Contour
+end
+
+@testset "MakieExt: nmrplot! without axis uses current_axis" begin
+    dat = exampledata("2D_HN")
+    fap = nmrplot(dat)
+    # Without an explicit axis — should resolve to current_axis().
+    plt2 = nmrplot!(dat / 2; poscolor=:red)
+    @test plt2 isa Makie.Contour
+end
+
+@testset "MakieExt: vector of pseudo-2D" begin
+    dat = exampledata("pseudo2D_XSTE")
+    fig, ax, plt = nmrplot([dat, dat / 2]; style=:stack)
+    @test ax isa Makie.Axis
+    fig, ax, plt = nmrplot([dat, dat / 2]; style=:waterfall)
+    @test ax isa Makie.Axis3
+    @test_throws ArgumentError nmrplot([dat, dat / 2]; style=:heatmap)
+end
+
+@testset "MakieExt: pseudo-2D overlay" begin
+    dat = exampledata("pseudo2D_XSTE")
+    fap = nmrplot(dat; style=:stack)
+    plt2 = nmrplot!(dat / 2; style=:stack, color=:green)
+    @test plt2 isa Makie.Lines
+
+    fap = nmrplot(dat; style=:waterfall)
+    plt3 = nmrplot!(dat / 2; style=:waterfall, color=:green)
+    @test plt3 isa Makie.Lines
 end
 
 @testset "MakieExt: pseudo-2D heatmap (default)" begin

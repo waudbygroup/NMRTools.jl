@@ -5,6 +5,11 @@
 const _Spec2DFreq = NMRData{T,2,<:Tuple{<:FrequencyDimension,
                                          <:FrequencyDimension}} where {T}
 
+# Maps a main contour Axis to its (top, right) projection-strip axes (or
+# `nothing` if absent). Used so `nmrplot!` overlays can add projection
+# lines to the same strips as the original plot.
+const _PROJECTION_STRIPS = WeakKeyDict{Makie.Axis,NamedTuple}()
+
 function NMRTools.nmrplot(spec::_Spec2DFreq; figure=NamedTuple(), kwargs...)
     fig = Makie.Figure(; figure...)
     ax, plt = NMRTools.nmrplot(fig[1, 1], spec; kwargs...)
@@ -28,6 +33,11 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           kwargs...)
     dfwd = reorder(spec, ForwardOrdered)
     x, y = dims(dfwd)
+    title_str = !isnothing(title) ? title :
+                string(something(label(spec), ""))
+    has_xproj = !isnothing(xprojection)
+    has_yproj = !isnothing(yprojection)
+    main_title = has_xproj ? "" : title_str
     defaults = (; xreversed=true,
                 yreversed=true,
                 xlabel=axislabel(x),
@@ -36,60 +46,60 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                 ygridvisible=false,
                 xtickalign=1,
                 ytickalign=1,
-                title=string(something(label(spec), "")))
-    ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, axis)
+                title=main_title)
+    ax_kwargs = _axis_overrides(defaults; title=nothing, xlabel, ylabel, axis)
 
-    has_xproj = !isnothing(xprojection)
-    has_yproj = !isnothing(yprojection)
     if has_xproj || has_yproj
-        ax = _build_2d_with_projections!(gp, spec, ax_kwargs;
-                                         xprojection, yprojection, normalize)
+        ax = _build_projection_layout(gp, ax_kwargs; has_xproj, has_yproj,
+                                      top_title=has_xproj ? title_str : "")
     else
         ax = Makie.Axis(gp; ax_kwargs...)
     end
 
     poscolor = isnothing(poscolor) ? color : poscolor
     plt = NMRTools.nmrplot!(ax, spec; normalize, poscolor, negcolor,
-                            negcontours, kwargs...)
+                            negcontours, xprojection, yprojection, kwargs...)
     _apply_contour_legend!(ax, legend,
                            [string(something(NMRTools.label(spec), ""))],
                            [plt.color[]])
     return Makie.AxisPlot(ax, plt)
 end
 
-# Build a main Axis with optional top (x) and right (y) projection strips
-# inside a nested GridLayout. Returns the main Axis.
-function _build_2d_with_projections!(gp, spec, main_ax_kwargs;
-                                     xprojection, yprojection, normalize)
-    has_xproj = !isnothing(xprojection)
-    has_yproj = !isnothing(yprojection)
-    gl = Makie.GridLayout(gp; rowgap=2, colgap=2)
+# Create the nested GridLayout with optional projection strip axes. The
+# strips are constructed with decorations hidden and linked to the main
+# axis. The (top, right) strip handles are stashed in _PROJECTION_STRIPS
+# so subsequent `nmrplot!` calls can overlay onto them.
+function _build_projection_layout(gp, main_ax_kwargs; has_xproj, has_yproj,
+                                  top_title="")
+    gl = Makie.GridLayout(gp; rowgap=4, colgap=4)
     main_row = has_xproj ? 2 : 1
     ax = Makie.Axis(gl[main_row, 1]; main_ax_kwargs...)
 
+    ax_top = nothing
+    ax_right = nothing
+
     if has_xproj
-        ax_top = Makie.Axis(gl[1, 1]; xreversed=true)
-        _plot_xprojection!(ax_top, spec, xprojection, normalize)
+        ax_top = Makie.Axis(gl[1, 1]; xreversed=true, title=top_title)
+        # Hide everything except the title.
         Makie.hidedecorations!(ax_top)
         Makie.hidespines!(ax_top)
         Makie.linkxaxes!(ax_top, ax)
         Makie.rowsize!(gl, 1, Makie.Relative(0.18))
-        # Suppress main axis title (use top strip's space instead if title set).
     end
 
     if has_yproj
         ax_right = Makie.Axis(gl[main_row, 2]; yreversed=true)
-        _plot_yprojection!(ax_right, spec, yprojection, normalize)
         Makie.hidedecorations!(ax_right)
         Makie.hidespines!(ax_right)
         Makie.linkyaxes!(ax_right, ax)
         Makie.colsize!(gl, 2, Makie.Relative(0.18))
     end
 
+    _PROJECTION_STRIPS[ax] = (; top=ax_top, right=ax_right)
     return ax
 end
 
-function _plot_xprojection!(ax_top, spec_2d, proj, normalize)
+function _plot_xprojection!(ax_top, spec_2d, proj, normalize, color)
     if proj isa AbstractNMRData
         Afwd = reorder(proj, ForwardOrdered)
         sf, _ = _resolve_normalize(Afwd, normalize)
@@ -102,10 +112,10 @@ function _plot_xprojection!(ax_top, spec_2d, proj, normalize)
         reducer = _resolve_projection_reducer(proj)
         y = vec(reducer(z; dims=2))
     end
-    return Makie.lines!(ax_top, x, y; color=:black)
+    return Makie.lines!(ax_top, x, y; color=color)
 end
 
-function _plot_yprojection!(ax_right, spec_2d, proj, normalize)
+function _plot_yprojection!(ax_right, spec_2d, proj, normalize, color)
     if proj isa AbstractNMRData
         Afwd = reorder(proj, ForwardOrdered)
         sf, _ = _resolve_normalize(Afwd, normalize)
@@ -118,7 +128,7 @@ function _plot_yprojection!(ax_right, spec_2d, proj, normalize)
         reducer = _resolve_projection_reducer(proj)
         x = vec(reducer(z; dims=1))
     end
-    return Makie.lines!(ax_right, x, y; color=:black)
+    return Makie.lines!(ax_right, x, y; color=color)
 end
 
 function _resolve_projection_reducer(proj)
@@ -135,6 +145,8 @@ function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec2DFreq;
                            poscolor=nothing,
                            negcolor=nothing,
                            negcontours=true,
+                           xprojection=nothing,
+                           yprojection=nothing,
                            label=nothing,
                            kwargs...)
     ax.xreversed = true
@@ -168,6 +180,28 @@ function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec2DFreq;
         Makie.contour!(ax, data(x), data(y), z;
                        levels=neg_levels, color=negcolor_c, kwargs...)
     end
+
+    # Optional projection overlays. Look up the strip axes registered when
+    # the axis was created; warn if the user asked for projections but
+    # none exist.
+    if !isnothing(xprojection) || !isnothing(yprojection)
+        strips = get(_PROJECTION_STRIPS, ax, nothing)
+        if isnothing(strips)
+            @warn "nmrplot!: projection requested but this axis has no \
+                   projection strips. Call `nmrplot(spec; xprojection=...)` \
+                   first to set up the side strips."
+        else
+            if !isnothing(xprojection) && !isnothing(strips.top)
+                _plot_xprojection!(strips.top, spec, xprojection,
+                                   normalize, poscolor_c)
+            end
+            if !isnothing(yprojection) && !isnothing(strips.right)
+                _plot_yprojection!(strips.right, spec, yprojection,
+                                   normalize, poscolor_c)
+            end
+        end
+    end
+
     return plt_pos
 end
 
