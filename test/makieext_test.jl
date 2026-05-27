@@ -1,0 +1,119 @@
+using NMRTools
+using Artifacts
+using LazyArtifacts
+using Test
+using CairoMakie
+
+"""
+notes on testing, to generate plots:
+
+]activate --temp
+]dev .
+]add CairoMakie
+using NMRTools, CairoMakie
+"""
+
+@testset "MakieExt: 1D 19F" begin
+    dat = exampledata("1D_19F")
+    fig, ax, plt = nmrplot(dat)
+
+    @test fig isa Makie.Figure
+    @test ax isa Makie.Axis
+    @test plt isa Makie.Lines
+    @test ax.xreversed[] == true
+    @test ax.xlabel[] == "19F chemical shift (ppm)"
+    @test ax.xgridvisible[] == false
+    @test ax.yticksvisible[] == false
+end
+
+@testset "MakieExt: 2D HN" begin
+    dat = exampledata("2D_HN")
+    fig, ax, plt = nmrplot(dat)
+
+    @test fig isa Makie.Figure
+    @test ax isa Makie.Axis
+    @test ax.xreversed[] == true
+    @test ax.yreversed[] == true
+    @test ax.title[] == "13C,15N ubiquitin"
+    # Positive + negative contour layers added.
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2
+end
+
+@testset "MakieExt: 2D HN colour overrides" begin
+    dat = exampledata("2D_HN")
+    fig, ax, plt = nmrplot(dat; poscolor=:red)
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2
+
+    fig, ax, plt = nmrplot(dat; poscolor=:blue, negcolor=:red)
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2
+
+    fig, ax, plt = nmrplot(dat; poscolor=:limegreen, negcontours=false)
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 1
+end
+
+@testset "MakieExt: nmrplot! into existing axis" begin
+    dat = exampledata("1D_19F")
+    fig = Makie.Figure()
+    ax = Makie.Axis(fig[1, 1])
+    plt = nmrplot!(ax, dat)
+    @test ax.xreversed[] == true
+    @test plt isa Makie.Lines
+end
+
+@testset "MakieExt: grid position" begin
+    dat = exampledata("1D_19F")
+    fig = Makie.Figure()
+    ax, plt = nmrplot(fig[1, 1], dat)
+    @test ax isa Makie.Axis
+    @test ax.xreversed[] == true
+end
+
+@testset "MakieExt: vector of 1D" begin
+    dats = exampledata("1D_19F_titration")
+    fig, ax, plt = nmrplot(dats)
+    @test ax isa Makie.Axis
+    @test count(p -> p isa Makie.Lines, ax.scene.plots) == length(dats)
+
+    fig, ax, plt = nmrplot(dats; vstack=true)
+    @test count(p -> p isa Makie.Lines, ax.scene.plots) == length(dats)
+
+    fig, ax, plt = nmrplot(dats; vstack=5)
+    @test count(p -> p isa Makie.Lines, ax.scene.plots) == length(dats)
+end
+
+@testset "MakieExt: vector of 2D" begin
+    dats = exampledata("2D_HN_titration")
+    fig, ax, plt = nmrplot(dats)
+    @test ax isa Makie.Axis
+    @test ax.xreversed[] == true
+    @test ax.yreversed[] == true
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2 * length(dats)
+
+    # Explicit colours
+    fig, ax, plt = nmrplot(dats; colors=[:red, :blue])
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2 * length(dats)
+
+    # Sequential colormap fallback for long series.
+    fig, ax, plt = nmrplot(dats; colormap=:plasma)
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2 * length(dats)
+end
+
+@testset "MakieExt: Multicomplex 1D slice" begin
+    datMC2D = loadnmr(artifact"2D_HN"; allcomponents=true)
+    datMC = datMC2D[:, 1]
+    @test parent(datMC) isa AbstractVector{<:Multicomplex}
+
+    fig, ax, plt = nmrplot(datMC)
+    @test ax.xreversed[] == true
+    @test plt isa Makie.Lines
+end
+
+@testset "MakieExt: pseudo-2D not implemented" begin
+    dat = exampledata("pseudo2D_XSTE")
+    @test_throws ArgumentError nmrplot(dat)
+end
+
+@testset "MakieExt: 3D not implemented" begin
+    dat = exampledata("3D_HNCA")
+    @test_throws ArgumentError nmrplot(dat)
+end

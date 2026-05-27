@@ -24,9 +24,11 @@ Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
 [weakdeps]
+Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [extensions]
+MakieExt = "Makie"
 PlotsExt = "Plots"
 
 [compat]
@@ -39,6 +41,7 @@ DimensionalData = "0.29.24"
 JSON = "0.21,1"
 LazyArtifacts = "1"
 LinearAlgebra = "1"
+Makie = "0.21,0.22"
 MulticomplexNumbers = "0.3"
 Optim = "1,2"
 Peaks = "0.5,0.6"
@@ -53,10 +56,11 @@ YAML = "0.4.14"
 julia = "1.9"
 
 [extras]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 VisualRegressionTests = "34922c18-7c2a-561c-bac1-01e79b2c4c92"
 
 [targets]
-test = ["Test", "SafeTestsets", "Plots", "VisualRegressionTests"]
+test = ["Test", "SafeTestsets", "Plots", "CairoMakie", "VisualRegressionTests"]
