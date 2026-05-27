@@ -80,14 +80,15 @@ function _existing_2d_count(ax::Makie.Axis)
     return n ÷ 2
 end
 
-# Merge user-facing axis overrides (`title`, `xlabel`, `ylabel`) and the
-# `axis=NamedTuple(...)` escape hatch onto the default axis kwargs.
+# Merge user-facing axis overrides (`title`, `xlabel`, `ylabel`, `zlabel`)
+# and the `axis=NamedTuple(...)` escape hatch onto the default axis kwargs.
 function _axis_overrides(defaults; title=nothing, xlabel=nothing,
-                         ylabel=nothing, axis=NamedTuple())
+                         ylabel=nothing, zlabel=nothing, axis=NamedTuple())
     overrides = NamedTuple()
     isnothing(title)  || (overrides = merge(overrides, (; title)))
     isnothing(xlabel) || (overrides = merge(overrides, (; xlabel)))
     isnothing(ylabel) || (overrides = merge(overrides, (; ylabel)))
+    isnothing(zlabel) || (overrides = merge(overrides, (; zlabel)))
     return merge(defaults, overrides, axis)
 end
 

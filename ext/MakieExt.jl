@@ -13,6 +13,7 @@ include("MakieExt/plotutils.jl")
 include("MakieExt/plot_1d.jl")
 include("MakieExt/plot_2d.jl")
 include("MakieExt/plot_pseudo2d.jl")
+include("MakieExt/plot_3d.jl")
 
 # Convenience: forward `nmrplot!(fig_like, spec)` to the underlying axis so
 # the typical workflow `fig = nmrplot(spec); nmrplot!(fig, spec/2)` just
@@ -31,11 +32,13 @@ function NMRTools.nmrplot!(fig::Makie.Figure, args...; kwargs...)
     return NMRTools.nmrplot!(ax, args...; kwargs...)
 end
 
-# 3D not implemented in this iteration.
+# Fallback for 3D shapes other than pure-frequency (pseudo-3D, mixed
+# kinetic/freq, etc.) — supported in a later iteration.
 function NMRTools.nmrplot(spec::NMRData{<:Any,3}; kwargs...)
-    throw(ArgumentError("3D nmrplot not yet implemented in MakieExt; consider \
-                         plotting a 2D projection via \
-                         `maximum(spec; dims=2)[:, 1, :]` or similar."))
+    throw(ArgumentError("3D nmrplot in MakieExt currently only supports \
+                         pure-frequency 3D spectra. For pseudo-3D, project \
+                         to 2D first (e.g. `maximum(spec; dims=2)[:, 1, :]`) \
+                         and call nmrplot on the result."))
 end
 
 end # module

@@ -194,12 +194,23 @@ end
     @test count(p -> p isa Makie.Lines, ax.scene.plots) == length(dims(dat, 2))
 end
 
-@testset "MakieExt: pseudo-2D waterfall not yet implemented" begin
+@testset "MakieExt: pseudo-2D waterfall" begin
     dat = exampledata("pseudo2D_XSTE")
-    @test_throws ArgumentError nmrplot(dat; style=:waterfall)
+    fig, ax, plt = nmrplot(dat; style=:waterfall)
+    @test ax isa Makie.Axis3
+    @test plt isa Makie.Lines
+    @test count(p -> p isa Makie.Lines, ax.scene.plots) == length(dims(dat, 2))
 end
 
-@testset "MakieExt: 3D not implemented" begin
+@testset "MakieExt: 3D iso-surface contours" begin
     dat = exampledata("3D_HNCA")
-    @test_throws ArgumentError nmrplot(dat)
+    fig, ax, plt = nmrplot(dat)
+    @test ax isa Makie.Axis3
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2  # pos + neg
+
+    fig, ax, plt = nmrplot(dat; negcontours=false)
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 1
+
+    fig, ax, plt = nmrplot(dat; poscolor=:blue, nlevels=2)
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2
 end

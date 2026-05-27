@@ -36,8 +36,7 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
     elseif style === :stack
         return _pseudo2d_stack(gp, spec; kwargs...)
     elseif style === :waterfall
-        throw(ArgumentError("pseudo-2D :waterfall style not yet implemented; \
-                             use :heatmap (default) or :stack."))
+        return _pseudo2d_waterfall(gp, spec; kwargs...)
     else
         throw(ArgumentError("style must be :heatmap, :stack, or :waterfall"))
     end
@@ -86,6 +85,47 @@ function _pseudo2d_heatmap(gp, spec::_SpecPseudo2D_FN;
                              colormap=colormap, colorrange=colorrange, kwargs...)
     end
     return Makie.AxisPlot(ax, plt)
+end
+
+# True 3D waterfall on an Axis3: one line per slice at z = intensity,
+# y = the slice's non-frequency-dim value (e.g. relaxation time).
+function _pseudo2d_waterfall(gp, spec::_SpecPseudo2D_FN;
+                             normalize=true,
+                             color=nothing,
+                             colors=nothing,
+                             colormap=nothing,
+                             title=nothing,
+                             xlabel=nothing,
+                             ylabel=nothing,
+                             zlabel="Intensity",
+                             axis=NamedTuple(),
+                             kwargs...)
+    dfwd = reorder(spec, ForwardOrdered)
+    x, y = dims(dfwd)
+    sf, _ = _resolve_normalize(dfwd, normalize)
+    z = _realdata(dfwd) ./ sf
+    n = length(y)
+
+    defaults = (; xreversed=true,
+                xlabel=axislabel(x),
+                ylabel=axislabel(y),
+                zlabel=zlabel,
+                title=string(something(label(spec), "")))
+    ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, axis)
+    ax = Makie.Axis3(gp; ax_kwargs...)
+
+    colors = isnothing(colors) ? color : colors
+    cs = _series_poscolors(colors, n; colormap)
+
+    local first_plt
+    xvals = data(x)
+    yvals = data(y)
+    for i in 1:n
+        plt = Makie.lines!(ax, xvals, fill(yvals[i], length(xvals)), z[:, i];
+                           color=cs[i], kwargs...)
+        i == 1 && (first_plt = plt)
+    end
+    return Makie.AxisPlot(ax, first_plt)
 end
 
 function _pseudo2d_stack(gp, spec::_SpecPseudo2D_FN;
