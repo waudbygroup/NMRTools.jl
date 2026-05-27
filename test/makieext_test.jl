@@ -156,9 +156,47 @@ end
     @test plt isa Makie.Lines
 end
 
-@testset "MakieExt: pseudo-2D not implemented" begin
+@testset "MakieExt: 2D projections" begin
+    dat = exampledata("2D_HN")
+    # Default max projection on both edges.
+    fig, ax, plt = nmrplot(dat; xprojection=true, yprojection=true)
+    @test ax isa Makie.Axis
+    # Sum projection.
+    fig, ax, plt = nmrplot(dat; xprojection=:sum, yprojection=:sum)
+    @test ax isa Makie.Axis
+    # Only one side.
+    fig, ax, plt = nmrplot(dat; xprojection=true)
+    @test ax isa Makie.Axis
+    # User-supplied 1D spectrum on the x edge.
+    slice = dat[:, 1]
+    fig, ax, plt = nmrplot(dat; xprojection=slice)
+    @test ax isa Makie.Axis
+end
+
+@testset "MakieExt: pseudo-2D heatmap (default)" begin
     dat = exampledata("pseudo2D_XSTE")
-    @test_throws ArgumentError nmrplot(dat)
+    fig, ax, plt = nmrplot(dat)
+    @test ax isa Makie.Axis
+    @test ax.xreversed[] == true
+    @test plt isa Makie.Heatmap
+
+    # No colorbar
+    fig, ax, plt = nmrplot(dat; colorbar=false)
+    @test plt isa Makie.Heatmap
+end
+
+@testset "MakieExt: pseudo-2D stack" begin
+    dat = exampledata("pseudo2D_XSTE")
+    fig, ax, plt = nmrplot(dat; style=:stack)
+    @test ax isa Makie.Axis
+    @test ax.xreversed[] == true
+    @test plt isa Makie.Lines
+    @test count(p -> p isa Makie.Lines, ax.scene.plots) == length(dims(dat, 2))
+end
+
+@testset "MakieExt: pseudo-2D waterfall not yet implemented" begin
+    dat = exampledata("pseudo2D_XSTE")
+    @test_throws ArgumentError nmrplot(dat; style=:waterfall)
 end
 
 @testset "MakieExt: 3D not implemented" begin

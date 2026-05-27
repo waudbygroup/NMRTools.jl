@@ -18,6 +18,8 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           poscolor=nothing,
                           negcolor=nothing,
                           negcontours=true,
+                          xprojection=nothing,
+                          yprojection=nothing,
                           title=nothing,
                           xlabel=nothing,
                           ylabel=nothing,
@@ -36,7 +38,16 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                 ytickalign=1,
                 title=string(something(label(spec), "")))
     ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, axis)
-    ax = Makie.Axis(gp; ax_kwargs...)
+
+    has_xproj = !isnothing(xprojection)
+    has_yproj = !isnothing(yprojection)
+    if has_xproj || has_yproj
+        ax = _build_2d_with_projections!(gp, spec, ax_kwargs;
+                                         xprojection, yprojection, normalize)
+    else
+        ax = Makie.Axis(gp; ax_kwargs...)
+    end
+
     poscolor = isnothing(poscolor) ? color : poscolor
     plt = NMRTools.nmrplot!(ax, spec; normalize, poscolor, negcolor,
                             negcontours, kwargs...)
@@ -44,6 +55,78 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                            [string(something(NMRTools.label(spec), ""))],
                            [plt.color[]])
     return Makie.AxisPlot(ax, plt)
+end
+
+# Build a main Axis with optional top (x) and right (y) projection strips
+# inside a nested GridLayout. Returns the main Axis.
+function _build_2d_with_projections!(gp, spec, main_ax_kwargs;
+                                     xprojection, yprojection, normalize)
+    has_xproj = !isnothing(xprojection)
+    has_yproj = !isnothing(yprojection)
+    gl = Makie.GridLayout(gp; rowgap=2, colgap=2)
+    main_row = has_xproj ? 2 : 1
+    ax = Makie.Axis(gl[main_row, 1]; main_ax_kwargs...)
+
+    if has_xproj
+        ax_top = Makie.Axis(gl[1, 1]; xreversed=true)
+        _plot_xprojection!(ax_top, spec, xprojection, normalize)
+        Makie.hidedecorations!(ax_top)
+        Makie.hidespines!(ax_top)
+        Makie.linkxaxes!(ax_top, ax)
+        Makie.rowsize!(gl, 1, Makie.Relative(0.18))
+        # Suppress main axis title (use top strip's space instead if title set).
+    end
+
+    if has_yproj
+        ax_right = Makie.Axis(gl[main_row, 2]; yreversed=true)
+        _plot_yprojection!(ax_right, spec, yprojection, normalize)
+        Makie.hidedecorations!(ax_right)
+        Makie.hidespines!(ax_right)
+        Makie.linkyaxes!(ax_right, ax)
+        Makie.colsize!(gl, 2, Makie.Relative(0.18))
+    end
+
+    return ax
+end
+
+function _plot_xprojection!(ax_top, spec_2d, proj, normalize)
+    if proj isa AbstractNMRData
+        Afwd = reorder(proj, ForwardOrdered)
+        sf, _ = _resolve_normalize(Afwd, normalize)
+        x = data(dims(Afwd, 1))
+        y = _realdata(Afwd) ./ sf
+    else
+        dfwd = reorder(spec_2d, ForwardOrdered)
+        x = data(dims(dfwd, 1))
+        z = _realdata(dfwd)
+        reducer = _resolve_projection_reducer(proj)
+        y = vec(reducer(z; dims=2))
+    end
+    return Makie.lines!(ax_top, x, y; color=:black)
+end
+
+function _plot_yprojection!(ax_right, spec_2d, proj, normalize)
+    if proj isa AbstractNMRData
+        Afwd = reorder(proj, ForwardOrdered)
+        sf, _ = _resolve_normalize(Afwd, normalize)
+        y = data(dims(Afwd, 1))
+        x = _realdata(Afwd) ./ sf
+    else
+        dfwd = reorder(spec_2d, ForwardOrdered)
+        y = data(dims(dfwd, 2))
+        z = _realdata(dfwd)
+        reducer = _resolve_projection_reducer(proj)
+        x = vec(reducer(z; dims=1))
+    end
+    return Makie.lines!(ax_right, x, y; color=:black)
+end
+
+function _resolve_projection_reducer(proj)
+    proj === true && return maximum
+    proj === :max && return maximum
+    proj === :sum && return sum
+    proj isa Function && return proj
+    throw(ArgumentError("projection must be true, :max, :sum, a function, or a 1D NMRData"))
 end
 
 function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec2DFreq;
