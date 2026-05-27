@@ -14,24 +14,29 @@ end
 function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           spec::_Spec1DFreq;
                           normalize=true,
+                          title=nothing,
+                          xlabel=nothing,
+                          ylabel=nothing,
+                          legend=false,
                           axis=NamedTuple(),
                           kwargs...)
     Afwd = reorder(spec, ForwardOrdered)
     dim = dims(Afwd, 1)
-    title_str = isempty(refdims(Afwd)) ? string(something(label(Afwd), "")) :
+    title_str = isempty(refdims(Afwd)) ? string(something(NMRTools.label(Afwd), "")) :
                 refdims_title(Afwd)
-    ax_kwargs = merge((; xreversed=true,
-                       xlabel=axislabel(dim),
-                       ylabel="",
-                       xgridvisible=false,
-                       ygridvisible=false,
-                       yticksvisible=false,
-                       yticklabelsvisible=false,
-                       xtickalign=1,
-                       title=title_str),
-                      axis)
+    defaults = (; xreversed=true,
+                xlabel=axislabel(dim),
+                ylabel="",
+                xgridvisible=false,
+                ygridvisible=false,
+                yticksvisible=false,
+                yticklabelsvisible=false,
+                xtickalign=1,
+                title=title_str)
+    ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, axis)
     ax = Makie.Axis(gp; ax_kwargs...)
     plt = NMRTools.nmrplot!(ax, spec; normalize, kwargs...)
+    _apply_legend!(ax, legend)
     return Makie.AxisPlot(ax, plt)
 end
 
@@ -42,7 +47,9 @@ function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec1DFreq;
     sf, _ = _resolve_normalize(Afwd, normalize)
     x = data(dims(Afwd, 1))
     y = _realdata(Afwd) ./ sf
-    return Makie.lines!(ax, x, y; kwargs...)
+    return Makie.lines!(ax, x, y;
+                        label=string(something(NMRTools.label(Afwd), "")),
+                        kwargs...)
 end
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -58,22 +65,27 @@ end
 function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           spec::_Spec1DNonFreq;
                           normalize=true,
+                          title=nothing,
+                          xlabel=nothing,
+                          ylabel=nothing,
+                          legend=false,
                           axis=NamedTuple(),
                           kwargs...)
     Afwd = reorder(spec, ForwardOrdered)
     dim = dims(Afwd, 1)
-    title_str = isempty(refdims(Afwd)) ? string(something(label(Afwd), "")) :
+    title_str = isempty(refdims(Afwd)) ? string(something(NMRTools.label(Afwd), "")) :
                 refdims_title(Afwd)
-    ax_kwargs = merge((; xlabel=axislabel(dim),
-                       ylabel="Intensity",
-                       xgridvisible=false,
-                       ygridvisible=false,
-                       xtickalign=1,
-                       ytickalign=1,
-                       title=title_str),
-                      axis)
+    defaults = (; xlabel=axislabel(dim),
+                ylabel="Intensity",
+                xgridvisible=false,
+                ygridvisible=false,
+                xtickalign=1,
+                ytickalign=1,
+                title=title_str)
+    ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, axis)
     ax = Makie.Axis(gp; ax_kwargs...)
     plt = NMRTools.nmrplot!(ax, spec; normalize, kwargs...)
+    _apply_legend!(ax, legend)
     return Makie.AxisPlot(ax, plt)
 end
 
@@ -83,7 +95,9 @@ function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec1DNonFreq;
     sf, _ = _resolve_normalize(Afwd, normalize)
     x = data(dims(Afwd, 1))
     y = _realdata(Afwd) ./ sf
-    return Makie.scatter!(ax, x, y; kwargs...)
+    return Makie.scatter!(ax, x, y;
+                          label=string(something(NMRTools.label(Afwd), "")),
+                          kwargs...)
 end
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -103,29 +117,37 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                                                       <:Tuple{<:FrequencyDimension}}};
                           normalize=true,
                           vstack=false,
+                          color=nothing,
                           colors=nothing,
-                          colormap=:viridis,
+                          colormap=nothing,
+                          title=nothing,
+                          xlabel=nothing,
+                          ylabel=nothing,
+                          legend=false,
                           axis=NamedTuple(),
                           kwargs...)
     isempty(v) && throw(ArgumentError("nmrplot: empty spectrum vector"))
     dim = dims(reorder(first(v), ForwardOrdered), 1)
-    ax_kwargs = merge((; xreversed=true,
-                       xlabel=axislabel(dim),
-                       ylabel="",
-                       xgridvisible=false,
-                       ygridvisible=false,
-                       yticksvisible=false,
-                       yticklabelsvisible=false,
-                       xtickalign=1),
-                      axis)
+    defaults = (; xreversed=true,
+                xlabel=axislabel(dim),
+                ylabel="",
+                xgridvisible=false,
+                ygridvisible=false,
+                yticksvisible=false,
+                yticklabelsvisible=false,
+                xtickalign=1,
+                title="")
+    ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, axis)
     ax = Makie.Axis(gp; ax_kwargs...)
+    colors = isnothing(colors) ? color : colors
     plt = _plot_1d_series!(ax, v; normalize, vstack, colors, colormap, kwargs...)
+    _apply_legend!(ax, legend)
     return Makie.AxisPlot(ax, plt)
 end
 
 function _plot_1d_series!(ax::Makie.Axis, v;
                           normalize=true, vstack=false,
-                          colors=nothing, colormap=:viridis, kwargs...)
+                          colors=nothing, colormap=nothing, kwargs...)
     n = length(v)
     cs = _series_poscolors(colors, n; colormap)
 
@@ -150,7 +172,8 @@ function _plot_1d_series!(ax::Makie.Axis, v;
         x = data(dims(Afwd, 1))
         y = _realdata(Afwd) ./ sf .+ voffset
         plt = Makie.lines!(ax, x, y; color=cs[i],
-                           label=string(something(label(Afwd), "")), kwargs...)
+                           label=string(something(NMRTools.label(Afwd), "")),
+                           kwargs...)
         i == 1 && (first_plt = plt)
         voffset += vdelta
     end

@@ -49,6 +49,44 @@ end
 
     fig, ax, plt = nmrplot(dat; poscolor=:limegreen, negcontours=false)
     @test count(p -> p isa Makie.Contour, ax.scene.plots) == 1
+
+    # `color=` is an alias for `poscolor=` — negative contour is auto-derived,
+    # not coloured the same as positive.
+    fig, ax, plt = nmrplot(dat; color=:red)
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2
+    # Explicit negcolor wins even when color/poscolor is set.
+    fig, ax, plt = nmrplot(dat; color=:green, negcolor=:red)
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2
+end
+
+@testset "MakieExt: top-level axis overrides" begin
+    dat = exampledata("2D_HN")
+    fig, ax, plt = nmrplot(dat; title="My HN", xlabel="¹H", ylabel="¹⁵N")
+    @test ax.title[] == "My HN"
+    @test ax.xlabel[] == "¹H"
+    @test ax.ylabel[] == "¹⁵N"
+end
+
+@testset "MakieExt: legend kwarg" begin
+    dats = exampledata("2D_HN_titration")
+    fig, ax, plt = nmrplot(dats; legend=true)
+    @test any(c -> c isa Makie.Legend, fig.content)
+
+    fig, ax, plt = nmrplot(dats; legend=:topleft)
+    @test any(c -> c isa Makie.Legend, fig.content)
+
+    fig, ax, plt = nmrplot(dats)
+    @test !any(c -> c isa Makie.Legend, fig.content)
+end
+
+@testset "MakieExt: nmrplot! forwards from Figure / FigureAxisPlot" begin
+    dat = exampledata("2D_HN")
+    fap = nmrplot(dat)
+    # Both forms should work.
+    plt2 = nmrplot!(fap, dat; poscolor=:red)
+    @test plt2 isa Makie.Contour
+    plt3 = nmrplot!(fap.figure, dat; poscolor=:blue)
+    @test plt3 isa Makie.Contour
 end
 
 @testset "MakieExt: nmrplot! into existing axis" begin

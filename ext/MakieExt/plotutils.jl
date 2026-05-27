@@ -36,18 +36,19 @@ end
 
 _theme_palette() = Makie.wong_colors()
 
-# Build a vector of n colours for a series of spectra. Short series use the
-# theme palette, long series fall through to a sequential colormap so that
-# colour encodes order along the series axis.
-function _series_poscolors(arg, n::Integer; colormap=:viridis)
+# Build a vector of n colours for a series of spectra. Defaults to HSV
+# evenly spaced around the hue circle (matching PlotsExt) so each spectrum
+# is visually distinct without yellow-disappears-on-white issues. Users
+# can pass an explicit vector via `colors`, a single colour to repeat, or
+# override the colourmap.
+function _series_poscolors(arg, n::Integer; colormap=nothing)
     if arg isa AbstractVector
         return [_parse_colorant(arg[mod1(i, length(arg))]) for i in 1:n]
     elseif !isnothing(arg)
         return fill(_parse_colorant(arg), n)
     end
-    pal = _theme_palette()
-    if n <= length(pal)
-        return [_parse_colorant(pal[i]) for i in 1:n]
+    if isnothing(colormap)
+        return [HSV(h, 0.9, 0.85) for h in (0:(n - 1)) .* (360.0 / n)]
     end
     cs = Makie.to_colormap(colormap)
     return [cs[round(Int, 1 + (i - 1) * (length(cs) - 1) / max(n - 1, 1))] for i in 1:n]
@@ -60,4 +61,39 @@ function _series_negcolors(arg, poscolors)
         return fill(_parse_colorant(arg), length(poscolors))
     end
     return [_derive_negcolor(c) for c in poscolors]
+end
+
+# Merge user-facing axis overrides (`title`, `xlabel`, `ylabel`) and the
+# `axis=NamedTuple(...)` escape hatch onto the default axis kwargs.
+function _axis_overrides(defaults; title=nothing, xlabel=nothing,
+                         ylabel=nothing, axis=NamedTuple())
+    overrides = NamedTuple()
+    isnothing(title)  || (overrides = merge(overrides, (; title)))
+    isnothing(xlabel) || (overrides = merge(overrides, (; xlabel)))
+    isnothing(ylabel) || (overrides = merge(overrides, (; ylabel)))
+    return merge(defaults, overrides, axis)
+end
+
+# Position aliases for Makie.axislegend. Makie's convention is two-letter
+# (e.g. :rt for top-right); we also accept friendlier spellings.
+const _LEGEND_POS_ALIAS = Dict(
+    :topright => :rt, :topleft => :lt, :bottomright => :rb, :bottomleft => :lb,
+    :top => :ct, :bottom => :cb, :left => :lc, :right => :rc,
+    true => :rt,
+)
+
+function _apply_legend!(ax::Makie.Axis, legend)
+    legend === false && return nothing
+    legend isa Bool && legend &&
+        return Makie.axislegend(ax; position=:rt)
+    if legend isa Symbol
+        pos = get(_LEGEND_POS_ALIAS, legend, legend)
+        return Makie.axislegend(ax; position=pos)
+    end
+    legend isa AbstractString &&
+        return Makie.axislegend(ax, legend)
+    if legend isa NamedTuple
+        return Makie.axislegend(ax; legend...)
+    end
+    throw(ArgumentError("legend must be false / true / a position symbol / a title string / a NamedTuple"))
 end
