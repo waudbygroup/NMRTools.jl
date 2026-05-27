@@ -234,15 +234,15 @@ end
     @test count(p -> p isa Makie.Lines, ax.scene.plots) == length(dims(dat, 2))
 end
 
-@testset "MakieExt: 3D iso-surface contours" begin
+@testset "MakieExt: 3D volume rendering" begin
     dat = exampledata("3D_HNCA")
     fig, ax, plt = nmrplot(dat)
     @test ax isa Makie.Axis3
-    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2  # pos + neg
+    @test plt isa Makie.Volume
 
-    fig, ax, plt = nmrplot(dat; negcontours=false)
-    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 1
+    fig, ax, plt = nmrplot(dat; algorithm=:absorption, absorption=4.0)
+    @test plt isa Makie.Volume
 
-    fig, ax, plt = nmrplot(dat; poscolor=:blue, nlevels=2)
-    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2
+    fig, ax, plt = nmrplot(dat; colormap=:viridis, threshold=10)
+    @test plt isa Makie.Volume
 end
