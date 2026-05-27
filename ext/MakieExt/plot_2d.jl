@@ -40,7 +40,9 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
     poscolor = isnothing(poscolor) ? color : poscolor
     plt = NMRTools.nmrplot!(ax, spec; normalize, poscolor, negcolor,
                             negcontours, kwargs...)
-    _apply_legend!(ax, legend)
+    _apply_contour_legend!(ax, legend,
+                           [string(something(NMRTools.label(spec), ""))],
+                           [plt.color[]])
     return Makie.AxisPlot(ax, plt)
 end
 
@@ -60,7 +62,13 @@ function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec2DFreq;
     _, σ = _resolve_normalize(dfwd, normalize)
 
     poscolor = isnothing(poscolor) ? color : poscolor
-    poscolor_c = isnothing(poscolor) ? _theme_palette()[1] : _parse_colorant(poscolor)
+    if isnothing(poscolor)
+        pal = _theme_palette()
+        idx = _existing_2d_count(ax) + 1
+        poscolor_c = _parse_colorant(pal[mod1(idx, length(pal))])
+    else
+        poscolor_c = _parse_colorant(poscolor)
+    end
     negcolor_c = isnothing(negcolor) ? _derive_negcolor(poscolor_c) :
                  _parse_colorant(negcolor)
 
@@ -127,6 +135,7 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
 
     refnorm = (normalize === true) ? first(v) : normalize
     local first_plt
+    labels = String[]
     for (i, d) in enumerate(v)
         dfwd = reorder(d, ForwardOrdered)
         x, y = dims(dfwd)
@@ -135,9 +144,9 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
         pos_levels = collect(5σ .* contourlevels())
         plt_pos = Makie.contour!(ax, data(x), data(y), z;
                                  levels=pos_levels, color=poscolors[i],
-                                 label=string(something(NMRTools.label(dfwd), "")),
                                  kwargs...)
         i == 1 && (first_plt = plt_pos)
+        push!(labels, string(something(NMRTools.label(dfwd), "")))
         if negcontours
             neg_levels = collect(-5σ .* reverse(collect(contourlevels())))
             Makie.contour!(ax, data(x), data(y), z;
@@ -145,6 +154,6 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                            kwargs...)
         end
     end
-    _apply_legend!(ax, legend)
+    _apply_contour_legend!(ax, legend, labels, poscolors)
     return Makie.AxisPlot(ax, first_plt)
 end

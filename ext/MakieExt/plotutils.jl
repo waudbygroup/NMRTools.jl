@@ -36,22 +36,28 @@ end
 
 _theme_palette() = Makie.wong_colors()
 
-# Build a vector of n colours for a series of spectra. Defaults to HSV
-# evenly spaced around the hue circle (matching PlotsExt) so each spectrum
-# is visually distinct without yellow-disappears-on-white issues. Users
-# can pass an explicit vector via `colors`, a single colour to repeat, or
-# override the colourmap.
+# Build a vector of n colours for a series of spectra.
+# - Explicit `arg` (vector or scalar) wins.
+# - Explicit `colormap` samples a colourmap at n points.
+# - 1–5 spectra: Makie's default Wong palette (themable, perceptual).
+# - 6+ spectra: HSV evenly spaced around the hue circle (matching PlotsExt;
+#   distinguishable without yellow-on-white visibility issues).
 function _series_poscolors(arg, n::Integer; colormap=nothing)
     if arg isa AbstractVector
         return [_parse_colorant(arg[mod1(i, length(arg))]) for i in 1:n]
     elseif !isnothing(arg)
         return fill(_parse_colorant(arg), n)
     end
-    if isnothing(colormap)
-        return [HSV(h, 0.9, 0.85) for h in (0:(n - 1)) .* (360.0 / n)]
+    if !isnothing(colormap)
+        cs = Makie.to_colormap(colormap)
+        return [cs[round(Int, 1 + (i - 1) * (length(cs) - 1) / max(n - 1, 1))]
+                for i in 1:n]
     end
-    cs = Makie.to_colormap(colormap)
-    return [cs[round(Int, 1 + (i - 1) * (length(cs) - 1) / max(n - 1, 1))] for i in 1:n]
+    if n <= 5
+        pal = _theme_palette()
+        return [_parse_colorant(pal[mod1(i, length(pal))]) for i in 1:n]
+    end
+    return [HSV(h, 0.9, 0.85) for h in (0:(n - 1)) .* (360.0 / n)]
 end
 
 function _series_negcolors(arg, poscolors)
@@ -61,6 +67,17 @@ function _series_negcolors(arg, poscolors)
         return fill(_parse_colorant(arg), length(poscolors))
     end
     return [_derive_negcolor(c) for c in poscolors]
+end
+
+# Count Contour plots already in the axis, divide by 2 (pos+neg per
+# spectrum). Used to advance the Wong colour cycler across successive
+# `nmrplot!` calls on 2D spectra so overlays don't all share Wong[1].
+function _existing_2d_count(ax::Makie.Axis)
+    n = 0
+    for p in ax.scene.plots
+        p isa Makie.Contour && (n += 1)
+    end
+    return n ÷ 2
 end
 
 # Merge user-facing axis overrides (`title`, `xlabel`, `ylabel`) and the
@@ -82,18 +99,43 @@ const _LEGEND_POS_ALIAS = Dict(
     true => :rt,
 )
 
+function _resolve_legend_position(legend)
+    if legend isa Symbol
+        return get(_LEGEND_POS_ALIAS, legend, legend)
+    elseif legend === true
+        return :rt
+    end
+    return :rt
+end
+
 function _apply_legend!(ax::Makie.Axis, legend)
     legend === false && return nothing
     legend isa Bool && legend &&
         return Makie.axislegend(ax; position=:rt)
-    if legend isa Symbol
-        pos = get(_LEGEND_POS_ALIAS, legend, legend)
-        return Makie.axislegend(ax; position=pos)
-    end
+    legend isa Symbol &&
+        return Makie.axislegend(ax; position=_resolve_legend_position(legend))
     legend isa AbstractString &&
         return Makie.axislegend(ax, legend)
-    if legend isa NamedTuple
+    legend isa NamedTuple &&
         return Makie.axislegend(ax; legend...)
-    end
     throw(ArgumentError("legend must be false / true / a position symbol / a title string / a NamedTuple"))
+end
+
+# Variant for contour series: Makie's auto-generated legend entries for
+# `Contour` plots ignore the line colour, so we build `LineElement`s
+# explicitly from the resolved colours.
+function _apply_contour_legend!(ax::Makie.Axis, legend, labels, colors)
+    legend === false && return nothing
+    nonempty = [(l, c) for (l, c) in zip(labels, colors) if !isempty(l)]
+    isempty(nonempty) && return nothing
+    entries = [Makie.LineElement(; color=c) for (_, c) in nonempty]
+    labs = [l for (l, _) in nonempty]
+    if legend isa AbstractString
+        return Makie.axislegend(ax, entries, labs, legend; position=:rt)
+    elseif legend isa NamedTuple
+        return Makie.axislegend(ax, entries, labs; legend...)
+    else
+        return Makie.axislegend(ax, entries, labs;
+                                position=_resolve_legend_position(legend))
+    end
 end

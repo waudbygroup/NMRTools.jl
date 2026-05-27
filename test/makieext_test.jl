@@ -89,6 +89,16 @@ end
     @test plt3 isa Makie.Contour
 end
 
+@testset "MakieExt: 2D overlay cycles colours" begin
+    dat = exampledata("2D_HN")
+    fap = nmrplot(dat)
+    plt1_color = fap.plot.color[]
+    plt2 = nmrplot!(fap, dat)
+    plt2_color = plt2.color[]
+    # Second spectrum should get a different Wong colour, not the same one.
+    @test plt1_color != plt2_color
+end
+
 @testset "MakieExt: nmrplot! into existing axis" begin
     dat = exampledata("1D_19F")
     fig = Makie.Figure()
