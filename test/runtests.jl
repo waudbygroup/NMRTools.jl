@@ -13,3 +13,7 @@ end
 @safetestset "PlotsExt" begin
     include("plotsext_test.jl")
 end
+
+@safetestset "MakieExt" begin
+    include("makieext_test.jl")
+end

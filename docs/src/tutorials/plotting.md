@@ -2,6 +2,8 @@
 
 NMRTools contains recipes for plotting common types of spectra, using the `Plots` package.
 
+For Makie-based plotting with `nmrplot` and `nmrplot!`, see [Makie plotting](@ref).
+
 
 ## Plotting a 1D spectrum
 
