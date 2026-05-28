@@ -166,6 +166,11 @@ end
     @test ax.xreversed[] == true
 
     @visualtest (fname -> save_rgb(fname, fig)) "makie-images/1D_19F_gridpos.png"
+
+    fig = Figure(; size=(1000, 420))
+    nmrplot(fig[1, 1], exampledata("1D_19F"); title="1D")
+    nmrplot(fig[1, 2], exampledata("2D_HN"); title="2D", xlims=(6, 10))
+    @visualtest (fname -> save_rgb(fname, fig)) "makie-images/subplots.png"
 end
 
 @testset "MakieExt: vector of 1D" begin
