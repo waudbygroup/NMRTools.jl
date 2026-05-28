@@ -49,10 +49,50 @@ save("makie-2D.svg", fig); nothing # hide
 
 ![](makie-2D.svg)
 
+Add 1D projections along each axis:
+
+```@example 1
+fig = nmrplot(exampledata("2D_HN"), xprojection=true, yprojection=true)
+save("makie-2D-projections.svg", fig); nothing # hide
+```
+
+![](makie-2D-projections.svg)
+
+Plot a series of 2Ds in one call:
+
+```@example 1
+fig = nmrplot(exampledata("2D_HN_titration"), legend=:topleft)
+save("makie-2D-series.svg", fig); nothing # hide
+```
+
+![](makie-2D-series.svg)
+
+Or add spectra one-by-one with `nmrplot!` and then add a legend in standard Makie style:
+
+```@example 1
+dats = exampledata("2D_HN_titration")
+fig, ax = nmrplot(dats[1], title="", xlims=(-120, -128))
+nmrplot!(fig, dats[5])
+nmrplot!(fig, dats[10])
+axislegend(ax)
+save("makie-2D-series-add.svg", fig); nothing # hide
+```
+
+![](makie-2D-series-add.svg)
+
+When plotting a small number of 2Ds, Makie's default cycle is used instead of a rainbow gradient:
+
+```@example 1
+fig = nmrplot(exampledata("2D_HN_titration")[[1, 5, 10]])
+save("makie-2D-series-small.svg", fig); nothing # hide
+```
+
+![](makie-2D-series-small.svg)
+
 Contours are drawn at positive and negative levels by default. You can control colours and disable negative contours:
 
 ```@example 1
-nmrplot(spec2d; negcontours=false)
+fig = nmrplot(spec2d; negcontours=false)
 save("makie-2Db.svg", fig); nothing # hide
 ```
 
@@ -61,22 +101,61 @@ save("makie-2Db.svg", fig); nothing # hide
 or adjust negative contour colours:
 
 ```@example 1
-nmrplot(spec2d; negcolor=:red)
+fig = nmrplot(spec2d; negcolor=:red)
 save("makie-2Dc.svg", fig); nothing # hide
 ```
 
 ![](makie-2Dc.svg)
 
 
-## Plot placement and layout
+### Pseudo-2D spectra (one frequency + one non-frequency dimension)
 
-`nmrplot` works directly with Makie layout slots (`GridPosition`) and can be composed with other Makie plots:
+Choose a style with the `style` keyword:
+
+- `style=:heatmap` (default)
+- `style=:flat` (overlaid 1D slices)
+- `style=:waterfall` (3D slice view)
+
+Example pseudo-2D diffusion plot:
 
 ```@example 1
-fig = Figure(size=(1000, 420))
+diffusiondata = exampledata("pseudo2D_XSTE")
+# set the gradient strengths - which varied from 2% to 98% of the max, over 10 points
+diffusiondata = setgradientlist(diffusiondata, LinRange(0.02, 0.98, 10))
+fig = nmrplot(diffusiondata, xlims=(7, 9.5))
+save("makie-pseudo2D-heatmap.svg", fig); nothing # hide
+```
 
-nmrplot(fig[1, 1], exampledata("1D_19F"); title="1D")
-nmrplot(fig[1, 2], exampledata("2D_HN"); title="2D")
+![](makie-pseudo2D-heatmap.svg)
+
+The default is a heatmap, and flat/waterfall styles are also available:
+
+```@example 1
+fig = nmrplot(diffusiondata, xlims=(7, 9.5), style=:flat)
+save("makie-pseudo2D-flat.svg", fig); nothing # hide
+```
+
+![](makie-pseudo2D-flat.svg)
+
+```@example 1
+fig = nmrplot(diffusiondata, xlims=(7, 9.5), style=:waterfall)
+save("makie-pseudo2D-waterfall.svg", fig); nothing # hide
+```
+
+![](makie-pseudo2D-waterfall.svg)
+
+
+
+## Plot placement and layout
+
+`nmrplot` works directly with Makie layouts and can be composed with other Makie plots:
+
+```@example 1
+fig = Figure()
+
+nmrplot(fig[1, 1], exampledata("1D_1H"); title="", xlims=(-1, 4.5))
+nmrplot(fig[1, 2], exampledata("2D_HN"); title="", xlims=(6, 10))
+scatter(fig[2,:], randn(100))
 
 save("makie-plots.svg", fig); nothing # hide
 ```
@@ -84,41 +163,4 @@ save("makie-plots.svg", fig); nothing # hide
 ![](makie-plots.svg)
 
 
-## Supported data shapes
 
-### 1D frequency-domain
-
-- Plotted as lines on `Axis`
-- Frequency axis is reversed (`xreversed=true`)
-- Lists of 1D spectra can be overlaid or vertically stacked with `vstack`
-
-### 2D pure-frequency
-
-- Plotted as contour maps on `Axis`
-- Both frequency axes are reversed
-- Optional projections can be added with `xprojection` and `yprojection`
-
-### 3D pure-frequency
-
-- Plotted as iso-surfaces on `Axis3`
-- Positive and optional negative surfaces are drawn at multiples of the noise level
-
-### Pseudo-2D (one frequency + one non-frequency dimension)
-
-Choose a style with the `style` keyword:
-
-- `style=:heatmap` (single spectrum)
-- `style=:flat` (overlaid 1D slices)
-- `style=:waterfall` (3D slice view)
-
-## Common keywords
-
-Common options across plotting modes include:
-
-- `normalize`: scale spectra consistently (default `true`)
-- `title`, `xlabel`, `ylabel`, `zlabel`: axis/title labels
-- `xlims`, `ylims`, `zlims`: explicit axis limits
-- `color`, `colors`, `colormap`: line/contour colour control
-- `axis`: pass a `NamedTuple` of Makie axis attributes for fine control
-
-For complete function signatures and dispatch forms, see the API entries for [`nmrplot`](@ref) and [`nmrplot!`](@ref).
