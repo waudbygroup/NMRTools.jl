@@ -17,6 +17,54 @@ end
 _realdata(A::AbstractNMRData) = data(A)
 _realdata(A::AbstractNMRData{<:Multicomplex}) = realest.(data(A))
 
+# Constrain an Axis to `xlims` and rescale y to the data falling *within*
+# that x-window — so a strong peak outside the window doesn't flatten the
+# region of interest. `specs` are the 1D spectra plotted, `offsets` their
+# per-spectrum vertical offsets (for stacked series), `normalize` the same
+# value passed to plotting. The x-axis reversal is handled by the Axis's
+# `xreversed` attribute, so limits are stored in ascending data order.
+function _autoscale_to_xlims!(ax, specs, normalize, xlims; pad=0.05,
+                              offsets=nothing)
+    lo, hi = minmax(Float64(first(xlims)), Float64(last(xlims)))
+    ymin = Inf
+    ymax = -Inf
+    for (k, spec) in enumerate(specs)
+        Afwd = reorder(spec, ForwardOrdered)
+        xd = data(dims(Afwd, 1))
+        yd = _realdata(Afwd) ./ _normalization_divisor(Afwd, normalize)
+        off = isnothing(offsets) ? 0.0 : offsets[k]
+        @inbounds for i in eachindex(xd)
+            if lo <= xd[i] <= hi
+                v = yd[i] + off
+                v < ymin && (ymin = v)
+                v > ymax && (ymax = v)
+            end
+        end
+    end
+    if isfinite(ymin) && isfinite(ymax) && ymax > ymin
+        p = pad * (ymax - ymin)
+        ax.limits[] = ((lo, hi), (ymin - p, ymax + p))
+    else
+        ax.limits[] = ((lo, hi), nothing)
+    end
+    return ax
+end
+
+# Vertical separation between successive spectra in a stacked 1D series.
+function _vstack_delta(v, normalize, vstack)
+    if vstack isa Bool
+        vstack || return 0.0
+        return maximum(maximum(abs.(_realdata(A))) /
+                       _normalization_divisor(A, normalize) for A in v) / length(v)
+    elseif vstack isa Number
+        return maximum(maximum(abs.(_realdata(A))) /
+                       _normalization_divisor(A, normalize) for A in v) /
+               length(v) * vstack
+    else
+        throw(ArgumentError("vstack must be a Bool or Number"))
+    end
+end
+
 # ── Normalisation ────────────────────────────────────────────────────────
 #
 # NMR data carries `scale(spec)` = ns·rg·concentration (the expected signal

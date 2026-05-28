@@ -5,8 +5,8 @@
 #   :heatmap (default)  — `Makie.heatmap!` with diverging colourmap centred
 #                          on zero. Single spectra only — heatmaps don't
 #                          overlay sensibly.
-#   :stack              — overlaid 1D slices with a constant vertical
-#                          offset per slice (regular Axis).
+#   :flat               — overlaid 1D slices, no vertical offset, with a
+#                          zero baseline (regular Axis).
 #   :waterfall          — 3D lines, one per slice (Axis3).
 # ─────────────────────────────────────────────────────────────────────────
 
@@ -43,29 +43,29 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           style=:heatmap, kwargs...)
     if style === :heatmap
         return _pseudo2d_heatmap(gp, spec; kwargs...)
-    elseif style === :stack
-        return _pseudo2d_stack(gp, spec; kwargs...)
+    elseif style === :flat
+        return _pseudo2d_flat(gp, spec; kwargs...)
     elseif style === :waterfall
         return _pseudo2d_waterfall(gp, spec; kwargs...)
     else
-        throw(ArgumentError("style must be :heatmap, :stack, or :waterfall"))
+        throw(ArgumentError("style must be :heatmap, :flat, or :waterfall"))
     end
 end
 
-# Vector dispatch — stack and waterfall overlay; heatmap rejected.
+# Vector dispatch — flat and waterfall overlay; heatmap rejected.
 function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           v::AbstractVector{<:_SpecPseudo2D};
-                          style=:stack, kwargs...)
+                          style=:flat, kwargs...)
     isempty(v) && throw(ArgumentError("nmrplot: empty spectrum vector"))
-    if style === :stack
-        return _pseudo2d_stack_vector(gp, v; kwargs...)
+    if style === :flat
+        return _pseudo2d_flat_vector(gp, v; kwargs...)
     elseif style === :waterfall
         return _pseudo2d_waterfall_vector(gp, v; kwargs...)
     elseif style === :heatmap
         throw(ArgumentError("Cannot overlay multiple heatmaps; plot each \
                              pseudo-2D separately."))
     else
-        throw(ArgumentError("style must be :stack or :waterfall for vectors"))
+        throw(ArgumentError("style must be :flat or :waterfall for vectors"))
     end
 end
 
@@ -77,12 +77,12 @@ NMRTools.nmrplot!(ax::Union{Makie.Axis,Makie.Axis3},
     NMRTools.nmrplot!(ax, permutedims(spec, (2, 1)); kwargs...)
 
 function NMRTools.nmrplot!(ax::Makie.Axis, spec::_SpecPseudo2D_FN;
-                           style=:stack, kwargs...)
-    style === :stack ||
+                           style=:flat, kwargs...)
+    style === :flat ||
         throw(ArgumentError("nmrplot!(::Axis, pseudo2D) only supports \
-                             style=:stack (got :$style). Use Axis3 for \
+                             style=:flat (got :$style). Use Axis3 for \
                              :waterfall."))
-    return _pseudo2d_stack!(ax, spec; kwargs...)
+    return _pseudo2d_flat!(ax, spec; kwargs...)
 end
 
 function NMRTools.nmrplot!(ax::Makie.Axis3, spec::_SpecPseudo2D_FN;
@@ -144,11 +144,11 @@ function _pseudo2d_heatmap(gp, spec::_SpecPseudo2D_FN;
     return Makie.AxisPlot(ax, plt)
 end
 
-# ──── Stack (overlaid 1D slices with vertical offset, regular Axis) ──────
+# ──── Flat (overlaid 1D slices, no offset, with zero baseline) ───────────
 
-function _pseudo2d_stack(gp, spec::_SpecPseudo2D_FN;
-                         title=nothing, xlabel=nothing, ylabel=nothing,
-                         legend=false, axis=NamedTuple(), kwargs...)
+function _pseudo2d_flat(gp, spec::_SpecPseudo2D_FN;
+                        title=nothing, xlabel=nothing, ylabel=nothing,
+                        legend=false, axis=NamedTuple(), kwargs...)
     dim = dims(reorder(spec, ForwardOrdered), 1)
     defaults = (; xreversed=true,
                 xlabel=axislabel(dim),
@@ -161,15 +161,15 @@ function _pseudo2d_stack(gp, spec::_SpecPseudo2D_FN;
                 title=string(something(label(spec), "")))
     ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, axis)
     ax = Makie.Axis(gp; ax_kwargs...)
-    plt = _pseudo2d_stack!(ax, spec; kwargs...)
+    plt = _pseudo2d_flat!(ax, spec; kwargs...)
     _apply_legend!(ax, legend)
     return Makie.AxisPlot(ax, plt)
 end
 
-function _pseudo2d_stack_vector(gp, v::AbstractVector{<:_SpecPseudo2D};
-                                color=nothing, colors=nothing, colormap=nothing,
-                                title=nothing, xlabel=nothing, ylabel=nothing,
-                                legend=false, axis=NamedTuple(), kwargs...)
+function _pseudo2d_flat_vector(gp, v::AbstractVector{<:_SpecPseudo2D};
+                               color=nothing, colors=nothing, colormap=nothing,
+                               title=nothing, xlabel=nothing, ylabel=nothing,
+                               legend=false, axis=NamedTuple(), kwargs...)
     first_spec = first(v) isa _SpecPseudo2D_FN ? first(v) :
                  permutedims(first(v), (2, 1))
     dim = dims(reorder(first_spec, ForwardOrdered), 1)
@@ -185,15 +185,14 @@ function _pseudo2d_stack_vector(gp, v::AbstractVector{<:_SpecPseudo2D};
     ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, axis)
     ax = Makie.Axis(gp; ax_kwargs...)
 
-    # For a vector of pseudo-2D in stack mode, treat colours as one per
-    # spectrum (not per slice within a spectrum). All slices of spectrum i
-    # then share `spec_colors[i]`.
+    # For a vector of pseudo-2D, treat colours as one per spectrum (not per
+    # slice within a spectrum). All slices of spectrum i share spec_colors[i].
     colors_arg = isnothing(colors) ? color : colors
     spec_colors = _series_poscolors(colors_arg, length(v); colormap)
 
     local first_plt
     for (i, spec) in enumerate(v)
-        plt = NMRTools.nmrplot!(ax, spec; style=:stack,
+        plt = NMRTools.nmrplot!(ax, spec; style=:flat,
                                 color=spec_colors[i], kwargs...)
         i == 1 && (first_plt = plt)
     end
@@ -201,13 +200,13 @@ function _pseudo2d_stack_vector(gp, v::AbstractVector{<:_SpecPseudo2D};
     return Makie.AxisPlot(ax, first_plt)
 end
 
-function _pseudo2d_stack!(ax::Makie.Axis, spec::_SpecPseudo2D_FN;
-                          normalize=true,
-                          vstack=true,
-                          color=nothing,
-                          colors=nothing,
-                          colormap=nothing,
-                          kwargs...)
+function _pseudo2d_flat!(ax::Makie.Axis, spec::_SpecPseudo2D_FN;
+                         normalize=true,
+                         color=nothing,
+                         colors=nothing,
+                         colormap=nothing,
+                         zeroline=true,
+                         kwargs...)
     ax.xreversed = true
     dfwd = reorder(spec, ForwardOrdered)
     x, y = dims(dfwd)
@@ -220,31 +219,26 @@ function _pseudo2d_stack!(ax::Makie.Axis, spec::_SpecPseudo2D_FN;
     cs = if !isnothing(colors)
         _series_poscolors(colors, n; colormap)
     elseif is_overlay
-        # Overlay without explicit colour: use second Wong colour for all
-        # slices so the overlay reads as one spectrum, visually distinct
-        # from the rainbow of the original. Pass `color=...` to customise.
+        # Overlay without explicit colour: use the second Wong colour for all
+        # slices so the overlay reads as one spectrum, distinct from the
+        # rainbow of the original. Pass `color=...` to customise.
         fill(_parse_colorant(_theme_palette()[2]), n)
     else
         _series_poscolors(nothing, n; colormap)
     end
 
-    vdelta = if vstack isa Bool
-        vstack ? maximum(abs, z) / n : 0.0
-    elseif vstack isa Number
-        maximum(abs, z) / n * vstack
-    else
-        throw(ArgumentError("vstack must be a Bool or Number"))
+    # Zero baseline, drawn once (skip when overlaying onto an existing plot).
+    if zeroline && !is_overlay
+        Makie.hlines!(ax, [0.0]; color=(:gray, 0.7), linewidth=0.8)
     end
 
     local first_plt
-    voffset = 0.0
     xvals = data(x)
     yvals = data(y)
     for i in 1:n
-        plt = Makie.lines!(ax, xvals, z[:, i] .+ voffset;
+        plt = Makie.lines!(ax, xvals, z[:, i];
                            color=cs[i], label=string(yvals[i]), kwargs...)
         i == 1 && (first_plt = plt)
-        voffset += vdelta
     end
     return first_plt
 end

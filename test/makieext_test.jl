@@ -129,6 +129,25 @@ end
     @test count(p -> p isa Makie.Lines, ax.scene.plots) == length(dats)
 end
 
+@testset "MakieExt: 1D xlims auto-scales y to window" begin
+    dat = exampledata("1D_19F")
+    # No xlims: limits stay automatic.
+    fig, ax, plt = nmrplot(dat)
+    @test ax.limits[] === nothing || all(isnothing, ax.limits[])
+
+    # With xlims: explicit limits applied (x window + windowed y range).
+    fig, ax, plt = nmrplot(dat; xlims=(-125, -122))
+    @test ax.limits[] !== nothing
+    fl = ax.finallimits[]
+    @test Float64(minimum(fl)[1]) ≈ -125.0 atol = 1e-6
+    @test Float64(maximum(fl)[1]) ≈ -122.0 atol = 1e-6
+
+    # Works for a series too.
+    dats = exampledata("1D_19F_titration")
+    fig, ax, plt = nmrplot(dats; xlims=(-125, -121))
+    @test ax.limits[] !== nothing
+end
+
 @testset "MakieExt: vector of 2D" begin
     dats = exampledata("2D_HN_titration")
     fig, ax, plt = nmrplot(dats)
@@ -187,7 +206,7 @@ end
 
 @testset "MakieExt: vector of pseudo-2D" begin
     dat = exampledata("pseudo2D_XSTE")
-    fig, ax, plt = nmrplot([dat, dat / 2]; style=:stack)
+    fig, ax, plt = nmrplot([dat, dat / 2]; style=:flat)
     @test ax isa Makie.Axis
     fig, ax, plt = nmrplot([dat, dat / 2]; style=:waterfall)
     @test ax isa Makie.Axis3
@@ -196,8 +215,8 @@ end
 
 @testset "MakieExt: pseudo-2D overlay" begin
     dat = exampledata("pseudo2D_XSTE")
-    fap = nmrplot(dat; style=:stack)
-    plt2 = nmrplot!(dat / 2; style=:stack, color=:green)
+    fap = nmrplot(dat; style=:flat)
+    plt2 = nmrplot!(dat / 2; style=:flat, color=:green)
     @test plt2 isa Makie.Lines
 
     fap = nmrplot(dat; style=:waterfall)
@@ -217,13 +236,15 @@ end
     @test plt isa Makie.Heatmap
 end
 
-@testset "MakieExt: pseudo-2D stack" begin
+@testset "MakieExt: pseudo-2D flat" begin
     dat = exampledata("pseudo2D_XSTE")
-    fig, ax, plt = nmrplot(dat; style=:stack)
+    fig, ax, plt = nmrplot(dat; style=:flat)
     @test ax isa Makie.Axis
     @test ax.xreversed[] == true
     @test plt isa Makie.Lines
+    # One Lines per slice; zero baseline adds an HLines (not a Lines).
     @test count(p -> p isa Makie.Lines, ax.scene.plots) == length(dims(dat, 2))
+    @test any(p -> p isa Makie.HLines, ax.scene.plots)
 end
 
 @testset "MakieExt: pseudo-2D waterfall" begin

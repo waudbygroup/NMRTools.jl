@@ -14,6 +14,7 @@ end
 function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           spec::_Spec1DFreq;
                           normalize=true,
+                          xlims=nothing,
                           title=nothing,
                           xlabel=nothing,
                           ylabel=nothing,
@@ -37,6 +38,7 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
     ax = Makie.Axis(gp; ax_kwargs...)
     plt = NMRTools.nmrplot!(ax, spec; normalize, kwargs...)
     _apply_legend!(ax, legend)
+    isnothing(xlims) || _autoscale_to_xlims!(ax, [spec], normalize, xlims)
     return Makie.AxisPlot(ax, plt)
 end
 
@@ -117,6 +119,7 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                                                       <:Tuple{<:FrequencyDimension}}};
                           normalize=true,
                           vstack=false,
+                          xlims=nothing,
                           color=nothing,
                           colors=nothing,
                           colormap=nothing,
@@ -142,6 +145,11 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
     colors = isnothing(colors) ? color : colors
     plt = _plot_1d_series!(ax, v; normalize, vstack, colors, colormap, kwargs...)
     _apply_legend!(ax, legend)
+    if !isnothing(xlims)
+        vdelta = _vstack_delta(v, normalize, vstack)
+        offsets = [(i - 1) * vdelta for i in eachindex(v)]
+        _autoscale_to_xlims!(ax, v, normalize, xlims; offsets)
+    end
     return Makie.AxisPlot(ax, plt)
 end
 
@@ -150,19 +158,7 @@ function _plot_1d_series!(ax::Makie.Axis, v;
                           colors=nothing, colormap=nothing, kwargs...)
     n = length(v)
     cs = _series_poscolors(colors, n; colormap)
-
-    vdelta = 0.0
-    if vstack isa Bool
-        if vstack
-            vdelta = maximum(maximum(abs.(_realdata(A))) /
-                             _normalization_divisor(A, normalize) for A in v) / n
-        end
-    elseif vstack isa Number
-        vdelta = maximum(maximum(abs.(_realdata(A))) /
-                         _normalization_divisor(A, normalize) for A in v) / n * vstack
-    else
-        throw(ArgumentError("vstack must be a Bool or Number"))
-    end
+    vdelta = _vstack_delta(v, normalize, vstack)
 
     local first_plt
     voffset = 0.0
