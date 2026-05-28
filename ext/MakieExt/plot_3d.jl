@@ -83,11 +83,23 @@ function NMRTools.nmrplot!(ax::Makie.Axis3, spec::_Spec3DFreq;
     yr = (Float64(first(data(y))), Float64(last(data(y))))
     zr = (Float64(first(data(z))), Float64(last(data(z))))
 
+    # Colour each iso-surface a single solid colour. A 3D `contour` colours
+    # surfaces by level through `colormap`+`colorrange`, so passing a single
+    # `color` with a single `level` gives a degenerate colorrange and the
+    # surface fails to render. Use a 2-point constant colourmap and an
+    # explicit non-degenerate colorrange instead.
+    lv = level * σ
+    poscol = Makie.to_color(poscolor_c)
+    negcol = Makie.to_color(negcolor_c)
     plt_pos = Makie.contour!(ax, xr, yr, zr, vol;
-                             levels=[level * σ], color=poscolor_c, kwargs...)
+                             levels=[lv],
+                             colormap=[poscol, poscol],
+                             colorrange=(0.0, lv), kwargs...)
     if negcontours
         Makie.contour!(ax, xr, yr, zr, vol;
-                       levels=[-level * σ], color=negcolor_c, kwargs...)
+                       levels=[-lv],
+                       colormap=[negcol, negcol],
+                       colorrange=(-lv, 0.0), kwargs...)
     end
     return plt_pos
 end
