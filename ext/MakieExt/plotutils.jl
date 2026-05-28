@@ -65,18 +65,55 @@ function _vstack_delta(v, normalize, vstack)
     end
 end
 
+# Normalise a user-supplied limit (nothing, or any 2-element order) to an
+# ascending (lo, hi) tuple. Axis reversal is handled by `xreversed` etc.,
+# so limits are always stored ascending.
+_lim_pair(::Nothing) = nothing
+_lim_pair(l) = (Float64(minimum(l)), Float64(maximum(l)))
+
+# How many times we've drawn a pseudo-2D spectrum into a given axis.
+# Returns 1 on the first call, 2 on the next, etc. Used to advance the
+# colour cycle on overlays. We track this explicitly rather than inspecting
+# `ax.scene.plots`, because an Axis3 populates its scene with framework
+# plots even before any data is added (which would make a fresh axis look
+# like an overlay).
+const _OVERLAY_COUNT = WeakKeyDict{Any,Int}()
+function _next_overlay_index!(ax)
+    n = get(_OVERLAY_COUNT, ax, 0) + 1
+    _OVERLAY_COUNT[ax] = n
+    return n
+end
+
+# Apply explicit axis limits generally (no auto-scaling). Works for 2D Axis
+# and 3D Axis3; each of xlims/ylims/zlims may be `nothing` (keep auto).
+function _apply_axis_limits!(ax::Makie.Axis, xlims, ylims)
+    (isnothing(xlims) && isnothing(ylims)) && return ax
+    ax.limits[] = (_lim_pair(xlims), _lim_pair(ylims))
+    return ax
+end
+
+function _apply_axis_limits!(ax::Makie.Axis3, xlims, ylims, zlims=nothing)
+    (isnothing(xlims) && isnothing(ylims) && isnothing(zlims)) && return ax
+    try
+        ax.limits[] = (_lim_pair(xlims), _lim_pair(ylims), _lim_pair(zlims))
+    catch err
+        @warn "nmrplot: could not apply 3D axis limits" exception = err
+    end
+    return ax
+end
+
 # ── Normalisation ────────────────────────────────────────────────────────
 #
 # NMR data carries `scale(spec)` = ns·rg·concentration (the expected signal
 # magnitude) and a `:noise` RMS level. The `normalize` argument is handled
-# differently for *intensity* plots vs *contour/volume* plots:
+# differently for *intensity* plots vs *contour* plots:
 #
-#   • Intensity plots (1D lines, pseudo-2D heatmap/stack/waterfall) divide
+#   • Intensity plots (1D lines, pseudo-2D heatmap/flat/waterfall) divide
 #     the DATA by a scaling factor so spectra at different concentrations or
 #     receiver gains are directly comparable → `_normalization_divisor`.
 #
-#   • Contour/volume plots (2D, 3D) leave the data in RAW units and instead
-#     position the threshold σ (2D contour base = 5σ, 3D volume floor).
+#   • Contour plots (2D, 3D) leave the data in RAW units and instead
+#     position the threshold σ (2D base = 5σ, 3D iso-surface = level·σ).
 #     Data and σ are therefore both raw and mutually consistent — we do NOT
 #     divide σ by `scale` here, precisely because the data isn't divided
 #     either → `_contour_sigma`.
@@ -106,10 +143,10 @@ end
 """
     _contour_sigma(spec, normalize) -> Real
 
-Noise level σ for 2D contour base levels (`5σ`) and the 3D volume floor.
-Data is left raw, so σ is raw too. `false`/`true` → `spec[:noise]`; a
-reference spectrum → that reference's noise rescaled by the concentration
-ratio `scale(spec)/scale(ref)`.
+Noise level σ for 2D contour base levels (`5σ`) and 3D iso-surfaces
+(`level·σ`). Data is left raw, so σ is raw too. `false`/`true` →
+`spec[:noise]`; a reference spectrum → that reference's noise rescaled by
+the concentration ratio `scale(spec)/scale(ref)`.
 """
 function _contour_sigma(spec::AbstractNMRData, normalize)
     (normalize === false || normalize === true) && return spec[:noise]

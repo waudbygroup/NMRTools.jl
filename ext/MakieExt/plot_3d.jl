@@ -1,21 +1,12 @@
 # ─────────────────────────────────────────────────────────────────────────
-# 3D pure-frequency NMR spectra → Makie volume rendering on Axis3
+# 3D pure-frequency NMR spectra → iso-surface contours on Axis3
 #
-# Default algorithm is `:mip` (maximum intensity projection) — an intuitive
-# peak-focused view of 3D NMR data. Other choices:
-#   :absorption — alpha-blended volume (tune with `absorption=...`)
-#   :iso        — iso-surface (set `isovalue=...`, `isorange=...`)
-#   :additive   — additive blending
-#
-# Data is kept in raw (signed) units. The visible window is set with
-# `colorrange = (threshold*σ, max)`: values at/below the noise floor map to
-# the transparent low end of the colourmap and disappear, while peaks light
-# up — the volume analogue of "2D contours start at 5σ". Negative values
-# fall below the range and are likewise transparent (fine for the usual
-# positive-peak experiments; pass an explicit `colorrange` to change this).
-#
-# High dynamic range tip: if one strong peak washes the rest out, lower the
-# upper bound, e.g. `colorrange = (5σ, 30σ)`.
+# Two iso-surfaces by default — one positive at +level·σ and one negative
+# at −level·σ (level = 20) — coloured exactly like 2D contour plots:
+# `poscolor` cycles the Wong palette (or is taken from `color`/`poscolor`),
+# `negcolor` is derived from it unless given. σ uses the same
+# `_contour_sigma` logic as the 2D plots, so reference normalisation and
+# overlays of multiple 3D spectra behave just like the 2D case.
 # ─────────────────────────────────────────────────────────────────────────
 
 const _Spec3DFreq = NMRData{T,3,<:Tuple{<:FrequencyDimension,
@@ -31,15 +22,18 @@ end
 function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           spec::_Spec3DFreq;
                           normalize=true,
-                          algorithm=:mip,
-                          colormap=:plasma,
-                          absorption=4.0,
-                          threshold=5,
-                          colorrange=nothing,
+                          color=nothing,
+                          poscolor=nothing,
+                          negcolor=nothing,
+                          negcontours=true,
+                          level=20,
                           title=nothing,
                           xlabel=nothing,
                           ylabel=nothing,
                           zlabel=nothing,
+                          xlims=nothing,
+                          ylims=nothing,
+                          zlims=nothing,
                           axis=NamedTuple(),
                           kwargs...)
     dfwd = reorder(spec, ForwardOrdered)
@@ -53,61 +47,115 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                 title=string(something(label(spec), "")))
     ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, zlabel, axis)
     ax = Makie.Axis3(gp; ax_kwargs...)
-    plt = NMRTools.nmrplot!(ax, spec; normalize, algorithm, colormap,
-                            absorption, threshold, colorrange, kwargs...)
+    poscolor = isnothing(poscolor) ? color : poscolor
+    plt = NMRTools.nmrplot!(ax, spec; normalize, poscolor, negcolor,
+                            negcontours, level, kwargs...)
+    _apply_axis_limits!(ax, xlims, ylims, zlims)
     return Makie.AxisPlot(ax, plt)
 end
 
 function NMRTools.nmrplot!(ax::Makie.Axis3, spec::_Spec3DFreq;
                            normalize=true,
-                           algorithm=:mip,
-                           colormap=:plasma,
-                           absorption=4.0,
-                           threshold=5,
-                           colorrange=nothing,
+                           color=nothing,
+                           poscolor=nothing,
+                           negcolor=nothing,
+                           negcontours=true,
+                           level=20,
                            kwargs...)
     dfwd = reorder(spec, ForwardOrdered)
     x, y, z = dims(dfwd)
     σ = _contour_sigma(dfwd, normalize)
 
-    vol = Float32.(_realdata(dfwd))
-    vmax = maximum(vol)
+    poscolor = isnothing(poscolor) ? color : poscolor
+    if isnothing(poscolor)
+        pal = _theme_palette()
+        idx = _existing_3d_count(ax) + 1
+        poscolor_c = _parse_colorant(pal[mod1(idx, length(pal))])
+    else
+        poscolor_c = _parse_colorant(poscolor)
+    end
+    negcolor_c = isnothing(negcolor) ? _derive_negcolor(poscolor_c) :
+                 _parse_colorant(negcolor)
 
-    # Lower bound at threshold·σ (noise floor); guard against σ being unset
-    # or larger than the data peak.
-    lo = (!isnothing(σ) && threshold * σ < vmax) ? Float32(threshold * σ) :
-         zero(Float32)
-    crange = isnothing(colorrange) ? (lo, Float32(vmax)) : colorrange
-
-    cmap = _fade_low_colormap(colormap)
-
-    # Makie's VolumeLike conversion expects (start, stop) endpoint tuples on
-    # each axis, not full coordinate vectors.
+    vol = _realdata(dfwd)
+    # Makie's 3D contour (VolumeLike) wants (start, stop) endpoint tuples.
     xr = (Float64(first(data(x))), Float64(last(data(x))))
     yr = (Float64(first(data(y))), Float64(last(data(y))))
     zr = (Float64(first(data(z))), Float64(last(data(z))))
 
-    vol_kwargs = if algorithm === :absorption
-        (; algorithm=:absorption, absorption=Float32(absorption),
-         colormap=cmap, colorrange=crange)
-    else
-        (; algorithm=algorithm, colormap=cmap, colorrange=crange)
+    plt_pos = Makie.contour!(ax, xr, yr, zr, vol;
+                             levels=[level * σ], color=poscolor_c, kwargs...)
+    if negcontours
+        Makie.contour!(ax, xr, yr, zr, vol;
+                       levels=[-level * σ], color=negcolor_c, kwargs...)
     end
-    return Makie.volume!(ax, xr, yr, zr, vol; vol_kwargs..., kwargs...)
+    return plt_pos
 end
 
-# Colourmap whose low end fades from fully transparent to opaque over the
-# first `framp` fraction of its range. Combined with `colorrange`, this
-# makes values near the lower bound disappear smoothly instead of popping
-# in — the volume analogue of contours fading in above the noise floor.
-function _fade_low_colormap(colormap; framp=0.15)
-    cmap = copy(Makie.to_colormap(colormap))
-    n = length(cmap)
-    nramp = max(1, round(Int, framp * n))
-    for i in 1:nramp
-        c = cmap[i]
-        a = Float32((i - 1) / nramp)
-        cmap[i] = Makie.RGBAf(Colors.red(c), Colors.green(c), Colors.blue(c), a)
+# Count Contour plots already on the Axis3 (pos+neg per spectrum) so the
+# Wong colour cycle advances across successive `nmrplot!` overlays.
+function _existing_3d_count(ax::Makie.Axis3)
+    n = 0
+    for p in ax.scene.plots
+        p isa Makie.Contour && (n += 1)
     end
-    return cmap
+    return n ÷ 2
+end
+
+# ─────────────────────────────────────────────────────────────────────────
+# Vector of 3D spectra (overlay)
+# ─────────────────────────────────────────────────────────────────────────
+
+function NMRTools.nmrplot(v::AbstractVector{<:_Spec3DFreq};
+                          figure=NamedTuple(), kwargs...)
+    fig = Makie.Figure(; figure...)
+    ax, plt = NMRTools.nmrplot(fig[1, 1], v; kwargs...)
+    return Makie.FigureAxisPlot(fig, ax, plt)
+end
+
+function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
+                          v::AbstractVector{<:_Spec3DFreq};
+                          normalize=true,
+                          color=nothing,
+                          colors=nothing,
+                          negcolors=nothing,
+                          colormap=nothing,
+                          negcontours=true,
+                          level=20,
+                          title=nothing,
+                          xlabel=nothing,
+                          ylabel=nothing,
+                          zlabel=nothing,
+                          xlims=nothing,
+                          ylims=nothing,
+                          zlims=nothing,
+                          axis=NamedTuple(),
+                          kwargs...)
+    isempty(v) && throw(ArgumentError("nmrplot: empty spectrum vector"))
+    dfwd0 = reorder(first(v), ForwardOrdered)
+    x0, y0, z0 = dims(dfwd0)
+    defaults = (; xreversed=true,
+                yreversed=true,
+                zreversed=true,
+                xlabel=axislabel(x0),
+                ylabel=axislabel(y0),
+                zlabel=axislabel(z0),
+                title="")
+    ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, zlabel, axis)
+    ax = Makie.Axis3(gp; ax_kwargs...)
+
+    n = length(v)
+    colors = isnothing(colors) ? color : colors
+    poscolors = _series_poscolors(colors, n; colormap)
+    negc = _series_negcolors(negcolors, poscolors)
+    refnorm = (normalize === true) ? first(v) : normalize
+
+    local first_plt
+    for (i, d) in enumerate(v)
+        plt = NMRTools.nmrplot!(ax, d; normalize=refnorm, poscolor=poscolors[i],
+                                negcolor=negc[i], negcontours, level, kwargs...)
+        i == 1 && (first_plt = plt)
+    end
+    _apply_axis_limits!(ax, xlims, ylims, zlims)
+    return Makie.AxisPlot(ax, first_plt)
 end

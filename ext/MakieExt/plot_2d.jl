@@ -28,6 +28,8 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           title=nothing,
                           xlabel=nothing,
                           ylabel=nothing,
+                          xlims=nothing,
+                          ylims=nothing,
                           legend=false,
                           axis=NamedTuple(),
                           kwargs...)
@@ -62,6 +64,7 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
     _apply_contour_legend!(ax, legend,
                            [string(something(NMRTools.label(spec), ""))],
                            [plt.color[]])
+    _apply_axis_limits!(ax, xlims, ylims)
     return Makie.AxisPlot(ax, plt)
 end
 
@@ -227,6 +230,8 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           title=nothing,
                           xlabel=nothing,
                           ylabel=nothing,
+                          xlims=nothing,
+                          ylims=nothing,
                           legend=false,
                           axis=NamedTuple(),
                           kwargs...)
@@ -272,5 +277,6 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
         end
     end
     _apply_contour_legend!(ax, legend, labels, poscolors)
+    _apply_axis_limits!(ax, xlims, ylims)
     return Makie.AxisPlot(ax, first_plt)
 end

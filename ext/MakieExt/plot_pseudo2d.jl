@@ -103,6 +103,8 @@ function _pseudo2d_heatmap(gp, spec::_SpecPseudo2D_FN;
                            title=nothing,
                            xlabel=nothing,
                            ylabel=nothing,
+                           xlims=nothing,
+                           ylims=nothing,
                            axis=NamedTuple(),
                            kwargs...)
     dfwd = reorder(spec, ForwardOrdered)
@@ -141,6 +143,7 @@ function _pseudo2d_heatmap(gp, spec::_SpecPseudo2D_FN;
         plt = Makie.heatmap!(ax, data(x), data(y), z;
                              colormap=colormap, colorrange=colorrange, kwargs...)
     end
+    _apply_axis_limits!(ax, xlims, ylims)
     return Makie.AxisPlot(ax, plt)
 end
 
@@ -148,6 +151,7 @@ end
 
 function _pseudo2d_flat(gp, spec::_SpecPseudo2D_FN;
                         title=nothing, xlabel=nothing, ylabel=nothing,
+                        xlims=nothing, ylims=nothing,
                         legend=false, axis=NamedTuple(), kwargs...)
     dim = dims(reorder(spec, ForwardOrdered), 1)
     defaults = (; xreversed=true,
@@ -163,12 +167,14 @@ function _pseudo2d_flat(gp, spec::_SpecPseudo2D_FN;
     ax = Makie.Axis(gp; ax_kwargs...)
     plt = _pseudo2d_flat!(ax, spec; kwargs...)
     _apply_legend!(ax, legend)
+    _apply_axis_limits!(ax, xlims, ylims)
     return Makie.AxisPlot(ax, plt)
 end
 
 function _pseudo2d_flat_vector(gp, v::AbstractVector{<:_SpecPseudo2D};
                                color=nothing, colors=nothing, colormap=nothing,
                                title=nothing, xlabel=nothing, ylabel=nothing,
+                               xlims=nothing, ylims=nothing,
                                legend=false, axis=NamedTuple(), kwargs...)
     first_spec = first(v) isa _SpecPseudo2D_FN ? first(v) :
                  permutedims(first(v), (2, 1))
@@ -197,6 +203,7 @@ function _pseudo2d_flat_vector(gp, v::AbstractVector{<:_SpecPseudo2D};
         i == 1 && (first_plt = plt)
     end
     _apply_legend!(ax, legend)
+    _apply_axis_limits!(ax, xlims, ylims)
     return Makie.AxisPlot(ax, first_plt)
 end
 
@@ -215,20 +222,22 @@ function _pseudo2d_flat!(ax::Makie.Axis, spec::_SpecPseudo2D_FN;
     n = length(y)
 
     colors = isnothing(colors) ? color : colors
-    is_overlay = !isempty(ax.scene.plots)
+    idx = _next_overlay_index!(ax)
     cs = if !isnothing(colors)
         _series_poscolors(colors, n; colormap)
-    elseif is_overlay
-        # Overlay without explicit colour: use the second Wong colour for all
-        # slices so the overlay reads as one spectrum, distinct from the
-        # rainbow of the original. Pass `color=...` to customise.
-        fill(_parse_colorant(_theme_palette()[2]), n)
-    else
+    elseif idx == 1
+        # First spectrum: per-slice colour cycle (Wong / HSV).
         _series_poscolors(nothing, n; colormap)
+    else
+        # Overlay: one Wong colour for all slices so the overlay reads as a
+        # single spectrum, distinct from the original. Pass `color=...` to
+        # customise.
+        pal = _theme_palette()
+        fill(_parse_colorant(pal[mod1(idx, length(pal))]), n)
     end
 
-    # Zero baseline, drawn once (skip when overlaying onto an existing plot).
-    if zeroline && !is_overlay
+    # Zero baseline, drawn once (only for the first spectrum on the axis).
+    if zeroline && idx == 1
         Makie.hlines!(ax, [0.0]; color=(:gray, 0.7), linewidth=0.8)
     end
 
@@ -247,7 +256,9 @@ end
 
 function _pseudo2d_waterfall(gp, spec::_SpecPseudo2D_FN;
                              title=nothing, xlabel=nothing, ylabel=nothing,
-                             zlabel="Intensity", axis=NamedTuple(), kwargs...)
+                             zlabel="Intensity",
+                             xlims=nothing, ylims=nothing, zlims=nothing,
+                             axis=NamedTuple(), kwargs...)
     dfwd = reorder(spec, ForwardOrdered)
     x, y = dims(dfwd)
     defaults = (; xreversed=true,
@@ -263,13 +274,16 @@ function _pseudo2d_waterfall(gp, spec::_SpecPseudo2D_FN;
     ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, zlabel, axis)
     ax = Makie.Axis3(gp; ax_kwargs...)
     plt = _pseudo2d_waterfall!(ax, spec; kwargs...)
+    _apply_axis_limits!(ax, xlims, ylims, zlims)
     return Makie.AxisPlot(ax, plt)
 end
 
 function _pseudo2d_waterfall_vector(gp, v::AbstractVector{<:_SpecPseudo2D};
                                     color=nothing, colors=nothing, colormap=nothing,
                                     title=nothing, xlabel=nothing, ylabel=nothing,
-                                    zlabel="Intensity", axis=NamedTuple(),
+                                    zlabel="Intensity",
+                                    xlims=nothing, ylims=nothing, zlims=nothing,
+                                    axis=NamedTuple(),
                                     kwargs...)
     first_spec = first(v) isa _SpecPseudo2D_FN ? first(v) :
                  permutedims(first(v), (2, 1))
@@ -293,6 +307,7 @@ function _pseudo2d_waterfall_vector(gp, v::AbstractVector{<:_SpecPseudo2D};
                                 color=spec_colors[i], kwargs...)
         i == 1 && (first_plt = plt)
     end
+    _apply_axis_limits!(ax, xlims, ylims, zlims)
     return Makie.AxisPlot(ax, first_plt)
 end
 
@@ -309,16 +324,16 @@ function _pseudo2d_waterfall!(ax::Makie.Axis3, spec::_SpecPseudo2D_FN;
     n = length(y)
 
     colors = isnothing(colors) ? color : colors
-    is_overlay = !isempty(ax.scene.plots)
+    idx = _next_overlay_index!(ax)
     cs = if !isnothing(colors)
         _series_poscolors(colors, n; colormap)
-    elseif is_overlay
-        # Overlay without explicit colour: use second Wong colour for all
-        # slices so the overlay reads as one spectrum, visually distinct
-        # from the rainbow of the original. Pass `color=...` to customise.
-        fill(_parse_colorant(_theme_palette()[2]), n)
-    else
+    elseif idx == 1
+        # First spectrum: per-slice colour cycle (Wong / HSV).
         _series_poscolors(nothing, n; colormap)
+    else
+        # Overlay: one Wong colour for all slices.
+        pal = _theme_palette()
+        fill(_parse_colorant(pal[mod1(idx, length(pal))]), n)
     end
 
     local first_plt

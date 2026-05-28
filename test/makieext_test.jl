@@ -255,19 +255,41 @@ end
     @test count(p -> p isa Makie.Lines, ax.scene.plots) == length(dims(dat, 2))
 end
 
-@testset "MakieExt: 3D volume rendering" begin
+@testset "MakieExt: 3D contour" begin
     dat = exampledata("3D_HNCA")
     fig, ax, plt = nmrplot(dat)
     @test ax isa Makie.Axis3
-    @test plt isa Makie.Volume
+    @test plt isa Makie.Contour
+    # Positive + negative iso-surface.
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2
 
-    fig, ax, plt = nmrplot(dat; algorithm=:absorption, absorption=4.0)
-    @test plt isa Makie.Volume
+    fig, ax, plt = nmrplot(dat; negcontours=false)
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 1
 
-    fig, ax, plt = nmrplot(dat; colormap=:viridis, threshold=10)
-    @test plt isa Makie.Volume
+    fig, ax, plt = nmrplot(dat; poscolor=:blue, level=30)
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 2
+end
 
-    # Explicit colorrange override for dynamic-range control.
-    fig, ax, plt = nmrplot(dat; colorrange=(1e5, 1e6))
-    @test plt isa Makie.Volume
+@testset "MakieExt: 3D contour overlay" begin
+    dat = exampledata("3D_HNCA")
+    # Vector overlay, like 2D contour series.
+    fig, ax, plt = nmrplot([dat, dat / 2])
+    @test ax isa Makie.Axis3
+    @test count(p -> p isa Makie.Contour, ax.scene.plots) == 4  # 2 specs × ±
+
+    # Manual overlay advances the colour cycle.
+    fap = nmrplot(dat)
+    plt2 = nmrplot!(dat / 2)
+    @test plt2 isa Makie.Contour
+end
+
+@testset "MakieExt: general xlims/ylims" begin
+    # 2D
+    dat2 = exampledata("2D_HN")
+    fig, ax, plt = nmrplot(dat2; xlims=(6, 10), ylims=(110, 125))
+    @test ax.limits[] !== nothing
+    # pseudo-2D heatmap
+    datp = exampledata("pseudo2D_XSTE")
+    fig, ax, plt = nmrplot(datp; xlims=(5, 10))
+    @test ax.limits[] !== nothing
 end

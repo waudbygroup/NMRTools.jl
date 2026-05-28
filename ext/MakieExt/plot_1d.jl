@@ -5,6 +5,36 @@
 const _Spec1DFreq = NMRData{T,1,<:Tuple{<:FrequencyDimension}} where {T}
 const _Spec1DNonFreq = NMRData{T,1,<:Tuple{<:NonFrequencyDimension}} where {T}
 
+# Axis defaults for a 1D frequency spectrum: a single clean bottom axis —
+# all left/right/top spines and the entire y-decoration are hidden.
+function _axis1d_defaults(dim, title_str)
+    return (; xreversed=true,
+            xlabel=axislabel(dim),
+            ylabel="",
+            xgridvisible=false,
+            ygridvisible=false,
+            yticksvisible=false,
+            yticklabelsvisible=false,
+            leftspinevisible=false,
+            rightspinevisible=false,
+            topspinevisible=false,
+            bottomspinevisible=true,
+            xtickalign=1,
+            title=title_str)
+end
+
+# Apply x/y limits to a 1D axis. When only `xlims` is given, the y-range is
+# auto-scaled to the data *within* the x-window (so an out-of-window peak
+# doesn't flatten the view). `offsets` are per-spectrum vstack offsets.
+function _apply_1d_limits!(ax, specs, normalize, xlims, ylims; offsets=nothing)
+    if !isnothing(xlims) && isnothing(ylims)
+        _autoscale_to_xlims!(ax, specs, normalize, xlims; offsets)
+    elseif !isnothing(xlims) || !isnothing(ylims)
+        _apply_axis_limits!(ax, xlims, ylims)
+    end
+    return ax
+end
+
 function NMRTools.nmrplot(spec::_Spec1DFreq; figure=NamedTuple(), kwargs...)
     fig = Makie.Figure(; figure...)
     ax, plt = NMRTools.nmrplot(fig[1, 1], spec; kwargs...)
@@ -15,6 +45,7 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           spec::_Spec1DFreq;
                           normalize=true,
                           xlims=nothing,
+                          ylims=nothing,
                           title=nothing,
                           xlabel=nothing,
                           ylabel=nothing,
@@ -25,20 +56,12 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
     dim = dims(Afwd, 1)
     title_str = isempty(refdims(Afwd)) ? string(something(NMRTools.label(Afwd), "")) :
                 refdims_title(Afwd)
-    defaults = (; xreversed=true,
-                xlabel=axislabel(dim),
-                ylabel="",
-                xgridvisible=false,
-                ygridvisible=false,
-                yticksvisible=false,
-                yticklabelsvisible=false,
-                xtickalign=1,
-                title=title_str)
-    ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, axis)
+    ax_kwargs = _axis_overrides(_axis1d_defaults(dim, title_str);
+                                title, xlabel, ylabel, axis)
     ax = Makie.Axis(gp; ax_kwargs...)
     plt = NMRTools.nmrplot!(ax, spec; normalize, kwargs...)
     _apply_legend!(ax, legend)
-    isnothing(xlims) || _autoscale_to_xlims!(ax, [spec], normalize, xlims)
+    _apply_1d_limits!(ax, [spec], normalize, xlims, ylims)
     return Makie.AxisPlot(ax, plt)
 end
 
@@ -120,6 +143,7 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           normalize=true,
                           vstack=false,
                           xlims=nothing,
+                          ylims=nothing,
                           color=nothing,
                           colors=nothing,
                           colormap=nothing,
@@ -131,25 +155,14 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           kwargs...)
     isempty(v) && throw(ArgumentError("nmrplot: empty spectrum vector"))
     dim = dims(reorder(first(v), ForwardOrdered), 1)
-    defaults = (; xreversed=true,
-                xlabel=axislabel(dim),
-                ylabel="",
-                xgridvisible=false,
-                ygridvisible=false,
-                yticksvisible=false,
-                yticklabelsvisible=false,
-                xtickalign=1,
-                title="")
-    ax_kwargs = _axis_overrides(defaults; title, xlabel, ylabel, axis)
+    ax_kwargs = _axis_overrides(_axis1d_defaults(dim, ""); title, xlabel, ylabel, axis)
     ax = Makie.Axis(gp; ax_kwargs...)
     colors = isnothing(colors) ? color : colors
     plt = _plot_1d_series!(ax, v; normalize, vstack, colors, colormap, kwargs...)
     _apply_legend!(ax, legend)
-    if !isnothing(xlims)
-        vdelta = _vstack_delta(v, normalize, vstack)
-        offsets = [(i - 1) * vdelta for i in eachindex(v)]
-        _autoscale_to_xlims!(ax, v, normalize, xlims; offsets)
-    end
+    vdelta = _vstack_delta(v, normalize, vstack)
+    offsets = [(i - 1) * vdelta for i in eachindex(v)]
+    _apply_1d_limits!(ax, v, normalize, xlims, ylims; offsets)
     return Makie.AxisPlot(ax, plt)
 end
 
