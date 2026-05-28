@@ -9,9 +9,10 @@
 # overlays of multiple 3D spectra behave just like the 2D case.
 # ─────────────────────────────────────────────────────────────────────────
 
-const _Spec3DFreq = NMRData{T,3,<:Tuple{<:FrequencyDimension,
-                                         <:FrequencyDimension,
-                                         <:FrequencyDimension}} where {T}
+const _Spec3DFreq = NMRData{T,3,
+                            <:Tuple{<:FrequencyDimension,
+                                    <:FrequencyDimension,
+                                    <:FrequencyDimension}} where {T}
 
 function NMRTools.nmrplot(spec::_Spec3DFreq; figure=NamedTuple(), kwargs...)
     fig = Makie.Figure(; figure...)
@@ -38,9 +39,9 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           kwargs...)
     dfwd = reorder(spec, ForwardOrdered)
     x, y, z = dims(dfwd)
-    defaults = (; xreversed=true,
-                yreversed=true,
-                zreversed=true,
+    defaults = (; xreversed=false,
+                yreversed=false,
+                zreversed=false,
                 xlabel=axislabel(x),
                 ylabel=axislabel(y),
                 zlabel=axislabel(z),
@@ -83,24 +84,13 @@ function NMRTools.nmrplot!(ax::Makie.Axis3, spec::_Spec3DFreq;
     yr = (Float64(first(data(y))), Float64(last(data(y))))
     zr = (Float64(first(data(z))), Float64(last(data(z))))
 
-    # Colour each iso-surface a single solid colour. A 3D `contour` colours
-    # surfaces by level through `colormap`+`colorrange`, so passing a single
-    # `color` with a single `level` gives a degenerate colorrange and the
-    # surface fails to render. Use a 2-point constant colourmap and an
-    # explicit non-degenerate colorrange instead.
-    lv = level * σ
-    poscol = Makie.to_color(poscolor_c)
-    negcol = Makie.to_color(negcolor_c)
     plt_pos = Makie.contour!(ax, xr, yr, zr, vol;
-                             levels=[lv],
-                             colormap=[poscol, poscol],
-                             colorrange=(0.0, lv), kwargs...)
+                             levels=[level * σ], color=poscolor_c, kwargs...)
     if negcontours
-        Makie.contour!(ax, xr, yr, zr, vol;
-                       levels=[-lv],
-                       colormap=[negcol, negcol],
-                       colorrange=(-lv, 0.0), kwargs...)
+        Makie.contour!(ax, xr, yr, zr, -vol;
+                       levels=[level * σ], color=negcolor_c, kwargs...)
     end
+
     return plt_pos
 end
 
@@ -146,9 +136,9 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
     isempty(v) && throw(ArgumentError("nmrplot: empty spectrum vector"))
     dfwd0 = reorder(first(v), ForwardOrdered)
     x0, y0, z0 = dims(dfwd0)
-    defaults = (; xreversed=true,
-                yreversed=true,
-                zreversed=true,
+    defaults = (; xreversed=false,
+                yreversed=false,
+                zreversed=false,
                 xlabel=axislabel(x0),
                 ylabel=axislabel(y0),
                 zlabel=axislabel(z0),
