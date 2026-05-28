@@ -11,6 +11,7 @@ makedocs(;
                 "Getting started" => "quickstart.md",
                 "Tutorials" => ["Working with NMR data" => "tutorials/data.md",
                                 "Plotting" => "tutorials/plotting.md",
+                                "Makie plotting" => "tutorials/makie.md",
                                 "Peak detection" => "tutorials/peaks.md",
                                 "Metadata" => "tutorials/metadata.md",
                                 "Animating spectra" => "tutorials/animation.md",
