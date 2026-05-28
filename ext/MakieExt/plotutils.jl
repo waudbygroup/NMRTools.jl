@@ -17,21 +17,57 @@ end
 _realdata(A::AbstractNMRData) = data(A)
 _realdata(A::AbstractNMRData{<:Multicomplex}) = realest.(data(A))
 
-# Three-way logic for the `normalize` argument mirroring PlotsExt:
-#   normalize = true  → use the spectrum's own scale
-#   normalize = false → no scaling
-#   normalize = ref::NMRData → scale relative to ref
-# Returns the scalar by which to divide the data and the contour-level σ.
-function _resolve_normalize(spec::AbstractNMRData, normalize)
-    if normalize === false
-        return (one(eltype(_realdata(spec))), spec[:noise])
-    elseif normalize === true
-        return (scale(spec), spec[:noise])
-    elseif normalize isa AbstractNMRData
-        return (scale(spec), normalize[:noise] * scale(spec) / scale(normalize))
-    else
-        throw(ArgumentError("normalize must be true, false or a reference spectrum"))
-    end
+# ── Normalisation ────────────────────────────────────────────────────────
+#
+# NMR data carries `scale(spec)` = ns·rg·concentration (the expected signal
+# magnitude) and a `:noise` RMS level. The `normalize` argument is handled
+# differently for *intensity* plots vs *contour/volume* plots:
+#
+#   • Intensity plots (1D lines, pseudo-2D heatmap/stack/waterfall) divide
+#     the DATA by a scaling factor so spectra at different concentrations or
+#     receiver gains are directly comparable → `_normalization_divisor`.
+#
+#   • Contour/volume plots (2D, 3D) leave the data in RAW units and instead
+#     position the threshold σ (2D contour base = 5σ, 3D volume floor).
+#     Data and σ are therefore both raw and mutually consistent — we do NOT
+#     divide σ by `scale` here, precisely because the data isn't divided
+#     either → `_contour_sigma`.
+#
+# `normalize` accepts:
+#   false        — no normalisation        (divisor 1;       σ = own noise)
+#   true         — self-normalise          (divisor = scale; σ = own noise)
+#   ref::NMRData — normalise to a reference (divisor = own scale;
+#                  σ = noise(ref)·scale(spec)/scale(ref) — a common,
+#                  concentration-aware floor so overlaid spectra compare
+#                  fairly: a 2× more concentrated spectrum needs 2× taller
+#                  peaks to break the same contour threshold)
+
+"""
+    _normalization_divisor(spec, normalize) -> Real
+
+Factor to divide intensity data by before plotting. `false` → 1; `true` or
+a reference spectrum → `scale(spec)` (1D always self-normalises — the
+reference only affects contour σ, matching the Plots extension).
+"""
+function _normalization_divisor(spec::AbstractNMRData, normalize)
+    normalize === false && return one(eltype(_realdata(spec)))
+    (normalize === true || normalize isa AbstractNMRData) && return scale(spec)
+    throw(ArgumentError("normalize must be true, false, or a reference NMRData"))
+end
+
+"""
+    _contour_sigma(spec, normalize) -> Real
+
+Noise level σ for 2D contour base levels (`5σ`) and the 3D volume floor.
+Data is left raw, so σ is raw too. `false`/`true` → `spec[:noise]`; a
+reference spectrum → that reference's noise rescaled by the concentration
+ratio `scale(spec)/scale(ref)`.
+"""
+function _contour_sigma(spec::AbstractNMRData, normalize)
+    (normalize === false || normalize === true) && return spec[:noise]
+    normalize isa AbstractNMRData &&
+        return normalize[:noise] * scale(spec) / scale(normalize)
+    throw(ArgumentError("normalize must be true, false, or a reference NMRData"))
 end
 
 _theme_palette() = Makie.wong_colors()

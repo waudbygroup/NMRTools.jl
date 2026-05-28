@@ -102,7 +102,7 @@ end
 function _plot_xprojection!(ax_top, spec_2d, proj, normalize, color)
     if proj isa AbstractNMRData
         Afwd = reorder(proj, ForwardOrdered)
-        sf, _ = _resolve_normalize(Afwd, normalize)
+        sf = _normalization_divisor(Afwd, normalize)
         x = data(dims(Afwd, 1))
         y = _realdata(Afwd) ./ sf
     else
@@ -118,7 +118,7 @@ end
 function _plot_yprojection!(ax_right, spec_2d, proj, normalize, color)
     if proj isa AbstractNMRData
         Afwd = reorder(proj, ForwardOrdered)
-        sf, _ = _resolve_normalize(Afwd, normalize)
+        sf = _normalization_divisor(Afwd, normalize)
         y = data(dims(Afwd, 1))
         x = _realdata(Afwd) ./ sf
     else
@@ -154,7 +154,7 @@ function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec2DFreq;
 
     dfwd = reorder(spec, ForwardOrdered)
     x, y = dims(dfwd)
-    _, σ = _resolve_normalize(dfwd, normalize)
+    σ = _contour_sigma(dfwd, normalize)
 
     poscolor = isnothing(poscolor) ? color : poscolor
     if isnothing(poscolor)
@@ -256,7 +256,7 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
     for (i, d) in enumerate(v)
         dfwd = reorder(d, ForwardOrdered)
         x, y = dims(dfwd)
-        _, σ = _resolve_normalize(dfwd, refnorm)
+        σ = _contour_sigma(dfwd, refnorm)
         z = _realdata(dfwd)
         pos_levels = collect(5σ .* contourlevels())
         plt_pos = Makie.contour!(ax, data(x), data(y), z;

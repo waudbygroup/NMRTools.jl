@@ -44,7 +44,7 @@ function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec1DFreq;
                            normalize=true, kwargs...)
     ax.xreversed = true
     Afwd = reorder(spec, ForwardOrdered)
-    sf, _ = _resolve_normalize(Afwd, normalize)
+    sf = _normalization_divisor(Afwd, normalize)
     x = data(dims(Afwd, 1))
     y = _realdata(Afwd) ./ sf
     return Makie.lines!(ax, x, y;
@@ -92,7 +92,7 @@ end
 function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec1DNonFreq;
                            normalize=true, kwargs...)
     Afwd = reorder(spec, ForwardOrdered)
-    sf, _ = _resolve_normalize(Afwd, normalize)
+    sf = _normalization_divisor(Afwd, normalize)
     x = data(dims(Afwd, 1))
     y = _realdata(Afwd) ./ sf
     return Makie.scatter!(ax, x, y;
@@ -155,11 +155,11 @@ function _plot_1d_series!(ax::Makie.Axis, v;
     if vstack isa Bool
         if vstack
             vdelta = maximum(maximum(abs.(_realdata(A))) /
-                             _resolve_normalize(A, normalize)[1] for A in v) / n
+                             _normalization_divisor(A, normalize) for A in v) / n
         end
     elseif vstack isa Number
         vdelta = maximum(maximum(abs.(_realdata(A))) /
-                         _resolve_normalize(A, normalize)[1] for A in v) / n * vstack
+                         _normalization_divisor(A, normalize) for A in v) / n * vstack
     else
         throw(ArgumentError("vstack must be a Bool or Number"))
     end
@@ -168,7 +168,7 @@ function _plot_1d_series!(ax::Makie.Axis, v;
     voffset = 0.0
     for (i, A) in enumerate(v)
         Afwd = reorder(A, ForwardOrdered)
-        sf, _ = _resolve_normalize(Afwd, normalize)
+        sf = _normalization_divisor(Afwd, normalize)
         x = data(dims(Afwd, 1))
         y = _realdata(Afwd) ./ sf .+ voffset
         plt = Makie.lines!(ax, x, y; color=cs[i],

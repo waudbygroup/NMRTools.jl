@@ -107,7 +107,7 @@ function _pseudo2d_heatmap(gp, spec::_SpecPseudo2D_FN;
                            kwargs...)
     dfwd = reorder(spec, ForwardOrdered)
     x, y = dims(dfwd)
-    sf, _ = _resolve_normalize(dfwd, normalize)
+    sf = _normalization_divisor(dfwd, normalize)
     z = _realdata(dfwd) ./ sf
 
     if isnothing(colorrange)
@@ -211,7 +211,7 @@ function _pseudo2d_stack!(ax::Makie.Axis, spec::_SpecPseudo2D_FN;
     ax.xreversed = true
     dfwd = reorder(spec, ForwardOrdered)
     x, y = dims(dfwd)
-    sf, _ = _resolve_normalize(dfwd, normalize)
+    sf = _normalization_divisor(dfwd, normalize)
     z = _realdata(dfwd) ./ sf
     n = length(y)
 
@@ -310,7 +310,7 @@ function _pseudo2d_waterfall!(ax::Makie.Axis3, spec::_SpecPseudo2D_FN;
                               kwargs...)
     dfwd = reorder(spec, ForwardOrdered)
     x, y = dims(dfwd)
-    sf, _ = _resolve_normalize(dfwd, normalize)
+    sf = _normalization_divisor(dfwd, normalize)
     z = _realdata(dfwd) ./ sf
     n = length(y)
 

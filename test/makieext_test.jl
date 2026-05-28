@@ -245,4 +245,8 @@ end
 
     fig, ax, plt = nmrplot(dat; colormap=:viridis, threshold=10)
     @test plt isa Makie.Volume
+
+    # Explicit colorrange override for dynamic-range control.
+    fig, ax, plt = nmrplot(dat; colorrange=(1e5, 1e6))
+    @test plt isa Makie.Volume
 end
