@@ -14,19 +14,27 @@ using CairoMakie
 ### 1D spectrum
 
 ```@example 1
-spec1d = exampledata("1D_19F")
-fig = nmrplot(spec1d)
-save(fig, "makie-1D.svg"); nothing # hide
+fig = nmrplot(exampledata("1D_1H"))
+save("makie-1D.svg", fig); nothing # hide
 ```
 
 ![](makie-1D.svg)
+
+Set the plot range with the `xlims` option - the spectrum will rescale vertically to match:
+
+```@example 1
+fig = nmrplot(exampledata("1D_1H"), xlims=(-1, 4.5))
+save("makie-1D-xlim.svg", fig); nothing # hide
+```
+
+![](makie-1D-xlim.svg)
 
 
 Use the mutating form to overlay additional spectra onto the same axis:
 
 ```@example 1
-nmrplot!(fig, spec1d / 2)
-save(fig, "makie-1Db.svg"); nothing # hide
+nmrplot!(fig, exampledata("1D_1H") / 2)
+save("makie-1Db.svg", fig); nothing # hide
 ```
 
 ![](makie-1Db.svg)
@@ -36,7 +44,7 @@ save(fig, "makie-1Db.svg"); nothing # hide
 ```@example 1
 spec2d = exampledata("2D_HN")
 fig = nmrplot(spec2d)
-save(fig, "makie-2D.svg"); nothing # hide
+save("makie-2D.svg", fig); nothing # hide
 ```
 
 ![](makie-2D.svg)
@@ -45,7 +53,7 @@ Contours are drawn at positive and negative levels by default. You can control c
 
 ```@example 1
 nmrplot(spec2d; negcontours=false)
-save(fig, "makie-2Db.svg"); nothing # hide
+save("makie-2Db.svg", fig); nothing # hide
 ```
 
 ![](makie-2Db.svg)
@@ -54,7 +62,7 @@ or adjust negative contour colours:
 
 ```@example 1
 nmrplot(spec2d; negcolor=:red)
-save(fig, "makie-2Dc.svg"); nothing # hide
+save("makie-2Dc.svg", fig); nothing # hide
 ```
 
 ![](makie-2Dc.svg)
@@ -70,7 +78,7 @@ fig = Figure(size=(1000, 420))
 nmrplot(fig[1, 1], exampledata("1D_19F"); title="1D")
 nmrplot(fig[1, 2], exampledata("2D_HN"); title="2D")
 
-save(fig, "makie-plots.svg"); nothing # hide
+save("makie-plots.svg", fig); nothing # hide
 ```
 
 ![](makie-plots.svg)
