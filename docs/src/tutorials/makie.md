@@ -64,7 +64,7 @@ save("makie-2D-projections.svg", fig); nothing # hide
 Plot a series of spectra in one call; colours cycle automatically and a legend can be added:
 
 ```@example 1
-fig = nmrplot(exampledata("2D_HN_titration"), legend=:topleft)
+fig = nmrplot(exampledata("2D_HN_titration"), legend=:lt)
 save("makie-2D-series.svg", fig); nothing # hide
 ```
 
@@ -217,7 +217,7 @@ For interactive use with GLMakie, the same `record` approach works — or you ca
 | `normalize` | `true` | Scale by scans and receiver gain. Pass `false` to use raw intensities. |
 | `vstack` | `false` | Stack spectra vertically. Pass a number to scale the offset. |
 | `xlims` | auto | Chemical shift range (ppm). y-axis rescales to fit. |
-| `legend` | `false` | Legend position, e.g. `:topright`. Entries named from spectrum labels. |
+| `legend` | `false` | Legend position, e.g. `:rt`. Entries named from spectrum labels. |
 | `axis` | `(;)` | Extra `Axis` keyword arguments (escape hatch). |
 
 ### 2D spectra
@@ -235,5 +235,5 @@ For interactive use with GLMakie, the same `record` approach works — or you ca
 | `yprojection` | `nothing` | 1D projection along the indirect dimension. |
 | `xlims` | auto | Direct-dimension range (ppm). |
 | `ylims` | auto | Indirect-dimension range (ppm). |
-| `legend` | `false` | Legend position, e.g. `:topleft`. Entries named from spectrum labels. |
+| `legend` | `false` | Legend position, e.g. `:lt`. Entries named from spectrum labels. |
 | `axis` | `(;)` | Extra `Axis` keyword arguments (escape hatch). |

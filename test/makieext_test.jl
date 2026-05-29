@@ -112,7 +112,7 @@ end
 
     @visualtest (fname -> save_rgb(fname, fig)) "makie-images/2D_HN_legend.png"
 
-    fig, ax, plt = nmrplot(dats; legend=:topleft)
+    fig, ax, plt = nmrplot(dats; legend=:lt)
     @test any(c -> c isa Makie.Legend, fig.content)
 
     @visualtest (fname -> save_rgb(fname, fig)) "makie-images/2D_HN_legend_topleft.png"
