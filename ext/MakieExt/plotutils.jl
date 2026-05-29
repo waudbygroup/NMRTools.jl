@@ -238,7 +238,7 @@ end
 function _axis_overrides(defaults; title=nothing, xlabel=nothing,
                          ylabel=nothing, zlabel=nothing, axis=NamedTuple())
     overrides = NamedTuple()
-    isnothing(title)  || (overrides = merge(overrides, (; title)))
+    isnothing(title) || (overrides = merge(overrides, (; title)))
     isnothing(xlabel) || (overrides = merge(overrides, (; xlabel)))
     isnothing(ylabel) || (overrides = merge(overrides, (; ylabel)))
     isnothing(zlabel) || (overrides = merge(overrides, (; zlabel)))
@@ -263,6 +263,7 @@ end
 # explicitly from the resolved colours.
 function _apply_contour_legend!(ax::Makie.Axis, legend, labels, colors)
     legend === false && return nothing
+
     nonempty = [(l, c) for (l, c) in zip(labels, colors) if !isempty(l)]
     isempty(nonempty) && return nothing
     entries = [Makie.LineElement(; color=c) for (_, c) in nonempty]
@@ -271,6 +272,8 @@ function _apply_contour_legend!(ax::Makie.Axis, legend, labels, colors)
         return Makie.axislegend(ax, entries, labs, legend; position=:rt)
     elseif legend isa NamedTuple
         return Makie.axislegend(ax, entries, labs; legend...)
+    elseif legend === true
+        return Makie.axislegend(ax, entries, labs; position=:rt)
     else
         return Makie.axislegend(ax, entries, labs; position=legend)
     end

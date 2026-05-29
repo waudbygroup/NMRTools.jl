@@ -73,7 +73,7 @@ save("makie-2D-series.svg", fig); nothing # hide
 Or add spectra one-by-one with `nmrplot!`:
 
 ```@example 1
-dats = exampledata("2D_HN_titration")
+dats = exampledata("1D_19F_titration")
 fig, ax = nmrplot(dats[1], title="", xlims=(-120, -128))
 nmrplot!(fig, dats[5])
 nmrplot!(fig, dats[10])
