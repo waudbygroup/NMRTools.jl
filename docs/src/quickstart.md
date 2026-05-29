@@ -9,7 +9,7 @@ using Pkg
 Pkg.add("NMRTools")
 ```
 
-The examples in this tutorial also using the `Plots` package, which can be obtained similarly.
+The examples in this tutorial also use the `CairoMakie` package for plotting, which can be obtained similarly.
 
 
 ## Plot a 1D spectrum
@@ -17,55 +17,55 @@ The examples in this tutorial also using the `Plots` package, which can be obtai
 Let's load some example data. This can be a Bruker experiment directory, a specific pdata folder, or an NMRPipe-format file.
 
 ```@example 1
-using NMRTools, Plots
+using NMRTools, CairoMakie
 spec = exampledata("1D_19F")
 ```
 
-NMRTools contains Plots recipes for common types of spectrum. To plot a 1D spectrum, use
-the `plot` command:
+NMRTools provides `nmrplot` for interactive and publication-quality figures. To plot a 1D spectrum:
 
 ```@example 1
-plot(spec)
-savefig("plot-y.svg"); nothing # hide
+fig = nmrplot(spec)
+save("plot-y.svg", fig); nothing # hide
 ```
 
 ![](plot-y.svg)
 
-We could zoom in on a particular region using the usual `xlims` arguments from `Plots`, but we can also select a chemical shift range from the data directly. To do this, we use square brackets `[...]` to access
-the data like an array, but use the `..` selector to specify our chemical shift range:
+We can zoom in using `xlims`, or select a chemical shift range from the data directly using the `..` selector — the y-axis then rescales to fit only the displayed region:
 
 ```@example 1
-plot(spec[-124.5 .. -123])
-savefig("plot-y2.svg"); nothing # hide
+fig = nmrplot(spec[-124.5 .. -123])
+save("plot-y2.svg", fig); nothing # hide
 ```
 
 ![](plot-y2.svg)
 
-All plots can be saved as high quality vector graphics or png files, using the `savefig` command:
+All plots can be saved as high quality vector graphics or PNG files using `save`:
 
 ```julia
-savefig("myspectrum.pdf")
+save("myspectrum.pdf", fig)
+save("myspectrum.svg", fig)
+save("myspectrum.png", fig)
 ```
 
 
 ## Plot a 2D spectrum
 
-Two-dimensional spectra can be plotted in exactly the same way as for 1Ds.
+Two-dimensional spectra are plotted in exactly the same way.
 
 ```@example 2d
-using NMRTools, Plots # hide
+using NMRTools, CairoMakie
 spec = exampledata("2D_HN")
-plot(spec)
-savefig("plot-2d.svg"); nothing # hide
+fig = nmrplot(spec)
+save("plot-2d.svg", fig); nothing # hide
 ```
 
 ![](plot-2d.svg)
 
-Contour levels are set to five times the noise level. To adjust them, multiply or divide the spectrum by a scaling factor. You can also adjust the title — by default taken from the spectrum label — using the `title` keyword. Use an empty string (`title=""`) to remove the title.
+Contour levels start at five times the noise level with a geometric spacing of 1.7. Adjust the number of levels or spacing with the `levels` and `spacing` keywords. Use `title=""` to suppress the title:
 
 ```@example 2d
-plot(spec / 2, title="spectrum divided by two")
-savefig("plot-2d-scaled.svg"); nothing # hide
+fig = nmrplot(spec; levels=4, spacing=2.0, title="")
+save("plot-2d-scaled.svg", fig); nothing # hide
 ```
 
 ![](plot-2d-scaled.svg)

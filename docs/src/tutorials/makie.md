@@ -197,7 +197,6 @@ record(fig, "makie-titration.gif", spectra; framerate=4) do s
     empty!(ax)
     ax.title[] = label(s)
     nmrplot!(ax, s; normalize=ref)
-    xlims!(ax, 6, 10.5)
 end
 nothing # hide
 ```
