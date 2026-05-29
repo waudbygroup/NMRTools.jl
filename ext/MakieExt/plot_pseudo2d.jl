@@ -97,7 +97,7 @@ end
 
 function _pseudo2d_heatmap(gp, spec::_SpecPseudo2D_FN;
                            normalize=true,
-                           colormap=:RdBu,
+                           colormap=nothing,
                            colorrange=nothing,
                            colorbar=true,
                            title=nothing,
@@ -113,13 +113,22 @@ function _pseudo2d_heatmap(gp, spec::_SpecPseudo2D_FN;
     z = _realdata(dfwd) ./ sf
 
     if isnothing(colorrange)
-        # 99th-percentile clipping so the bar focuses on the bulk of the
-        # data rather than spanning rare outliers, and stays centred at 0.
         absz = abs.(vec(z))
         vmax = isempty(absz) ? 1.0 : quantile(absz, 0.99)
         vmax > 0 || (vmax = maximum(abs, z); vmax > 0 || (vmax = 1.0))
-        colorrange = (-vmax, vmax)
+        zlo, zhi = extrema(z)
+        eps_guard = eps(Float64) * max(vmax, 1.0)
+        if zlo >= -0.1 * max(zhi, eps_guard)
+            # Predominantly positive — one-sided range with sequential colourmap.
+            colorrange = (0.0, vmax)
+            isnothing(colormap) && (colormap = :viridis)
+        else
+            # Mixed or negative data — symmetric diverging colourmap centred at 0.
+            colorrange = (-vmax, vmax)
+            isnothing(colormap) && (colormap = :RdBu)
+        end
     end
+    isnothing(colormap) && (colormap = :RdBu)
 
     defaults = (; xreversed=true,
                 yreversed=false,

@@ -1,15 +1,15 @@
 # Animating spectra
 
-The plot recipes defined within NMRTools provide an easy way to generate animations of spectral data, using the `@animate` macro defined within the Plots package. A couple of examples are provided below.
+Makie's `record` function can create animations of spectral data, saving directly to GIF or video formats. A couple of examples are provided below.
 
 ## Phosphorylation kinetics
 
-First, load in some data. This pseudo-3D kinetic data - a series of 1H,15N SOFAST-HMQC spectra - showing the progressive phosphorylation of cJun by JNK1 kinase. Read more about the paper here: [Waudby et al. Nat Commun (2022)](https://www.nature.com/articles/s41467-022-33866-w).
+First, load in some data. This pseudo-3D kinetic data — a series of 1H,15N SOFAST-HMQC spectra — shows the progressive phosphorylation of cJun by JNK1 kinase. Read more about the paper here: [Waudby et al. Nat Commun (2022)](https://www.nature.com/articles/s41467-022-33866-w).
 
 ```@example 1
-using NMRTools, Plots
+using NMRTools, CairoMakie
 
-spec=exampledata("pseudo3D_kinetics")
+spec = exampledata("pseudo3D_kinetics")
 nothing # hide
 ```
 
@@ -17,7 +17,7 @@ The data have been processed in Topspin using `ftnd 3` and `ftnd 2`, so that the
 
 ```@example 1
 # get number of time points
-nt = size(spec,3)
+nt = size(spec, 3)
 
 # calculate a list of measurement times
 # experiment was recorded with 2 min per spectrum, plus initial dead-time of 4 min
@@ -25,17 +25,16 @@ tmin = LinRange(0, 2*(nt-1), nt) .+ 4
 thr = tmin / 60
 ```
 
-Now we can generate the animation, by looping over each point in the time series with the Plots `@animate` macro, then saving as an animated gif.
+Now we can generate the animation, by looping over each point in the time series with Makie's `record` function, then saving as an animated gif.
 
 ```@example 1
-anim = @animate for i=1:nt
-    # generate a nice title with the time rounded to 1 decimal place, e.g. "Time elapsed: 0.1 hr"
-    titletext = "Time elapsed: $(round(thr[i],digits=1)) hr"
-    plot(spec[:,:,i], title=titletext)
+ref = spec[:, :, 1]
+fig, ax, _ = nmrplot(ref; normalize=ref)
+record(fig, "kinetics.gif", 1:nt; framerate=30) do i
+    empty!(ax)
+    ax.title[] = "Time elapsed: $(round(thr[i], digits=1)) hr"
+    nmrplot!(ax, spec[:, :, i]; normalize=ref)
 end
-
-# save as an animated gif
-gif(anim, "kinetics.gif", fps=30)
 nothing # hide
 ```
 
@@ -44,7 +43,7 @@ nothing # hide
 
 ## 2D titration
 
-First, load in some data - as described in the [tutorial on plotting](@ref "Overlaying multiple 2D spectra").
+First, load in some data — a series of 1H,15N HSQC spectra from a titration experiment:
 
 ```@example 1
 spectra2d = exampledata("2D_HN_titration")
@@ -54,19 +53,22 @@ nothing # hide
 Now loop over the spectra to produce the animation:
 
 ```@example 1
-refspec = spectra2d[1]
-anim=@animate for spec in spectra2d
-    plot(spec, xlims=(6,10.5), title=label(spec), normalize=refspec)
+ref = spectra2d[1]
+fig, ax, _ = nmrplot(ref; normalize=ref, xlims=(6, 10.5))
+record(fig, "titration.gif", spectra2d; framerate=8) do s
+    empty!(ax)
+    ax.title[] = label(s)
+    nmrplot!(ax, s; normalize=ref)
+    xlims!(ax, 6, 10.5)
 end
-
-gif(anim, "titration.gif", fps=8)
 nothing # hide
 ```
 
 ![](titration.gif)
 
 !!! note
-    The `normalize=refspec` parameter scales all spectra relative to the reference spectrum, defined on the first line
-    as the first spectrum in the titration series. This ensures that contour levels are directly comparable across the
-    different spectra. This normalization automatically compensates for differences in acquisition parameters such as
-    number of scans and receiver gain that would otherwise affect absolute intensities.
+    The `normalize=ref` parameter scales all spectra relative to the reference spectrum, defined
+    as the first spectrum in the titration series. This ensures that contour levels are directly
+    comparable across the different spectra. This normalization automatically compensates for
+    differences in acquisition parameters such as number of scans and receiver gain that would
+    otherwise affect absolute intensities.
