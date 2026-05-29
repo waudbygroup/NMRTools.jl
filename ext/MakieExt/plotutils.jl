@@ -1,5 +1,53 @@
 contourlevels(spacing=1.7, n=12) = (spacing^i for i in 0:(n - 1))
 
+# ── Interactive contour level control ────────────────────────────────────
+#
+# Each 2D-contour Axis gets one ContourState, shared across all spectra
+# overlaid on that axis. `level_mult` is an Observable{Float64} (starts at 1)
+# that uniformly scales every contour plot's levels. `spacing` is the factor
+# applied per up/down keypress. When `nmrplot!` adds a spectrum it creates
+# Observable levels via `@lift($level_mult .* base_levels)` so all plots on the
+# axis update reactively when the multiplier changes.
+
+mutable struct ContourState
+    level_mult::Observable{Float64}
+    spacing::Float64
+end
+
+const _CONTOUR_STATES = WeakKeyDict{Makie.Axis,ContourState}()
+const _KEYBOARD_REGISTERED = WeakKeyDict{Makie.Figure,Bool}()
+const _FIGURE_AXES = WeakKeyDict{Makie.Figure,Set{Makie.Axis}}()
+
+function _get_or_create_contour_state!(ax::Makie.Axis, spacing::Float64)
+    state = get!(() -> ContourState(Observable(1.0), spacing), _CONTOUR_STATES, ax)
+    state.spacing = spacing
+    return state
+end
+
+function _register_contour_keyboard!(fig::Makie.Figure, axes)
+    fig_axes = get!(() -> Set{Makie.Axis}(), _FIGURE_AXES, fig)
+    for ax in axes
+        ax isa Makie.Axis && push!(fig_axes, ax)
+    end
+    isempty(fig_axes) && return
+    get(_KEYBOARD_REGISTERED, fig, false) && return
+    _KEYBOARD_REGISTERED[fig] = true
+    on(events(fig).keyboardbutton) do event
+        (event.action == Keyboard.press || event.action == Keyboard.repeat) || return
+        current_axes = get(_FIGURE_AXES, fig, nothing)
+        isnothing(current_axes) && return
+        for ax in current_axes
+            state = get(_CONTOUR_STATES, ax, nothing)
+            isnothing(state) && continue
+            if event.key == Keyboard.up
+                state.level_mult[] *= state.spacing
+            elseif event.key == Keyboard.down
+                state.level_mult[] /= state.spacing
+            end
+        end
+    end
+end
+
 _parse_colorant(c::Colorant) = c
 _parse_colorant(c) = parse(Colorant, c)
 
