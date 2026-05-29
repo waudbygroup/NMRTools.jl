@@ -35,7 +35,7 @@ PlotsExt = "Plots"
 [compat]
 ArtifactUtils = "0.2"
 Artifacts = "1"
-CairoMakie = "0.13.10"
+CairoMakie = "0.13,0.14,0.15"
 ColorSchemes = "3"
 Colors = "0.12,0.13"
 Dates = "1"
@@ -44,7 +44,7 @@ FileIO = "1.19.0"
 JSON = "0.21,1"
 LazyArtifacts = "1"
 LinearAlgebra = "1"
-Makie = "0.21,0.22"
+Makie = "0.21,0.22,0.23,0.24"
 MulticomplexNumbers = "0.3"
 Optim = "1,2"
 Peaks = "0.5,0.6"
@@ -68,5 +68,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 VisualRegressionTests = "34922c18-7c2a-561c-bac1-01e79b2c4c92"
 
 [targets]
-
 test = ["Test", "SafeTestsets", "Plots", "CairoMakie", "VisualRegressionTests", "FileIO"]
