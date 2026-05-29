@@ -13,7 +13,6 @@ const _PROJECTION_STRIPS = WeakKeyDict{Makie.Axis,NamedTuple}()
 function NMRTools.nmrplot(spec::_Spec2DFreq; figure=NamedTuple(), kwargs...)
     fig = Makie.Figure(; figure...)
     ap = NMRTools.nmrplot(fig[1, 1], spec; kwargs...)
-    _register_contour_keyboard!(fig, [ap.axis])
     return Makie.FigureAxisPlot(fig, ap.axis, ap.plot)
 end
 
@@ -152,8 +151,8 @@ function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec2DFreq;
                            xprojection=nothing,
                            yprojection=nothing,
                            label=nothing,
-                           clspacing=1.7,
-                           clnlevels=12,
+                           spacing=1.7,
+                           levels=12,
                            kwargs...)
     ax.xreversed = true
     ax.yreversed = true
@@ -176,11 +175,14 @@ function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec2DFreq;
     label_str = isnothing(label) ? string(something(NMRTools.label(dfwd), "")) :
                 string(label)
 
-    state = _get_or_create_contour_state!(ax, Float64(clspacing))
+    state = _get_or_create_contour_state!(ax, Float64(spacing))
+    _register_contour_keyboard!(ax)
     lm = state.level_mult
     z = _realdata(dfwd)
-    pos_base = collect(5σ .* contourlevels(clspacing, clnlevels))
-    neg_base = collect(-5σ .* reverse(collect(contourlevels(clspacing, clnlevels))))
+    pos_base = levels isa AbstractVector ?
+               collect(Float64, levels) :
+               collect(5σ .* contourlevels(spacing, levels))
+    neg_base = -reverse(pos_base)
     pos_levels_obs = @lift($lm .* pos_base)
     neg_levels_obs = @lift($lm .* neg_base)
     plt_pos = Makie.contour!(ax, data(x), data(y), z;
@@ -223,7 +225,6 @@ function NMRTools.nmrplot(v::AbstractVector{<:_Spec2DFreq};
                           figure=NamedTuple(), kwargs...)
     fig = Makie.Figure(; figure...)
     ap = NMRTools.nmrplot(fig[1, 1], v; kwargs...)
-    _register_contour_keyboard!(fig, [ap.axis])
     return Makie.FigureAxisPlot(fig, ap.axis, ap.plot)
 end
 
@@ -242,8 +243,8 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           ylims=nothing,
                           legend=false,
                           axis=NamedTuple(),
-                          clspacing=1.7,
-                          clnlevels=12,
+                          spacing=1.7,
+                          levels=12,
                           kwargs...)
     isempty(v) && throw(ArgumentError("nmrplot: empty spectrum vector"))
     dfwd0 = reorder(first(v), ForwardOrdered)
@@ -270,7 +271,7 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
     labels = String[]
     for (i, d) in enumerate(v)
         plt = NMRTools.nmrplot!(ax, d; normalize=refnorm, poscolor=poscolors[i],
-                                negcolor=negc[i], negcontours, clspacing, clnlevels,
+                                negcolor=negc[i], negcontours, spacing, levels,
                                 kwargs...)
         i == 1 && (first_plt = plt)
         push!(labels, string(something(NMRTools.label(reorder(d, ForwardOrdered)), "")))
