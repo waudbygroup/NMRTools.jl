@@ -298,7 +298,8 @@ end
     fap = nmrplot(dat; style=:waterfall)
     plt3 = nmrplot!(dat / 2; style=:waterfall, color=:green)
     @test plt3 isa Makie.Lines
-    @visualtest (fname -> save_rgb(fname, fap)) "makie-images/pseudo2D_waterfall_overlay.png"
+    # increase tolerence - different makie versions move the axis text very slightly
+    @visualtest (fname -> save_rgb(fname, fap)) "makie-images/pseudo2D_waterfall_overlay.png" false 0.1
 end
 
 @testset "MakieExt: pseudo-2D heatmap (default)" begin
