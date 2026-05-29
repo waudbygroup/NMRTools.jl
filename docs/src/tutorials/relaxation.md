@@ -117,7 +117,7 @@ ax1 = Axis(fig[1, 1],
 scatter!(ax1, τ, integrals; label="observed")
 errorbars!(ax1, τ, integrals, fill(noise, length(τ)))
 lines!(ax1, x, yfit; label="fit (R₂ = $R2 s⁻¹)")
-axislegend(ax1; position=:topright)
+axislegend(ax1; position=:rt)
 ylims!(ax1, 0, nothing)
 
 ap2 = nmrplot(fig[1, 2], spec[plotrange, 1]; title="", color=:lightgray)
