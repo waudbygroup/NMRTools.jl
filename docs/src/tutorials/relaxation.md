@@ -6,7 +6,7 @@ Data have been processed in Topspin (using `xf2`), so can be loaded using the `l
 
 ```@example 1
 using NMRTools
-using Plots
+using CairoMakie
 using LsqFit
 using Measurements
 using Statistics
@@ -41,13 +41,12 @@ nothing # hide
 
 ## Plot the data
 
-To take a quick look at the data, we can plot the experiment either as 3D lines using the `plot` command, or as a heatmap:
+To take a quick look at the data, we can plot the experiment either as 3D lines using the waterfall style, or as a heatmap:
 ```@example 1
-plot(
-    plot(spec[plotrange,:]),
-    heatmap(spec[plotrange,:])
-)
-savefig("tutorial-relax-plot.svg"); nothing # hide
+fig = Figure()
+nmrplot(fig[1, 1], spec[plotrange, :]; style=:waterfall)
+nmrplot(fig[1, 2], spec[plotrange, :]; style=:heatmap)
+save("tutorial-relax-plot.svg", fig); nothing # hide
 ```
 
 ![](tutorial-relax-plot.svg)
@@ -108,23 +107,24 @@ Finally, plot the results:
 x = LinRange(0, maximum(τ)*1.1, 100)
 yfit = model(x, pfit)
 
-p1 = scatter(τ, integrals .± noise, label="observed",
-        frame=:box,
-        xlabel="Relaxation time (s)",
-        ylabel="Integrated signal",
-        title="",
-        ylims=(0,Inf), # make sure y axis starts at zero
-        widen=true,
-        grid=nothing)
-plot!(p1, x, yfit, label="fit (R₂ = $R2 s⁻¹)")
+fig = Figure()
+ax1 = Axis(fig[1, 1],
+    xlabel="Relaxation time (s)",
+    ylabel="Integrated signal",
+    title="",
+    xgridvisible=false,
+    ygridvisible=false)
+scatter!(ax1, τ, integrals; label="observed")
+errorbars!(ax1, τ, integrals, fill(noise, length(τ)))
+lines!(ax1, x, yfit; label="fit (R₂ = $R2 s⁻¹)")
+axislegend(ax1; position=:topright)
+ylims!(ax1, 0, nothing)
 
-p2 = plot(spec[plotrange,1],linecolor=:black)
-plot!(p2, spec[datarange,1], fill=(0,:orange), linecolor=:red)
-hline!(p2, [0], c=:grey)
-title!(p2, "")
+ap2 = nmrplot(fig[1, 2], spec[plotrange, 1]; title="", color=:lightgray)
+nmrplot!(ap2.axis, spec[datarange, 1]; color=:red)
+hlines!(ap2.axis, [0.0]; color=:grey)
 
-plot(p1, p2, layout=(1,2))
-savefig("tutorial-relax-fit.svg"); nothing # hide
+save("tutorial-relax-fit.svg", fig); nothing # hide
 ```
 
 ![](tutorial-relax-fit.svg)

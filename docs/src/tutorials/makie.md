@@ -1,4 +1,4 @@
-# Makie plotting
+# Plotting with Makie
 
 NMRTools provides a Makie extension with `nmrplot` and `nmrplot!` for interactive or publication-quality figures. Load NMRTools and a Makie backend:
 
@@ -184,22 +184,27 @@ ax.title[] = "My spectrum"
 fig = nmrplot(spec; axis=(; title="My spectrum"))
 ```
 
-## Animations (GLMakie)
+## Animations
 
-The standard Makie approach works: update an `Observable` and record frames with `record`.
+The standard Makie `record` function works directly with `nmrplot!`. This example cycles through a titration series and saves a GIF:
 
-```julia
-using GLMakie
-
+```@example 1
 spectra = exampledata("2D_HN_titration")
 ref = spectra[1]
 
-fig, ax, plt = nmrplot(spectra[1]; normalize=ref)
-record(fig, "titration.mp4", spectra; framerate=8) do spec
+fig, ax, _ = nmrplot(spectra[1]; normalize=ref, xlims=(6, 10.5))
+record(fig, "makie-titration.gif", spectra; framerate=4) do s
     empty!(ax)
-    nmrplot!(ax, spec; normalize=ref)
+    ax.title[] = label(s)
+    nmrplot!(ax, s; normalize=ref)
+    xlims!(ax, 6, 10.5)
 end
+nothing # hide
 ```
+
+![](makie-titration.gif)
+
+For interactive use with GLMakie, the same `record` approach works — or you can update the plot live by re-calling `nmrplot!` in response to user events.
 
 ## Options reference
 
