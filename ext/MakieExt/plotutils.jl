@@ -245,34 +245,17 @@ function _axis_overrides(defaults; title=nothing, xlabel=nothing,
     return merge(defaults, overrides, axis)
 end
 
-# Position aliases for Makie.axislegend. Makie's convention is two-letter
-# (e.g. :rt for top-right); we also accept friendlier spellings.
-const _LEGEND_POS_ALIAS = Dict(
-    :topright => :rt, :topleft => :lt, :bottomright => :rb, :bottomleft => :lb,
-    :top => :ct, :bottom => :cb, :left => :lc, :right => :rc,
-    true => :rt,
-)
-
-function _resolve_legend_position(legend)
-    if legend isa Symbol
-        return get(_LEGEND_POS_ALIAS, legend, legend)
-    elseif legend === true
-        return :rt
-    end
-    return :rt
-end
-
 function _apply_legend!(ax::Makie.Axis, legend)
     legend === false && return nothing
     legend isa Bool && legend &&
         return Makie.axislegend(ax; position=:rt)
     legend isa Symbol &&
-        return Makie.axislegend(ax; position=_resolve_legend_position(legend))
+        return Makie.axislegend(ax; position=legend)
     legend isa AbstractString &&
         return Makie.axislegend(ax, legend)
     legend isa NamedTuple &&
         return Makie.axislegend(ax; legend...)
-    throw(ArgumentError("legend must be false / true / a position symbol / a title string / a NamedTuple"))
+    throw(ArgumentError("legend must be false / true / a Makie position symbol (e.g. :rt, :lt) / a title string / a NamedTuple"))
 end
 
 # Variant for contour series: Makie's auto-generated legend entries for
@@ -289,7 +272,6 @@ function _apply_contour_legend!(ax::Makie.Axis, legend, labels, colors)
     elseif legend isa NamedTuple
         return Makie.axislegend(ax, entries, labs; legend...)
     else
-        return Makie.axislegend(ax, entries, labs;
-                                position=_resolve_legend_position(legend))
+        return Makie.axislegend(ax, entries, labs; position=legend)
     end
 end
