@@ -12,8 +12,8 @@ const _PROJECTION_STRIPS = WeakKeyDict{Makie.Axis,NamedTuple}()
 
 function NMRTools.nmrplot(spec::_Spec2DFreq; figure=NamedTuple(), kwargs...)
     fig = Makie.Figure(; figure...)
-    ax, plt = NMRTools.nmrplot(fig[1, 1], spec; kwargs...)
-    return Makie.FigureAxisPlot(fig, ax, plt)
+    ap = NMRTools.nmrplot(fig[1, 1], spec; kwargs...)
+    return Makie.FigureAxisPlot(fig, ap.axis, ap.plot)
 end
 
 function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
@@ -151,6 +151,8 @@ function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec2DFreq;
                            xprojection=nothing,
                            yprojection=nothing,
                            label=nothing,
+                           spacing=1.7,
+                           levels=12,
                            kwargs...)
     ax.xreversed = true
     ax.yreversed = true
@@ -173,15 +175,22 @@ function NMRTools.nmrplot!(ax::Makie.Axis, spec::_Spec2DFreq;
     label_str = isnothing(label) ? string(something(NMRTools.label(dfwd), "")) :
                 string(label)
 
+    state = _get_or_create_contour_state!(ax, Float64(spacing))
+    _register_contour_keyboard!(ax)
+    lm = state.level_mult
     z = _realdata(dfwd)
-    pos_levels = collect(5σ .* contourlevels())
+    pos_base = levels isa AbstractVector ?
+               collect(Float64, levels) :
+               collect(5σ .* contourlevels(spacing, levels))
+    neg_base = -reverse(pos_base)
+    pos_levels_obs = @lift($lm .* pos_base)
+    neg_levels_obs = @lift($lm .* neg_base)
     plt_pos = Makie.contour!(ax, data(x), data(y), z;
-                             levels=pos_levels, color=poscolor_c,
+                             levels=pos_levels_obs, color=poscolor_c,
                              label=label_str, kwargs...)
     if negcontours
-        neg_levels = collect(-5σ .* reverse(collect(contourlevels())))
         Makie.contour!(ax, data(x), data(y), z;
-                       levels=neg_levels, color=negcolor_c, kwargs...)
+                       levels=neg_levels_obs, color=negcolor_c, kwargs...)
     end
 
     # Optional projection overlays. Look up the strip axes registered when
@@ -215,8 +224,8 @@ end
 function NMRTools.nmrplot(v::AbstractVector{<:_Spec2DFreq};
                           figure=NamedTuple(), kwargs...)
     fig = Makie.Figure(; figure...)
-    ax, plt = NMRTools.nmrplot(fig[1, 1], v; kwargs...)
-    return Makie.FigureAxisPlot(fig, ax, plt)
+    ap = NMRTools.nmrplot(fig[1, 1], v; kwargs...)
+    return Makie.FigureAxisPlot(fig, ap.axis, ap.plot)
 end
 
 function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
@@ -234,6 +243,8 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
                           ylims=nothing,
                           legend=false,
                           axis=NamedTuple(),
+                          spacing=1.7,
+                          levels=12,
                           kwargs...)
     isempty(v) && throw(ArgumentError("nmrplot: empty spectrum vector"))
     dfwd0 = reorder(first(v), ForwardOrdered)
@@ -259,22 +270,11 @@ function NMRTools.nmrplot(gp::Union{Makie.GridPosition,Makie.GridSubposition},
     local first_plt
     labels = String[]
     for (i, d) in enumerate(v)
-        dfwd = reorder(d, ForwardOrdered)
-        x, y = dims(dfwd)
-        σ = _contour_sigma(dfwd, refnorm)
-        z = _realdata(dfwd)
-        pos_levels = collect(5σ .* contourlevels())
-        plt_pos = Makie.contour!(ax, data(x), data(y), z;
-                                 levels=pos_levels, color=poscolors[i],
-                                 kwargs...)
-        i == 1 && (first_plt = plt_pos)
-        push!(labels, string(something(NMRTools.label(dfwd), "")))
-        if negcontours
-            neg_levels = collect(-5σ .* reverse(collect(contourlevels())))
-            Makie.contour!(ax, data(x), data(y), z;
-                           levels=neg_levels, color=negc[i],
-                           kwargs...)
-        end
+        plt = NMRTools.nmrplot!(ax, d; normalize=refnorm, poscolor=poscolors[i],
+                                negcolor=negc[i], negcontours, spacing, levels,
+                                kwargs...)
+        i == 1 && (first_plt = plt)
+        push!(labels, string(something(NMRTools.label(reorder(d, ForwardOrdered)), "")))
     end
     _apply_contour_legend!(ax, legend, labels, poscolors)
     _apply_axis_limits!(ax, xlims, ylims)
