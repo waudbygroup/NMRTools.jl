@@ -39,6 +39,13 @@
   - power
   - angle = 90
 
+Channel references (`f1`…`f8`) resolve against the spectrometer channel model
+(`channel(spec, ...)`), which holds the nucleus, base frequency, and carrier for every
+channel — not just the detected ones. As a result, an `offset` frequency list converts to
+absolute ppm even when its channel's nucleus is never detected (e.g. a 13C CEST profile
+read out on a 1H axis): if no detected axis matches the channel, the channel's own bf/sfo
+are used as the reference.
+
 ## Experiment types and associated features
 
 - 1d, 2d, 3d

@@ -415,6 +415,59 @@ end
     # Test length
     @test length(fq_hz_rel) == 3
     @test length(fq_ppm_abs) == 3
+
+    # Axis-free conversions using a reference baked into the list
+    bf_ref = 6.0e8
+    sfo_ref = bf_ref * (1 + 4.7e-6)   # carrier 4.7 ppm above bf
+    offppm_ref = (sfo_ref - bf_ref) * 1e6 / bf_ref
+
+    fq_free = FQList([-100.0, 0.0, 100.0], :Hz, true, bf_ref, sfo_ref)
+    @test hz(fq_free) ≈ [-100.0, 0.0, 100.0]
+    @test ppm(fq_free) ≈ [offppm_ref - 100.0 / bf_ref * 1e6,
+                          offppm_ref,
+                          offppm_ref + 100.0 / bf_ref * 1e6]
+
+    # withreference attaches a reference from a channel dictionary
+    ch = Dict{Symbol,Any}(:bf => bf_ref, :sfo => sfo_ref)
+    fq_ref = withreference(FQList([-100.0, 0.0, 100.0], :Hz, true), ch)
+    @test ppm(fq_ref) ≈ ppm(fq_free)
+    @test hz(fq_ref) ≈ hz(fq_free)
+
+    # A list with no reference cannot self-convert
+    fq_noref = FQList([1.0, 2.0], :Hz, false)
+    @test_throws NMRToolsError ppm(fq_noref)
+    @test_throws NMRToolsError hz(fq_noref)
+end
+
+@testset "NMRBase: spectrometer channels" begin
+    spec = exampledata("2D_HN")
+
+    ch = channels(spec)
+    @test ch isa AbstractDict
+    # HN experiment routes 1H/13C/15N on f1/f2/f3 even though only H and N are detected
+    @test Set(keys(ch)) == Set([:f1, :f2, :f3])
+
+    # lookup by label
+    @test channel(spec, :f1)[:nucleus] == H1
+    @test channel(spec, :f3)[:nucleus] == N15
+    @test channel(spec, :f9) === nothing
+
+    # lookup by nucleus
+    @test channel(spec, H1)[:label] == :f1
+    @test channel(spec, N15)[:label] == :f3
+
+    # carbon has no detected axis but is reachable through the channel model
+    cch = channel(spec, C13)
+    @test cch[:label] == :f2
+    @test cch[:bf] == acqus(spec, :bf2)
+    @test cch[:sfo] == acqus(spec, :sfo2)
+    @test cch[:offsethz] ≈ cch[:sfo] - cch[:bf]
+    @test cch[:offsetppm] ≈ (cch[:sfo] - cch[:bf]) * 1e6 / cch[:bf]
+
+    # lookup by string (label or nucleus notation)
+    @test channel(spec, "f2") === cch
+    @test channel(spec, "13C") === cch
+    @test channel(spec, "not-a-nucleus") === nothing
 end
 
 @testset "NMRBase: nuclei and coherences" begin

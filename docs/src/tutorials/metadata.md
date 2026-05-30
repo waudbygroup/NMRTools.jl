@@ -82,6 +82,22 @@ acqus(spec, :cnst, 4)
     Arrayed parameters such as pulse lengths, delays, etc. are returned as dictionaries rather than lists to avoid indexing confusion between Bruker arrays, which are zero-based, and Julia arrays, which are unit-based.
 
 
+## Spectrometer channels
+
+Frequency dimensions carry their own `:bf`, `:sf`, and `:nucleus` metadata, but these only describe nuclei that were *detected* (i.e. that have an axis). To reach a nucleus that was manipulated but never detected — for example the carbon channel in a ¹³C-edited experiment read out on ¹H — use the spectrometer **channel** model.
+
+Channels describe the physical RF channels (`:f1`…`:f8`) independently of the detected dimensions. `channels(spec)` returns a dictionary of all channels, and `channel(spec, ...)` returns a single channel by label, by `Nucleus`, or by a string giving either:
+
+```@example 1
+channel(spec, :f1)        # by spectrometer channel label
+```
+
+```@example 1
+channel(spec, "13C")[:bf] # carbon base frequency, even with no carbon axis
+```
+
+Each channel dictionary has keys `:label`, `:nucleus`, `:bf` (base frequency, Hz), `:sfo` (carrier frequency, Hz), `:offsethz`, and `:offsetppm`.
+
 ## Auxiliary files
 
 If present, files such as `vclist` and `vdlist` are imported and can be accessed through the `acqus` function:

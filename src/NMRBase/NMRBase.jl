@@ -142,6 +142,7 @@ export defaultmetadata
 export metadatahelp
 export label, label!, units
 export acqus
+export channels, channel
 export annotations, hasannotations
 export sample, hassample, samplefile
 export referencepulse

@@ -591,14 +591,22 @@ function _apply_offset(spec, dim_index, values, block_name)
     block = NMRBase.annotations(spec, block_name)
     channel = get(block, "channel", nothing)
 
-    # Convert FQList to ppm if needed
+    # Convert FQList to ppm if needed.
+    # Prefer the detected frequency axis (it carries any applied referencing). Fall
+    # back to the spectrometer channel model so conversion still works when the
+    # saturated nucleus has no detected axis (e.g. 13C CEST read out on 1H).
     if values isa FQList
         freq_dim_index = _find_frequency_dim_for_channel(spec, channel)
         if !isnothing(freq_dim_index)
             freq_dim = dims(spec, freq_dim_index)
             offset_values = ppm(values, freq_dim)
         else
-            offset_values = data(values)  # Fall back to raw values
+            ch = isnothing(channel) ? nothing : NMRBase.channel(spec, channel)
+            if !isnothing(ch) && !isnothing(get(ch, :bf, nothing))
+                offset_values = ppm(withreference(values, ch))
+            else
+                offset_values = data(values)  # Fall back to raw values
+            end
         end
     else
         offset_values = values

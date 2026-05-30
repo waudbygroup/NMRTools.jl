@@ -31,6 +31,7 @@ export loadnmr
 export loadmetadata
 export loadjdx
 export FQList
+export withreference
 export sumexpts
 export scanexperiments
 export scansamples

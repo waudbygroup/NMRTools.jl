@@ -146,6 +146,68 @@ end
 acqus(A::Union{AbstractNMRData,NMRExperiment}, key, index) = acqus(A, key)[index]
 
 """
+    channels(nmrdata)
+    channel(nmrdata, label)
+    channel(nmrdata, nucleus)
+
+Access spectrometer channels. `channels` returns a dictionary of all channels keyed by
+label (`:f1`…`:f8`), or `nothing` if no channel information is available. `channel`
+returns a single channel dictionary (or `nothing` if not found).
+
+Each channel dictionary describes a physical RF channel independently of which dimensions
+were detected, with keys `:label`, `:nucleus`, `:bf` (base frequency, Hz), `:sfo` (carrier
+frequency, Hz), `:offsethz` and `:offsetppm` (carrier offset from `:bf`).
+
+A channel can be looked up by label (`channel(spec, :f2)`), by `Nucleus`
+(`channel(spec, C13)`), or by a string giving either (`channel(spec, "f2")`,
+`channel(spec, "13C")`). When several channels share a nucleus, the lowest-numbered
+channel is returned and a warning is issued.
+
+This is the recommended way to obtain the frequency of a nucleus that has no detected
+axis, e.g. the carbon channel in a ¹³C-edited experiment read out on ¹H.
+
+# Examples
+```julia-repl
+julia> channel(spec, C13)[:bf]
+1.5078e8
+
+julia> channel(spec, :f1)[:nucleus]
+H1
+```
+
+See also [`acqus`](@ref), [`metadata`](@ref).
+"""
+function channels end
+channels(A::Union{AbstractNMRData,NMRExperiment}) = metadata(A, :channels)
+
+function channel end
+function channel(A::Union{AbstractNMRData,NMRExperiment}, label::Symbol)
+    ch = channels(A)
+    isnothing(ch) && return nothing
+    return get(ch, label, nothing)
+end
+function channel(A::Union{AbstractNMRData,NMRExperiment}, nuc::Nucleus)
+    ch = channels(A)
+    isnothing(ch) && return nothing
+    matches = sort([c for c in values(ch) if get(c, :nucleus, nothing) === nuc];
+                   by=c -> c[:label])
+    isempty(matches) && return nothing
+    length(matches) > 1 &&
+        @warn "multiple channels carry nucleus $nuc; returning channel $(matches[1][:label])"
+    return matches[1]
+end
+function channel(A::Union{AbstractNMRData,NMRExperiment}, s::AbstractString)
+    m = match(r"^f(\d+)$", lowercase(strip(s)))
+    isnothing(m) || return channel(A, Symbol("f", m.captures[1]))
+    nuc = try
+        nucleus(s)
+    catch
+        return nothing
+    end
+    return channel(A, nuc)
+end
+
+"""
     annotations(nmrdata)
     annotations(nmrdata, key)
     annotations(nmrdata, key, index)

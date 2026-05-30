@@ -21,6 +21,7 @@ function loadmetadata(experimentfolder::String)
         md[:acqusfilename] = acqusfilename
         md[:temperature] = get(acqusmetadata, :te, nothing)
         md[:solvent] = get(acqusmetadata, :solvent, "unknown")
+        md[:channels] = _buildchannels(acqusmetadata)
         if haskey(acqusmetadata, :date)
             md[:date] = unix2datetime(acqusmetadata[:date])
         end
@@ -53,6 +54,50 @@ function loadmetadata(experimentfolder::String)
     end
 
     return md
+end
+
+"""
+    _buildchannels(acqusdic) -> Dict{Symbol,Any}
+
+Build a dictionary of spectrometer channels from a parsed acqus dictionary, keyed
+by channel label (`:f1`…`:f8`). Each entry is itself a dictionary describing the
+nucleus and frequencies on that channel, independent of which dimensions were
+detected. Only channels with an assigned nucleus (`nucN` present and not `"off"`)
+are included.
+
+Frequencies (`:bf`, `:sfo`) are in Hz — `replacefrequencies!` has already run by
+the time the acqus dictionary is built.
+"""
+function _buildchannels(acqusdic)
+    channels = Dict{Symbol,Any}()
+    for n in 1:8
+        nuc = get(acqusdic, Symbol("nuc$n"), nothing)
+        (nuc isa AbstractString && lowercase(strip(nuc)) != "off") || continue
+
+        bf = get(acqusdic, Symbol("bf$n"), nothing)
+        sfo = get(acqusdic, Symbol("sfo$n"), nothing)
+
+        ch = Dict{Symbol,Any}()
+        ch[:label] = Symbol("f$n")
+        ch[:nucleus] = try
+            nucleus(nuc)
+        catch
+            @debug "unable to parse nucleus '$nuc' for channel f$n"
+            nothing
+        end
+        ch[:bf] = bf
+        ch[:sfo] = sfo
+        if !isnothing(bf) && !isnothing(sfo)
+            ch[:offsethz] = sfo - bf
+            ch[:offsetppm] = (sfo - bf) * 1e6 / bf
+        else
+            ch[:offsethz] = nothing
+            ch[:offsetppm] = nothing
+        end
+
+        channels[Symbol("f$n")] = ch
+    end
+    return channels
 end
 
 function getacqusmetadata(format, filename, experimentfolder=nothing)
