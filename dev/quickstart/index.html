@@ -5,9 +5,10 @@ spec = exampledata(&quot;1D_19F&quot;)</code></pre><pre class="documenter-exampl
 <span class="sgr90">├──────────────────────────────────┴───────────────────────────────────── dims ┐</span>
   <span class="sgr38_5" style="color:#ff875f">↓ F1Dim</span> Sampled{Float64} <span class="sgr38_5" style="color:#ff875f">LinRange{Float64}(-119.5922, -124.16252020246354, 5000)</span> <span class="sgr38_5" style="color:#808080">ReverseOrdered</span> <span class="sgr38_5" style="color:#808080">Regular</span> <span class="sgr38_5" style="color:#808080">Points</span>
 <span class="sgr90">├──────────────────────────────────────────────────────────────────── metadata ┤</span>
-  Dict{Symbol, Any} with 18 entries:
+  Dict{Symbol, Any} with 19 entries:
   :filename         =&gt; &quot;/home/runner/.julia/artifacts/8581f841a7ad0ab21edeb8fd0…
   :field            =&gt; 11.7461
+  :channels         =&gt; Dict{Symbol, Any}(:f1=&gt;Dict{Symbol, Any}(:offsethz=&gt;-611…
   :label            =&gt; &quot;Example 19F 1D spectrum&quot;
   :ns               =&gt; 64
   :format           =&gt; :pdata
@@ -33,9 +34,10 @@ fig = nmrplot(spec)</code></pre><p><img src="../plot-2d.svg" alt/></p><p>Contour
 <span class="sgr90">├──────────────────────────────────┴───────────────────────────────────── dims ┐</span>
   <span class="sgr38_5" style="color:#ff875f">↓ F1Dim</span> Sampled{Float64} <span class="sgr38_5" style="color:#ff875f">LinRange{Float64}(-119.5922, -124.16252020246354, 5000)</span> <span class="sgr38_5" style="color:#808080">ReverseOrdered</span> <span class="sgr38_5" style="color:#808080">Regular</span> <span class="sgr38_5" style="color:#808080">Points</span>
 <span class="sgr90">├──────────────────────────────────────────────────────────────────── metadata ┤</span>
-  Dict{Symbol, Any} with 18 entries:
+  Dict{Symbol, Any} with 19 entries:
   :filename         =&gt; &quot;/home/runner/.julia/artifacts/8581f841a7ad0ab21edeb8fd0…
   :field            =&gt; 11.7461
+  :channels         =&gt; Dict{Symbol, Any}(:f1=&gt;Dict{Symbol, Any}(:offsethz=&gt;-611…
   :label            =&gt; &quot;Example 19F 1D spectrum&quot;
   :ns               =&gt; 64
   :format           =&gt; :pdata
@@ -57,8 +59,9 @@ fig = nmrplot(spec)</code></pre><p><img src="../plot-2d.svg" alt/></p><p>Contour
 <span class="sgr90">├───────────────────────────────┴──────────────────────────────────────── dims ┐</span>
   <span class="sgr38_5" style="color:#ff875f">↓ F1Dim</span> Sampled{Float64} <span class="sgr38_5" style="color:#ff875f">LinRange{Float64}(-119.68271044209722, -119.68728167654656, 6)</span> <span class="sgr38_5" style="color:#808080">ReverseOrdered</span> <span class="sgr38_5" style="color:#808080">Regular</span> <span class="sgr38_5" style="color:#808080">Points</span>
 <span class="sgr90">├──────────────────────────────────────────────────────────────────── metadata ┤</span>
-  Dict{Symbol, Any} with 18 entries:
+  Dict{Symbol, Any} with 19 entries:
   :filename         =&gt; &quot;/home/runner/.julia/artifacts/8581f841a7ad0ab21edeb8fd0…
+  :channels         =&gt; Dict{Symbol, Any}(:f1=&gt;Dict{Symbol, Any}(:offsethz=&gt;-611…
   :label            =&gt; &quot;Example 19F 1D spectrum&quot;
   :ns               =&gt; 64
   :temperature      =&gt; 318.151
@@ -81,8 +84,9 @@ fig = nmrplot(spec)</code></pre><p><img src="../plot-2d.svg" alt/></p><p>Contour
 <span class="sgr90">├─────────────────────────────────┴────────────────────────────────────── dims ┐</span>
   <span class="sgr38_5" style="color:#ff875f">↓ F1Dim</span> Sampled{Float64} <span class="sgr38_5" style="color:#ff875f">LinRange{Float64}(-123.50060545419717, -123.99978425606656, 547)</span> <span class="sgr38_5" style="color:#808080">ReverseOrdered</span> <span class="sgr38_5" style="color:#808080">Regular</span> <span class="sgr38_5" style="color:#808080">Points</span>
 <span class="sgr90">├──────────────────────────────────────────────────────────────────── metadata ┤</span>
-  Dict{Symbol, Any} with 18 entries:
+  Dict{Symbol, Any} with 19 entries:
   :filename         =&gt; &quot;/home/runner/.julia/artifacts/8581f841a7ad0ab21edeb8fd0…
+  :channels         =&gt; Dict{Symbol, Any}(:f1=&gt;Dict{Symbol, Any}(:offsethz=&gt;-611…
   :label            =&gt; &quot;Example 19F 1D spectrum&quot;
   :ns               =&gt; 64
   :temperature      =&gt; 318.151
@@ -106,10 +110,11 @@ fig = nmrplot(spec)</code></pre><p><img src="../plot-2d.svg" alt/></p><p>Contour
   <span class="sgr38_5" style="color:#ff875f">↓ F1Dim</span> Sampled{Float64} <span class="sgr38_5" style="color:#ff875f">LinRange{Float64}(11.07119, 5.722488424064256, 1216)</span> <span class="sgr38_5" style="color:#808080">ReverseOrdered</span> <span class="sgr38_5" style="color:#808080">Regular</span> <span class="sgr38_5" style="color:#808080">Points</span>,
   <span class="sgr38_5" style="color:#0087d7">→ F2Dim</span> Sampled{Float64} <span class="sgr38_5" style="color:#0087d7">LinRange{Float64}(128.9998, 107.04307400088886, 512)</span> <span class="sgr38_5" style="color:#808080">ReverseOrdered</span> <span class="sgr38_5" style="color:#808080">Regular</span> <span class="sgr38_5" style="color:#808080">Points</span>
 <span class="sgr90">├──────────────────────────────────────────────────────────────────── metadata ┤</span>
-  Dict{Symbol, Any} with 19 entries:
+  Dict{Symbol, Any} with 20 entries:
   :rg               =&gt; 203
   :filename         =&gt; &quot;/home/runner/.julia/artifacts/278430abd2b28a265273e7074…
   :field            =&gt; 14.0967
+  :channels         =&gt; Dict{Symbol, Any}(:f1=&gt;Dict{Symbol, Any}(:offsethz=&gt;2819…
   :label            =&gt; &quot;13C,15N ubiquitin&quot;
   :ns               =&gt; 2
   :format           =&gt; :pdata
@@ -131,8 +136,9 @@ fig = nmrplot(spec)</code></pre><p><img src="../plot-2d.svg" alt/></p><p>Contour
 <span class="sgr90">├────────────────────────────────┴─────────────────────────────────────── dims ┐</span>
   <span class="sgr38_5" style="color:#ff875f">↓ F1Dim</span> Sampled{Float64} <span class="sgr38_5" style="color:#ff875f">LinRange{Float64}(8.297789182848133, 8.10409134799943, 45)</span> <span class="sgr38_5" style="color:#808080">ReverseOrdered</span> <span class="sgr38_5" style="color:#808080">Regular</span> <span class="sgr38_5" style="color:#808080">Points</span>
 <span class="sgr90">├──────────────────────────────────────────────────────────────────── metadata ┤</span>
-  Dict{Symbol, Any} with 19 entries:
+  Dict{Symbol, Any} with 20 entries:
   :filename         =&gt; &quot;/home/runner/.julia/artifacts/278430abd2b28a265273e7074…
+  :channels         =&gt; Dict{Symbol, Any}(:f1=&gt;Dict{Symbol, Any}(:offsethz=&gt;2819…
   :label            =&gt; &quot;13C,15N ubiquitin&quot;
   :ns               =&gt; 2
   :temperature      =&gt; 276.999
@@ -173,4 +179,4 @@ fig = nmrplot(spec)</code></pre><p><img src="../plot-2d.svg" alt/></p><p>Contour
  5867.738952636719
  5862.253173828125
  5857.3370361328125</code></pre><p>Similarly, a plain vector containing axis values can be obtained from this using the <a href="../api/#NMRTools.NMRBase.data-Tuple{NMRData, Any}"><code>data</code></a> command, passing an additional argument to specify the dimension. This can either be a number or the axis type, e.g. <code>F1Dim</code>:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; data(spec, 1)</code><code class="nohighlight hljs ansi" style="display:block;">5000-element LinRange{Float64, Int64}:
- -119.592, -119.593, -119.594, -119.595, …, -124.161, -124.162, -124.163</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../tutorials/data/">Working with NMR data »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Friday 29 May 2026 22:13">Friday 29 May 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ -119.592, -119.593, -119.594, -119.595, …, -124.161, -124.162, -124.163</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../tutorials/data/">Working with NMR data »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Saturday 20 June 2026 16:48">Saturday 20 June 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
