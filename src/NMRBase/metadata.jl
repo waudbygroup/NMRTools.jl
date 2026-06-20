@@ -180,6 +180,16 @@ See also [`acqus`](@ref), [`metadata`](@ref).
 function channels end
 channels(A::Union{AbstractNMRData,NMRExperiment}) = metadata(A, :channels)
 
+"""
+    channel(nmrdata, label)
+    channel(nmrdata, nucleus)
+    channel(nmrdata, string)
+
+Return a single channel dictionary for the given spectrometer channel.
+
+See [`channels`](@ref) for the full description of the channel API and the keys
+available in the returned dictionary.
+"""
 function channel end
 function channel(A::Union{AbstractNMRData,NMRExperiment}, label::Symbol)
     ch = channels(A)
