@@ -37,7 +37,7 @@ Base.setindex!(f::FQList, v, i::Int) = (f.values[i] = v)
     withreference(f::FQList, channel) -> FQList
 
 Return a copy of frequency list `f` with its reference base and carrier frequencies
-(`:bf`, `:sfo`) populated from a channel dictionary (see [`channel`](@ref)). This
+(`:bf`, `:sfo`) populated from a channel dictionary (see [`channel`](@ref NMRTools.NMRBase.channel)). This
 makes the list self-describing, so it can be converted to ppm or Hz without a
 detected frequency axis.
 """
