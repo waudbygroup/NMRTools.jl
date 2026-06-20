@@ -26,3 +26,11 @@ plot(spec)
 ```
 
 See the [Getting started](@ref) guide for more examples, or explore the tutorial pages for detailed workflows including relaxation analysis, diffusion experiments, and advanced plotting techniques.
+
+## Related packages
+
+| Package | Description |
+|---------|-------------|
+| [MulticomplexNumbers.jl](https://github.com/waudbylab/MulticomplexNumbers.jl) | Multicomplex number types with FFTW extension, providing the algebraic foundation for NMR quadrature detection |
+| [NMRAnalysis.jl](https://github.com/waudbylab/NMRAnalysis.jl) | Quantitative NMR data analysis: relaxation, diffusion, titrations, and lineshape fitting |
+| [NMRScreen.jl](https://github.com/waudbylab/NMRScreen.jl) | Automated NMR screening workflows |
