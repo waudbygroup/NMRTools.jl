@@ -50,6 +50,29 @@ When data are sliced, new NMRData structures are created and their axes are upda
     When `NMRData` structures are sliced, copied, or otherwise modified, they inherit the same dictionary of metadata as the original variable. This means that any changes to metadata will affect both variables. To resolve this, make a `deepcopy` of the variable. Note also that any acquisition metadata might not reflect the correct shape of the data any more.
 
 
+## Accessing multicomplex (real/imaginary) data
+
+NMR data can be loaded with all quadrature components using the `allcomponents=true` keyword:
+
+```julia
+spec1d = loadnmr("expt/110", allcomponents=true)
+spec2d = loadnmr("expt/111", allcomponents=true)
+```
+
+Complex multidimensional data is represented using [MulticomplexNumbers.jl](https://waudbylab.org/MulticomplexNumbers.jl). This algebra provides a natural representation of the multiple real and imaginary components associated with NMR data ([Delsuc 1988](https://www.sciencedirect.com/science/article/pii/0022236488900364)), and facilitates phase correction and bookkeeping of individual real and imaginary components.
+
+```julia
+fig = Figure(size=(600, 600))
+nmrplot(fig[1,1:2], [real(spec1d), imag(spec1d)])  # 1D plot
+spec2d = spec2d[-0.5 .. 1.2, 81 .. 90] / 2
+nmrplot(fig[2,1], component.(spec2d, 1), title="component 1 (rr)")  # 2D plots
+nmrplot(fig[2,2], component.(spec2d, 2), title="component 2 (ri)")
+nmrplot(fig[3,1], component.(spec2d, 3), title="component 3 (ir)")
+nmrplot(fig[3,2], component.(spec2d, 4), title="component 4 (ii)")
+```
+
+![Multicomplex data](../assets/multicomplex.png)
+
 ## Accessing axis data
 
 Information on data dimensions is stored in `NMRDimension` structures. These can be accessed with the `dims` function:

@@ -27,10 +27,15 @@ plot(spec)
 
 See the [Getting started](@ref) guide for more examples, or explore the tutorial pages for detailed workflows including relaxation analysis, diffusion experiments, and advanced plotting techniques.
 
+
 ## Related packages
 
-| Package | Description |
-|---------|-------------|
-| [MulticomplexNumbers.jl](https://github.com/waudbylab/MulticomplexNumbers.jl) | Multicomplex number types with FFTW extension, providing the algebraic foundation for NMR quadrature detection |
-| [NMRAnalysis.jl](https://github.com/waudbylab/NMRAnalysis.jl) | Quantitative NMR data analysis: relaxation, diffusion, titrations, and lineshape fitting |
-| [NMRScreen.jl](https://github.com/waudbylab/NMRScreen.jl) | Automated NMR screening workflows |
+NMRTools.jl is part of a suite of Julia packages for NMR data handling developed
+by the [Waudby lab](https://waudbylab.org):
+
+- **[MulticomplexNumbers.jl](https://waudbylab.org/MulticomplexNumbers.jl)** — Multicomplex number types with FFTW extension, providing the natural algebraic representation of multi-dimensional NMR data.
+
+- **[NMRAnalysis.jl](https://waudbylab.org/NMRAnalysis.jl)** — Quantitative NMR data analysis, with a particular focus on biomolecular relaxation, diffusion, exchange, and protein dynamics measurements.
+
+- **[NMRScreen.jl](https://waudbylab.org/NMRScreen.jl)** — tools for
+  fragment screening by NMR, including automated analysis of large compound libraries.
