@@ -596,12 +596,12 @@ function _apply_offset(spec, dim_index, values, block_name)
     # back to the spectrometer channel model so conversion still works when the
     # saturated nucleus has no detected axis (e.g. 13C CEST read out on 1H).
     if values isa FQList
-        freq_dim_index = _find_frequency_dim_for_channel(spec, channel)
+        freq_dim_index = _find_frequency_dim_for_channels(spec, channel)
         if !isnothing(freq_dim_index)
             freq_dim = dims(spec, freq_dim_index)
             offset_values = ppm(values, freq_dim)
         else
-            ch = isnothing(channel) ? nothing : NMRBase.channel(spec, channel)
+            ch = isnothing(channel) ? nothing : NMRBase.channels(spec, channel)
             if !isnothing(ch) && !isnothing(get(ch, :bf, nothing))
                 offset_values = ppm(withreference(values, ch))
             else
@@ -653,12 +653,12 @@ function _apply_power(spec, dim_index, values, block_name)
 end
 
 """
-    _find_frequency_dim_for_channel(spec, channel) -> Union{Int, Nothing}
+    _find_frequency_dim_for_channels(spec, channel) -> Union{Int, Nothing}
 
 Find the frequency dimension index that corresponds to the given channel.
 Channel can be "f1", "f2", etc. or a nucleus string like "1H", "19F".
 """
-function _find_frequency_dim_for_channel(spec, channel::AbstractString)
+function _find_frequency_dim_for_channels(spec, channel::AbstractString)
     channel = String(channel)  # Convert SubString to String
     # If channel is "f1", "f2", look up the nucleus
     m = match(r"^f(\d+)$", channel)
@@ -682,4 +682,4 @@ function _find_frequency_dim_for_channel(spec, channel::AbstractString)
     return nothing
 end
 
-_find_frequency_dim_for_channel(spec, channel::Nothing) = nothing
+_find_frequency_dim_for_channels(spec, channel::Nothing) = nothing

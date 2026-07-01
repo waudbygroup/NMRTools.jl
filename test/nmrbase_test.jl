@@ -270,10 +270,11 @@ end
     # Test 1: Linear spacing with start/step
     spec1 = exampledata("pseudo2D_XSTE")  # 2k x 10
     annotations1 = Dict{String,Any}("dimensions" => ["calibration.duration", "f1"],
-                                    "calibration" => Dict{String,Any}("duration" => Dict{String,
-                                                                                         Any}("type" => "linear",
-                                                                                              "start" => 0.001,
-                                                                                              "step" => 0.002)))
+                                    "calibration" =>
+                                        Dict{String,Any}("duration" => Dict{String,
+                                                                            Any}("type" => "linear",
+                                                                                        "start" => 0.001,
+                                                                                        "step" => 0.002)))
     resolve_programmatic_lists!(annotations1, spec1)
 
     # Should create a vector of length 206 (first dimension)
@@ -286,10 +287,11 @@ end
     # Test 2: Linear spacing with start/end
     spec2 = exampledata("pseudo2D_XSTE")  # 2k x 10
     annotations2 = Dict{String,Any}("dimensions" => ["calibration.duration", "f1"],
-                                    "calibration" => Dict{String,Any}("duration" => Dict{String,
-                                                                                         Any}("type" => "linear",
-                                                                                              "start" => 0.001,
-                                                                                              "end" => 0.1)))
+                                    "calibration" =>
+                                        Dict{String,Any}("duration" => Dict{String,
+                                                                            Any}("type" => "linear",
+                                                                                        "start" => 0.001,
+                                                                                        "end" => 0.1)))
     resolve_programmatic_lists!(annotations2, spec2)
 
     @test annotations2["calibration"]["duration"] isa Vector
@@ -303,10 +305,11 @@ end
     # Test 3: Logarithmic spacing with start/end
     spec3 = exampledata("pseudo2D_XSTE")  # 2k x 10
     annotations3 = Dict{String,Any}("dimensions" => ["calibration.duration", "f1"],
-                                    "calibration" => Dict{String,Any}("duration" => Dict{String,
-                                                                                         Any}("type" => "log",
-                                                                                              "start" => 0.001,
-                                                                                              "end" => 0.1)))
+                                    "calibration" =>
+                                        Dict{String,Any}("duration" => Dict{String,
+                                                                            Any}("type" => "log",
+                                                                                        "start" => 0.001,
+                                                                                        "end" => 0.1)))
     resolve_programmatic_lists!(annotations3, spec3)
 
     @test annotations3["calibration"]["duration"] isa Vector
@@ -320,10 +323,11 @@ end
     # Test 4: Second dimension mapping
     spec4 = exampledata("pseudo2D_XSTE")  # 2k x 10
     annotations4 = Dict{String,Any}("dimensions" => ["gradient.strength", "f1"],
-                                    "gradient" => Dict{String,Any}("strength" => Dict{String,
-                                                                                      Any}("type" => "linear",
-                                                                                           "start" => 0.05,
-                                                                                           "step" => 0.1)))
+                                    "gradient" =>
+                                        Dict{String,Any}("strength" => Dict{String,
+                                                                            Any}("type" => "linear",
+                                                                                        "start" => 0.05,
+                                                                                        "step" => 0.1)))
     resolve_programmatic_lists!(annotations4, spec4)
 
     # Should create a vector of length 10 (second dimension)
@@ -336,18 +340,19 @@ end
     # Test 5: Counter-based pattern with integer counter
     spec5 = exampledata("pseudo2D_XSTE")
     annotations5 = Dict{String,Any}("dimensions" => ["calibration.duration", "f1"],
-                                    "calibration" => Dict{String,Any}("duration" => Dict{String,
-                                                                                         Any}("counter" => [0,
-                                                                                                            1,
-                                                                                                            2,
-                                                                                                            3,
-                                                                                                            4,
-                                                                                                            5,
-                                                                                                            6,
-                                                                                                            7,
-                                                                                                            8,
-                                                                                                            9],
-                                                                                              "scale" => 0.01)))
+                                    "calibration" =>
+                                        Dict{String,Any}("duration" => Dict{String,
+                                                                            Any}("counter" => [0,
+                                                                                               1,
+                                                                                               2,
+                                                                                               3,
+                                                                                               4,
+                                                                                               5,
+                                                                                               6,
+                                                                                               7,
+                                                                                               8,
+                                                                                               9],
+                                                                                        "scale" => 0.01)))
     resolve_programmatic_lists!(annotations5, spec5)
 
     @test annotations5["calibration"]["duration"] isa Vector
@@ -360,13 +365,14 @@ end
     # Test 6: Counter-based pattern with non-uniform counter
     spec6 = exampledata("pseudo2D_XSTE")
     annotations6 = Dict{String,Any}("dimensions" => ["gradient.strength", "f1"],
-                                    "gradient" => Dict{String,Any}("strength" => Dict{String,
-                                                                                      Any}("counter" => [1,
-                                                                                                         2,
-                                                                                                         4,
-                                                                                                         8,
-                                                                                                         16],
-                                                                                           "scale" => 0.05)))
+                                    "gradient" =>
+                                        Dict{String,Any}("strength" => Dict{String,
+                                                                            Any}("counter" => [1,
+                                                                                               2,
+                                                                                               4,
+                                                                                               8,
+                                                                                               16],
+                                                                                        "scale" => 0.05)))
     resolve_programmatic_lists!(annotations6, spec6)
 
     @test annotations6["gradient"]["strength"] isa Vector
@@ -448,16 +454,16 @@ end
     @test Set(keys(ch)) == Set([:f1, :f2, :f3])
 
     # lookup by label
-    @test channel(spec, :f1)[:nucleus] == H1
-    @test channel(spec, :f3)[:nucleus] == N15
-    @test channel(spec, :f9) === nothing
+    @test channels(spec, :f1)[:nucleus] == H1
+    @test channels(spec, :f3)[:nucleus] == N15
+    @test channels(spec, :f9) === nothing
 
     # lookup by nucleus
-    @test channel(spec, H1)[:label] == :f1
-    @test channel(spec, N15)[:label] == :f3
+    @test channels(spec, H1)[:label] == :f1
+    @test channels(spec, N15)[:label] == :f3
 
     # carbon has no detected axis but is reachable through the channel model
-    cch = channel(spec, C13)
+    cch = channels(spec, C13)
     @test cch[:label] == :f2
     @test cch[:bf] == acqus(spec, :bf2)
     @test cch[:sfo] == acqus(spec, :sfo2)
@@ -465,9 +471,9 @@ end
     @test cch[:offsetppm] ≈ (cch[:sfo] - cch[:bf]) * 1e6 / cch[:bf]
 
     # lookup by string (label or nucleus notation)
-    @test channel(spec, "f2") === cch
-    @test channel(spec, "13C") === cch
-    @test channel(spec, "not-a-nucleus") === nothing
+    @test channels(spec, "f2") === cch
+    @test channels(spec, "13C") === cch
+    @test channels(spec, "not-a-nucleus") === nothing
 end
 
 @testset "NMRBase: nuclei and coherences" begin

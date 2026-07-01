@@ -343,7 +343,7 @@ function _apply_offset(spec, dim_index, values, block)
 
     # Convert FQList to ppm if needed
     if values isa FQList
-        freq_dim_index = _find_frequency_dim_for_channel(spec, channel)
+        freq_dim_index = _find_frequency_dim_for_channels(spec, channel)
         if !isnothing(freq_dim_index)
             freq_dim = dims(spec, freq_dim_index)
             offset_values = ppm(values, freq_dim)
@@ -388,7 +388,7 @@ function _apply_power(spec, dim_index, values, block)
     return spec
 end
 
-function _find_frequency_dim_for_channel(spec, channel::String)
+function _find_frequency_dim_for_channels(spec, channel::String)
     # If channel is "f1", "f2", look up the nucleus
     m = match(r"^f(\d+)$", channel)
     if !isnothing(m)
@@ -455,7 +455,7 @@ end
    - `_apply_gradient()` - uses existing `GxDim`
    - `_apply_offset()` - uses new `OffsetDim`
    - `_apply_power()` - uses new `SpinlockDim`
-   - Helper: `_find_frequency_dim_for_channel()`
+   - Helper: `_find_frequency_dim_for_channels()`
 
 6. **Update loadnmr.jl** to use new function names:
    ```julia

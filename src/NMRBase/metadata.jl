@@ -147,8 +147,9 @@ acqus(A::Union{AbstractNMRData,NMRExperiment}, key, index) = acqus(A, key)[index
 
 """
     channels(nmrdata)
-    channel(nmrdata, label)
-    channel(nmrdata, nucleus)
+    channels(nmrdata, label)
+    channels(nmrdata, nucleus)
+    channels(nmrdata, string)
 
 Access spectrometer channels. `channels` returns a dictionary of all channels keyed by
 label (`:f1`…`:f8`), or `nothing` if no channel information is available. `channel`
@@ -158,9 +159,9 @@ Each channel dictionary describes a physical RF channel independently of which d
 were detected, with keys `:label`, `:nucleus`, `:bf` (base frequency, Hz), `:sfo` (carrier
 frequency, Hz), `:offsethz` and `:offsetppm` (carrier offset from `:bf`).
 
-A channel can be looked up by label (`channel(spec, :f2)`), by `Nucleus`
-(`channel(spec, C13)`), or by a string giving either (`channel(spec, "f2")`,
-`channel(spec, "13C")`). When several channels share a nucleus, the lowest-numbered
+A channel can be looked up by label (`channels(spec, :f2)`), by `Nucleus`
+(`channels(spec, C13)`), or by a string giving either (`channels(spec, "f2")`,
+`channels(spec, "13C")`). When several channels share a nucleus, the lowest-numbered
 channel is returned and a warning is issued.
 
 This is the recommended way to obtain the frequency of a nucleus that has no detected
@@ -168,10 +169,10 @@ axis, e.g. the carbon channel in a ¹³C-edited experiment read out on ¹H.
 
 # Examples
 ```julia-repl
-julia> channel(spec, C13)[:bf]
+julia> channels(spec, C13)[:bf]
 1.5078e8
 
-julia> channel(spec, :f1)[:nucleus]
+julia> channels(spec, :f1)[:nucleus]
 H1
 ```
 
@@ -180,23 +181,12 @@ See also [`acqus`](@ref), [`metadata`](@ref).
 function channels end
 channels(A::Union{AbstractNMRData,NMRExperiment}) = metadata(A, :channels)
 
-"""
-    channel(nmrdata, label)
-    channel(nmrdata, nucleus)
-    channel(nmrdata, string)
-
-Return a single channel dictionary for the given spectrometer channel.
-
-See [`channels`](@ref) for the full description of the channel API and the keys
-available in the returned dictionary.
-"""
-function channel end
-function channel(A::Union{AbstractNMRData,NMRExperiment}, label::Symbol)
+function channels(A::Union{AbstractNMRData,NMRExperiment}, label::Symbol)
     ch = channels(A)
     isnothing(ch) && return nothing
     return get(ch, label, nothing)
 end
-function channel(A::Union{AbstractNMRData,NMRExperiment}, nuc::Nucleus)
+function channels(A::Union{AbstractNMRData,NMRExperiment}, nuc::Nucleus)
     ch = channels(A)
     isnothing(ch) && return nothing
     matches = sort([c for c in values(ch) if get(c, :nucleus, nothing) === nuc];
@@ -206,15 +196,15 @@ function channel(A::Union{AbstractNMRData,NMRExperiment}, nuc::Nucleus)
         @warn "multiple channels carry nucleus $nuc; returning channel $(matches[1][:label])"
     return matches[1]
 end
-function channel(A::Union{AbstractNMRData,NMRExperiment}, s::AbstractString)
+function channels(A::Union{AbstractNMRData,NMRExperiment}, s::AbstractString)
     m = match(r"^f(\d+)$", lowercase(strip(s)))
-    isnothing(m) || return channel(A, Symbol("f", m.captures[1]))
+    isnothing(m) || return channels(A, Symbol("f", m.captures[1]))
     nuc = try
         nucleus(s)
     catch
         return nothing
     end
-    return channel(A, nuc)
+    return channels(A, nuc)
 end
 
 """
@@ -368,10 +358,8 @@ function sample(s::NMRSample, keys::Union{String,Symbol}...)
 end
 
 # Fields whose value "custom" should resolve to a sibling custom_* field
-const _CUSTOM_FIELD_MAP = Dict{String,String}(
-    "isotopic_labelling" => "custom_labelling",
-    "solvent" => "custom_solvent",
-)
+const _CUSTOM_FIELD_MAP = Dict{String,String}("isotopic_labelling" => "custom_labelling",
+                                              "solvent" => "custom_solvent")
 
 function _sample_traverse(current, keys::Union{String,Symbol}...)
     isempty(keys) && return current
