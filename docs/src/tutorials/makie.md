@@ -42,6 +42,18 @@ save("makie-1Db.svg", fig); nothing # hide
 
 ![](makie-1Db.svg)
 
+1D spectra can be stacked by passing the argument `vstack=true`, or `vstack=X` where `X` controls the spacing:
+
+```@example 1
+fig = Figure()
+nmrplot(fig[1,1], exampledata("1D_19F_titration"), xlims=(-121.8,-125.2), vstack=true, title="vstack=true")
+nmrplot(fig[1,2], exampledata("1D_19F_titration"), xlims=(-121.8,-125.2), vstack=2, title="vstack=2")
+nmrplot(fig[1,3], exampledata("1D_19F_titration"), xlims=(-121.8,-125.2), vstack=10, title="vstack=10")
+save("makie-1D-vstack.svg", fig); nothing # hide
+```
+
+![](makie-1D-vstack.svg)
+
 ## 2D spectra
 
 ```@example 1
@@ -153,11 +165,19 @@ save("makie-pseudo2D-waterfall.svg", fig); nothing # hide
 
 ## Saving figures
 
+Makie figures can be saved using GLMakie or CairoMakie as png files:
+
 ```julia
-save("spectrum.svg", fig)          # vector graphics (recommended)
-save("spectrum.pdf", fig)
-save("spectrum.png", fig)          # raster
+save("spectrum.png", fig)
 save("spectrum.png", fig; px_per_unit=2)  # 2× resolution
+```
+
+To save figures as vector graphics (pdf or svg), switch to CairoMakie:
+
+```julia
+using CairoMakie
+save("spectrum.svg", fig)          # vector graphics
+save("spectrum.pdf", fig)
 ```
 
 ## Layout and composition
