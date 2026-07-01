@@ -25,7 +25,9 @@ struct FQList{T} <: AbstractVector{T}
     sfo::Union{Float64,Nothing}
 end
 
-FQList(values, unit::Symbol, relative::Bool) = FQList(values, unit, relative, nothing, nothing)
+function FQList(values, unit::Symbol, relative::Bool)
+    return FQList(values, unit, relative, nothing, nothing)
+end
 
 data(f::FQList) = f.values
 Base.size(f::FQList) = size(f.values)
@@ -37,12 +39,13 @@ Base.setindex!(f::FQList, v, i::Int) = (f.values[i] = v)
     withreference(f::FQList, channel) -> FQList
 
 Return a copy of frequency list `f` with its reference base and carrier frequencies
-(`:bf`, `:sfo`) populated from a channel dictionary (see [`channel`](@ref NMRTools.NMRBase.channel)). This
+(`:bf`, `:sfo`) populated from a channel dictionary (see [`channels`](@ref NMRTools.NMRBase.channels)). This
 makes the list self-describing, so it can be converted to ppm or Hz without a
 detected frequency axis.
 """
 function withreference(f::FQList, ch::AbstractDict)
-    return FQList(f.values, f.unit, f.relative, get(ch, :bf, nothing), get(ch, :sfo, nothing))
+    return FQList(f.values, f.unit, f.relative, get(ch, :bf, nothing),
+                  get(ch, :sfo, nothing))
 end
 
 """
