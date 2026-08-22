@@ -6,7 +6,8 @@ DocMeta.setdocmeta!(NMRTools, :DocTestSetup, :(using NMRTools); recursive=true)
 
 makedocs(;
          modules=[NMRTools],
-         format=Documenter.HTML(; prettyurls=(get(ENV, "CI", nothing) == "true")),
+         format=Documenter.HTML(; prettyurls=(get(ENV, "CI", nothing) == "true"),
+                                canonical="https://waudbylab.org/NMRTools.jl/stable/"),
          pages=["Home" => "index.md",
                 "Getting started" => "quickstart.md",
                 "Tutorials" => ["Working with NMR data" => "tutorials/data.md",
